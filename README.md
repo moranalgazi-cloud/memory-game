@@ -1,0 +1,87 @@
+# Memory games
+
+A Vite-powered web app with several memory-style games, optional cloud sync and admin features via [Supabase](https://supabase.com), and Vitest unit tests.
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) **18** or newer (LTS recommended)
+- [npm](https://docs.npmjs.com/cli/v10/commands/npm) (comes with Node)
+
+## Install
+
+```bash
+git clone https://github.com/moranalgazi-cloud/memory-game.git
+cd memory-game
+npm install
+```
+
+If you cloned from a different path or folder name, `cd` into that directory instead of `memory-game`.
+
+## Configuration (optional)
+
+1. Copy the example env file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   On Windows PowerShell:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+2. **Local-only:** leave `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` empty in `.env`.
+
+3. **With Supabase:** create a project at [supabase.com](https://supabase.com), then in the Supabase SQL editor run the scripts in `supabase/` (start with `memory_players.sql`; use `memory_players_delete_policy.sql` if your workflow needs that policy). Fill in the URL and anon (or publishable) key from **Project Settings → API** — never put the **service_role** secret in the frontend. Details are in `.env.example`.
+
+## Run (development)
+
+```bash
+npm run dev
+```
+
+Vite prints a local URL (often `http://localhost:5173/`). Open it in your browser.
+
+## Build (production bundle)
+
+```bash
+npm run build
+```
+
+Output is written to `dist/`. Preview that build locally:
+
+```bash
+npm run preview
+```
+
+## Test
+
+Watch mode (re-runs on file changes):
+
+```bash
+npm test
+```
+
+Single run (e.g. for CI or a quick check):
+
+```bash
+npm run test:run
+```
+
+## Other scripts
+
+| Script            | Purpose                                      |
+| ----------------- | -------------------------------------------- |
+| `npm run build:lexicon` | Regenerates English lexicon data (see `scripts/`) |
+| `npm run fix:utf8`      | Normalizes text file encodings (also runs around install/dev/build) |
+
+## Project layout (short)
+
+- `src/` — application code, styles, and tests next to modules (`*.test.js`)
+- `supabase/` — SQL you can run in the Supabase dashboard
+- `scripts/` — Node helpers used by npm scripts
+
+## Learning checklist
+
+See `LEARNING-TODO.md` for a broader roadmap (Git habits, CI, Supabase depth, app quality). Feature ideas live in `FUNCTIONALITY-TODO.md`.
