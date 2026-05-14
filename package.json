@@ -1,0 +1,26 @@
+{
+  "name": "test-project",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node scripts/ensure-utf8.mjs",
+    "prebuild": "node scripts/ensure-utf8.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "build:lexicon": "node scripts/build-english-lexicon.mjs",
+    "fix:utf8": "node scripts/ensure-utf8.mjs",
+    "postinstall": "node scripts/ensure-utf8.mjs",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0",
+    "vitest": "^3.2.0"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0",
+    "@supabase/supabase-js": "^2.105.4"
+  }
+}

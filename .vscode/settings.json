@@ -1,0 +1,33 @@
+{
+  // Text in this repo must stay UTF-8 (not UTF-16). OneDrive or other tools can
+  // resave as UTF-16 and break Vite/HTML/JS parsing.
+  //
+  // If Vite won't start at all (even "Invalid token" in vite.config.js): from the
+  // project folder run:  npm run fix:utf8   (or: node scripts/ensure-utf8.mjs)
+  //
+  // If the status bar shows "UTF-16 LE": click encoding → "Save with Encoding" → UTF-8.
+  //
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  "files.eol": "\n",
+  "[javascript]": {
+    "files.encoding": "utf8"
+  },
+  "[json]": {
+    "files.encoding": "utf8"
+  },
+  "[jsonc]": {
+    "files.encoding": "utf8"
+  },
+  "[html]": {
+    "files.encoding": "utf8"
+  },
+  "[css]": {
+    "files.encoding": "utf8"
+  },
+  // Cursor/VS Code terminal sometimes starts without Node on PATH → "npm is not recognized".
+  // Prepend the default Windows Node install. If Node is elsewhere, fix your system PATH or edit this line.
+  "terminal.integrated.env.windows": {
+    "Path": "C:\\Program Files\\nodejs;${env:Path}"
+  }
+}

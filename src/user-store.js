@@ -1,0 +1,235 @@
+import { ADMIN_USERNAMES } from "./user-config.js";
+import { isCloudSyncEnabled, syncAllLocalUsersToCloud } from "./cloud-sync.js";
+
+let warnedCloudSyncDisabled = false;
+
+/** Push all local players to Supabase after the user list changes (eager — no dynamic import delay for mobile). */
+function scheduleSyncAllUsersToCloudIfEnabled() {
+  if (isCloudSyncEnabled()) {
+    void syncAllLocalUsersToCloud()
+      .then((r) => {
+        if (!r.ok) console.warn("[cloud-sync] syncAllLocalUsersToCloud:", r.failures.join(" | "));
+      })
+      .catch((e) => {
+        console.warn("[cloud-sync] syncAllLocalUsersToCloud:", e);
+      });
+    return;
+  }
+  if (!warnedCloudSyncDisabled) {
+    warnedCloudSyncDisabled = true;
+    console.warn(
+      "[cloud-sync] Sync is off. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env next to package.json, then stop and run `npm run dev` again.",
+    );
+  }
+}
+
+const USERS_KEY = "memory-app-users-v1";
+const CURRENT_SLUG_KEY = "memory-app-current-slug-v1";
+export const USER_STATS_PREFIX = "memory-game-stats-user-";
+const LEGACY_STATS_V2 = "memory-game-stats-v2";
+const LEGACY_STATS_V1 = "memory-game-stats-v1";
+
+/** `memory_players.id` is Postgres uuid — must be RFC 4122 (not ad‑hoc strings). */
+/** @param {unknown} s */
+function isValidRemoteUuid(s) {
+  if (typeof s !== "string") return false;
+  const t = s.trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(t);
+}
+
+/** @returns {string} */
+function allocateRemoteId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  const bytes = new Uint8Array(16);
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    crypto.getRandomValues(bytes);
+  } else {
+    for (let i = 0; i < 16; i++) bytes[i] = (Math.random() * 256) | 0;
+  }
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const h = (n) => n.toString(16).padStart(2, "0");
+  let s = "";
+  for (let i = 0; i < 16; i++) s += h(bytes[i]);
+  return `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20)}`;
+}
+
+/**
+ * @typedef {{ slug: string; name: string; createdAt: number; lastPlayedAt?: number; remoteId?: string }} AppUser
+ */
+
+/** @returns {AppUser[]} */
+function readUsers() {
+  try {
+    const raw = localStorage.getItem(USERS_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter((u) => u && typeof u.slug === "string" && typeof u.name === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+/** @param {AppUser[]} users */
+function writeUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+
+function migrateLegacyStatsIfNeeded() {
+  if (readUsers().length > 0) return;
+  const legacy = localStorage.getItem(LEGACY_STATS_V2) ?? localStorage.getItem(LEGACY_STATS_V1);
+  if (!legacy) return;
+  const slug = "player";
+  const name = "Player";
+  const remoteId = allocateRemoteId();
+  const users = [{ slug, name, createdAt: Date.now(), remoteId }];
+  writeUsers(users);
+  localStorage.setItem(USER_STATS_PREFIX + slug, legacy);
+  localStorage.setItem(CURRENT_SLUG_KEY, slug);
+  scheduleSyncAllUsersToCloudIfEnabled();
+}
+
+/**
+ * @param {string} displayName
+ * @returns {string}
+ */
+export function slugify(displayName) {
+  let s = displayName.trim().replace(/\s+/g, "-");
+  s = s.replace(/[^a-zA-Z0-9\u0590-\u05FF\-]/g, "");
+  if (!s) s = "u" + Math.random().toString(36).slice(2, 10);
+  return s.slice(0, 48);
+}
+
+/** @param {string} base */
+function uniqueSlug(base) {
+  const users = readUsers();
+  let slug = base;
+  let n = 0;
+  while (users.some((u) => u.slug === slug)) {
+    n += 1;
+    slug = `${base}-${n}`;
+  }
+  return slug;
+}
+
+migrateLegacyStatsIfNeeded();
+
+export function listUsers() {
+  return readUsers().slice().sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+}
+
+/** @param {string} name */
+export function userNameTaken(name) {
+  const n = name.trim().toLowerCase();
+  if (n.length < 2) return false;
+  return readUsers().some((u) => u.name.trim().toLowerCase() === n);
+}
+
+/** Ensures every stored user has a stable `remoteId` for cloud sync. */
+export function ensureUserRemoteIds() {
+  const users = readUsers();
+  let changed = false;
+  for (const u of users) {
+    if (!u.remoteId || typeof u.remoteId !== "string" || !isValidRemoteUuid(u.remoteId)) {
+      u.remoteId = allocateRemoteId();
+      changed = true;
+    }
+  }
+  if (changed) {
+    writeUsers(users);
+    scheduleSyncAllUsersToCloudIfEnabled();
+  }
+}
+
+/**
+ * @param {string} displayName
+ * @returns {{ ok: true, user: AppUser } | { ok: false, reason: "length" | "duplicate" }}
+ */
+export function addUser(displayName) {
+  const name = displayName.trim();
+  if (name.length < 2 || name.length > 32) return { ok: false, reason: "length" };
+  if (readUsers().some((u) => u.name.trim().toLowerCase() === name.toLowerCase())) {
+    return { ok: false, reason: "duplicate" };
+  }
+  const base = slugify(name);
+  const slug = uniqueSlug(base);
+  const user = {
+    slug,
+    name,
+    createdAt: Date.now(),
+    remoteId: allocateRemoteId(),
+  };
+  const users = readUsers();
+  users.push(user);
+  writeUsers(users);
+  return { ok: true, user };
+}
+
+/**
+ * @param {string} slug
+ * @returns {{ ok: false, reason: "last" | "missing" } | { ok: true, slug: string, removed: AppUser }}
+ */
+export function removeUser(slug) {
+  ensureUserRemoteIds();
+  const users = readUsers();
+  if (users.length <= 1) return { ok: false, reason: "last" };
+  const idx = users.findIndex((u) => u.slug === slug);
+  if (idx === -1) return { ok: false, reason: "missing" };
+  const removed = users[idx];
+  const wasCurrent = getCurrentUserSlug() === slug;
+  users.splice(idx, 1);
+  writeUsers(users);
+  try {
+    localStorage.removeItem(USER_STATS_PREFIX + slug);
+  } catch {
+    /* ignore */
+  }
+  if (wasCurrent) {
+    const sorted = users.slice().sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    const next = sorted[0];
+    if (next) localStorage.setItem(CURRENT_SLUG_KEY, next.slug);
+    else localStorage.removeItem(CURRENT_SLUG_KEY);
+  }
+  return { ok: true, slug, removed };
+}
+
+/** @param {string} slug */
+export function setCurrentUserSlug(slug) {
+  const users = readUsers();
+  if (!users.some((u) => u.slug === slug)) return false;
+  localStorage.setItem(CURRENT_SLUG_KEY, slug);
+  return true;
+}
+
+/** @returns {string | null} */
+export function getCurrentUserSlug() {
+  return localStorage.getItem(CURRENT_SLUG_KEY);
+}
+
+/** @returns {AppUser | null} */
+export function getCurrentUser() {
+  const slug = getCurrentUserSlug();
+  if (!slug) return null;
+  return readUsers().find((u) => u.slug === slug) ?? null;
+}
+
+/** @param {AppUser | null} user */
+export function isAdminUser(user) {
+  if (!user?.name) return false;
+  const n = user.name.trim().toLowerCase();
+  for (const a of ADMIN_USERNAMES) {
+    if (String(a).trim().toLowerCase() === n) return true;
+  }
+  return false;
+}
+
+/** @param {string} slug */
+export function touchUserPlayed(slug) {
+  const users = readUsers();
+  const u = users.find((x) => x.slug === slug);
+  if (!u) return;
+  u.lastPlayedAt = Date.now();
+  writeUsers(users);
+}

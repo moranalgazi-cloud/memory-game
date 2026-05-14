@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Memory games</title>
+  </head>
+  <body>
+    <div id="appRoot" class="app">
+      <header class="header">
+        <div class="header__top">
+          <div class="header__brand">
+            <h1 id="gameTitle">Memory games</h1>
+            <p id="gameTagline" class="tagline"></p>
+          </div>
+          <div class="settings-dropdown">
+            <button
+              type="button"
+              id="settingsMenuBtn"
+              class="btn btn--ghost btn--icon-menu"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-controls="settingsMenu"
+            >
+              <span class="icon-menu" aria-hidden="true">
+                <span class="icon-menu__line"></span>
+                <span class="icon-menu__line"></span>
+                <span class="icon-menu__line"></span>
+              </span>
+            </button>
+            <div id="settingsMenu" class="settings-menu" hidden>
+              <button type="button" id="openUserMenu" class="btn btn--ghost settings-menu__btn">
+                Player
+              </button>
+              <label class="field settings-menu__field">
+                <span id="labelLanguage" class="field__label">Language</span>
+                <select id="locale" aria-label="Language">
+                  <option value="en">English</option>
+                  <option value="he">עברית</option>
+                </select>
+              </label>
+              <button type="button" id="openRecords" class="btn btn--ghost settings-menu__btn">
+                Records
+              </button>
+              <button type="button" id="openAdmin" class="btn btn--ghost settings-menu__btn is-hidden">
+                Admin
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="toolbar toolbar--game">
+          <label class="field">
+            <span id="labelGameMode" class="field__label">Game</span>
+            <select id="gameMode" aria-label="Game type">
+              <option value="math">Multiplication</option>
+              <option value="english">English</option>
+              <option value="fractions">Fractions</option>
+            </select>
+          </label>
+          <label id="pairsField" class="field">
+            <span id="labelPairs" class="field__label">Pairs</span>
+            <select id="pairCount" aria-label="Number of pairs">
+              <option value="4">4</option>
+              <option value="6" selected>6</option>
+              <option value="8">8</option>
+            </select>
+          </label>
+          <label id="englishLevelField" class="field is-hidden">
+            <span id="labelEnglishLevel" class="field__label">Level</span>
+            <select id="englishLevel" aria-label="English level">
+              <option value="easy" selected>Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label id="tablesField" class="field">
+            <span id="labelTables" class="field__label">Tables</span>
+            <select id="tableMax" aria-label="Highest times table">
+              <option value="5">1–5</option>
+              <option value="9" selected>1–9</option>
+              <option value="12">1–12</option>
+            </select>
+          </label>
+          <button type="button" id="newGame" class="btn btn--primary">New game</button>
+        </div>
+        <dl class="stats">
+          <div>
+            <dt id="labelMoves">Moves</dt>
+            <dd id="moves">0</dd>
+          </div>
+          <div>
+            <dt id="labelMatches">Matches</dt>
+            <dd id="matches">0 / 0</dd>
+          </div>
+          <div>
+            <dt id="labelTime">Time</dt>
+            <dd id="elapsed">0:00</dd>
+          </div>
+        </dl>
+      </header>
+      <main>
+        <div id="board" class="board" role="grid" aria-label="Memory cards"></div>
+        <p id="winMessage" class="win-message" hidden></p>
+      </main>
+    </div>
+
+    <dialog id="recordsDialog" class="records-dialog">
+      <div class="records-dialog__inner">
+        <h2 id="recordsTitle" class="records-dialog__title">Your records</h2>
+        <div class="records-grid">
+          <div class="records-col">
+            <h3 id="recordsHeadingMath">Multiplication</h3>
+            <dl class="records-list">
+              <dt id="recMathBestLabel">Best time</dt>
+              <dd id="recMathBest">—</dd>
+              <dt id="recMathWonLabel">Games won</dt>
+              <dd id="recMathWon">0</dd>
+              <dt id="recMathPlayedLabel">Games played</dt>
+              <dd id="recMathPlayed">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h3 id="recordsHeadingEnglish">English</h3>
+            <dl class="records-list">
+              <dt id="recEngBestLabel">Best time</dt>
+              <dd id="recEngBest">—</dd>
+              <dt id="recEngWonLabel">Games won</dt>
+              <dd id="recEngWon">0</dd>
+              <dt id="recEngPlayedLabel">Games played</dt>
+              <dd id="recEngPlayed">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h3 id="recordsHeadingFractions">Fractions</h3>
+            <dl class="records-list">
+              <dt id="recFracBestLabel">Best time</dt>
+              <dd id="recFracBest">—</dd>
+              <dt id="recFracWonLabel">Games won</dt>
+              <dd id="recFracWon">0</dd>
+              <dt id="recFracPlayedLabel">Games played</dt>
+              <dd id="recFracPlayed">0</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="records-dialog__actions">
+          <button type="button" id="emailRecords" class="btn btn--ghost records-dialog__action">
+            Show off
+          </button>
+          <button type="button" id="closeRecords" class="btn btn--primary records-dialog__action">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="userDialog" class="user-dialog">
+      <div class="user-dialog__inner">
+        <h2 id="userDialogTitle" class="user-dialog__title">Who is playing?</h2>
+        <p id="userDialogLead" class="user-dialog__lead"></p>
+
+        <div class="user-dialog__section user-dialog__section--locale">
+          <label class="field user-dialog__locale-field">
+            <span id="labelUserDialogLanguage" class="field__label">Language</span>
+            <select id="userDialogLocale" aria-label="Language">
+              <option value="en">English</option>
+              <option value="he">עברית</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="user-dialog__section">
+          <h3 id="userStepPickTitle" class="user-dialog__step-title">1. Pick a player</h3>
+          <p id="userStepPickHint" class="user-dialog__step-hint"></p>
+          <div id="userListMount" class="user-list-mount" role="list"></div>
+        </div>
+
+        <div class="user-dialog__section">
+          <h3 id="userStepAddTitle" class="user-dialog__step-title">2. Or add someone new</h3>
+          <p id="userStepAddHint" class="user-dialog__step-hint"></p>
+          <label class="field user-dialog__new">
+            <span id="labelNewUser" class="field__label">New player name</span>
+            <input id="newUserName" type="text" maxlength="32" autocomplete="nickname" />
+          </label>
+          <p id="userAddError" class="user-add-error is-hidden" role="alert"></p>
+          <div class="user-dialog__actions">
+            <button type="button" id="addUserBtn" class="btn btn--ghost">Add player</button>
+            <button type="button" id="userDialogContinue" class="btn btn--primary" disabled>Continue</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="adminUnlockDialog" class="user-dialog">
+      <form id="adminUnlockForm" class="user-dialog__inner">
+        <h2 id="adminUnlockTitle" class="user-dialog__title">Admin password</h2>
+        <p id="adminUnlockHint" class="user-dialog__hint"></p>
+        <label class="field user-dialog__new">
+          <span id="labelAdminPassword" class="field__label">Password</span>
+          <input
+            id="adminPasswordInput"
+            type="password"
+            maxlength="64"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="go"
+          />
+        </label>
+        <p id="adminUnlockError" class="admin-unlock-error is-hidden" role="alert"></p>
+        <div class="user-dialog__actions">
+          <button type="button" id="adminUnlockCancel" class="btn btn--ghost">Cancel</button>
+          <button type="submit" id="adminUnlockSubmit" class="btn btn--primary">Unlock</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="adminDialog" class="admin-dialog">
+      <div class="admin-dialog__inner">
+        <h2 id="adminDialogTitle" class="admin-dialog__title">Admin overview</h2>
+        <p id="adminDialogHint" class="admin-dialog__hint"></p>
+        <div class="admin-table-wrap">
+          <table class="admin-table" id="adminTable" aria-describedby="adminDialogHint">
+            <thead id="adminTableHead"></thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+        <button type="button" id="closeAdmin" class="btn btn--primary admin-dialog__close">Close</button>
+      </div>
+    </dialog>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
