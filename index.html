@@ -52,8 +52,9 @@
           <label class="field">
             <span id="labelGameMode" class="field__label">Game</span>
             <select id="gameMode" aria-label="Game type">
+              <option value="english" selected>English</option>
+              <option value="sums">Plus &amp; minus</option>
               <option value="math">Multiplication</option>
-              <option value="english">English</option>
               <option value="fractions">Fractions</option>
             </select>
           </label>
@@ -68,6 +69,30 @@
           <label id="englishLevelField" class="field is-hidden">
             <span id="labelEnglishLevel" class="field__label">Level</span>
             <select id="englishLevel" aria-label="English level">
+              <option value="easy" selected>Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label id="sumsLevelField" class="field is-hidden">
+            <span id="labelSumsLevel" class="field__label">Level</span>
+            <select id="sumsLevel" aria-label="Plus and minus level">
+              <option value="easy" selected>Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label id="mathLevelField" class="field is-hidden">
+            <span id="labelMathLevel" class="field__label">Level</span>
+            <select id="mathLevel" aria-label="Multiplication level">
+              <option value="easy" selected>Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label id="fractionLevelField" class="field is-hidden">
+            <span id="labelFractionLevel" class="field__label">Level</span>
+            <select id="fractionLevel" aria-label="Fractions level">
               <option value="easy" selected>Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
@@ -117,6 +142,17 @@
               <dd id="recMathWon">0</dd>
               <dt id="recMathPlayedLabel">Games played</dt>
               <dd id="recMathPlayed">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h3 id="recordsHeadingSums">Plus &amp; minus</h3>
+            <dl class="records-list">
+              <dt id="recSumsBestLabel">Best time</dt>
+              <dd id="recSumsBest">—</dd>
+              <dt id="recSumsWonLabel">Games won</dt>
+              <dd id="recSumsWon">0</dd>
+              <dt id="recSumsPlayedLabel">Games played</dt>
+              <dd id="recSumsPlayed">0</dd>
             </dl>
           </div>
           <div class="records-col">

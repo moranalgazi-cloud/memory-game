@@ -17,6 +17,7 @@ import {
   buildFractionDeck,
   createPieSvg,
 } from "./fraction-game.js";
+import { buildSumPool, pickSumEntries, buildSumDeck } from "./sums-game.js";
 import { initLocale, setLocale, getLocale, t, setPageTitleForMode } from "./i18n.js";
 import {
   loadRecords,
@@ -56,8 +57,17 @@ const winMessage = document.querySelector("#winMessage");
 const gameModeSelect = document.querySelector("#gameMode");
 const pairCountSelect = document.querySelector("#pairCount");
 const englishLevelSelect = document.querySelector("#englishLevel");
+const sumsLevelSelect = document.querySelector("#sumsLevel");
+const mathLevelSelect = document.querySelector("#mathLevel");
+const fractionLevelSelect = document.querySelector("#fractionLevel");
 const pairsField = document.querySelector("#pairsField");
 const englishLevelField = document.querySelector("#englishLevelField");
+const sumsLevelField = document.querySelector("#sumsLevelField");
+const mathLevelField = document.querySelector("#mathLevelField");
+const fractionLevelField = document.querySelector("#fractionLevelField");
+const labelSumsLevel = document.querySelector("#labelSumsLevel");
+const labelMathLevel = document.querySelector("#labelMathLevel");
+const labelFractionLevel = document.querySelector("#labelFractionLevel");
 const tableMaxSelect = document.querySelector("#tableMax");
 const tablesField = document.querySelector("#tablesField");
 const localeSelect = document.querySelector("#locale");
@@ -100,19 +110,32 @@ const closeAdminBtn = document.querySelector("#closeAdmin");
 const settingsMenuBtn = document.querySelector("#settingsMenuBtn");
 const settingsMenu = document.querySelector("#settingsMenu");
 
-/** @typedef {"math" | "english" | "fractions"} GameMode */
+/** @typedef {"math" | "sums" | "english" | "fractions"} GameMode */
 /** @typedef {"easy" | "medium" | "hard"} EnglishLevel */
+/** @typedef {"easy" | "medium" | "hard"} SumsLevel */
+/** @typedef {"easy" | "medium" | "hard"} MathLevel */
+/** @typedef {"easy" | "medium" | "hard"} FractionLevel */
 
-/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none" } | null} */
+/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none" } | null} */
 let state = null;
 
 /** @type {string | null} */
 let pendingUserSlug = null;
 
 /** @type {Record<GameMode, string | null>} */
-const lastSignature = { math: null, english: null, fractions: null };
+const lastSignature = { math: null, sums: null, english: null, fractions: null };
 
 let booted = false;
+
+/** @type {ReturnType<typeof setTimeout> | null} */
+let winAutoRestartTimer = null;
+
+function clearWinAutoRestart() {
+  if (winAutoRestartTimer != null) {
+    window.clearTimeout(winAutoRestartTimer);
+    winAutoRestartTimer = null;
+  }
+}
 
 function isSettingsMenuOpen() {
   return Boolean(settingsMenu && !settingsMenu.hidden);
@@ -131,7 +154,10 @@ function closeSettingsMenu() {
 /** Pause before matched cards are finalized (ms). */
 const MATCH_PAUSE_MS = 400;
 /** Pause before a non-matching pair flips back — longer so players can compare. */
-const MISMATCH_PAUSE_MS = 1250;
+const MISMATCH_PAUSE_MS = 1000;
+
+/** Hues (0–360) cycled per matched pair so each pair has a distinct highlight. */
+const MATCH_PAIR_HUES = [150, 205, 35, 285, 20, 220, 48, 325, 175, 265, 95, 310];
 
 /**
  * After `renderBoard()` replaces the grid, the focused card is removed and the
@@ -161,7 +187,25 @@ function getMode() {
   const v = gameModeSelect?.value;
   if (v === "english") return "english";
   if (v === "fractions") return "fractions";
+  if (v === "sums") return "sums";
   return "math";
+}
+
+/** @returns {SumsLevel} */
+function getSumsLevel() {
+  const v = sumsLevelSelect?.value;
+  if (v === "medium" || v === "hard") return v;
+  return "easy";
+}
+
+/**
+ * @param {SumsLevel} level
+ * @returns {{ pairCount: number; maxNumber: number }}
+ */
+function getSumsLevelSettings(level) {
+  if (level === "hard") return { pairCount: 9, maxNumber: 100 };
+  if (level === "medium") return { pairCount: 6, maxNumber: 50 };
+  return { pairCount: 6, maxNumber: 10 };
 }
 
 /** @returns {EnglishLevel} */
@@ -181,17 +225,53 @@ function getEnglishLevelSettings(level) {
   return { pairCount: 6, englishSpeech: "both" };
 }
 
+/** @returns {MathLevel} */
+function getMathLevel() {
+  const v = mathLevelSelect?.value;
+  if (v === "medium" || v === "hard") return v;
+  return "easy";
+}
+
+/**
+ * @param {MathLevel} level
+ * @returns {{ pairCount: number; tableMax: number }}
+ */
+function getMathLevelSettings(level) {
+  if (level === "hard") return { pairCount: 9, tableMax: 10 };
+  if (level === "medium") return { pairCount: 6, tableMax: 10 };
+  return { pairCount: 4, tableMax: 5 };
+}
+
+/** @returns {FractionLevel} */
+function getFractionLevel() {
+  const v = fractionLevelSelect?.value;
+  if (v === "medium" || v === "hard") return v;
+  return "easy";
+}
+
+/**
+ * @param {FractionLevel} level
+ * @returns {{ pairCount: number; tableMax: number }}
+ */
+function getFractionLevelSettings(level) {
+  if (level === "hard") return { pairCount: 8, tableMax: 12 };
+  if (level === "medium") return { pairCount: 6, tableMax: 9 };
+  return { pairCount: 4, tableMax: 5 };
+}
+
 function refreshChrome() {
   const mode = getMode();
   setPageTitleForMode(mode);
   if (gameTitle) {
     if (mode === "english") gameTitle.textContent = t("titleEnglish");
     else if (mode === "fractions") gameTitle.textContent = t("titleFractions");
+    else if (mode === "sums") gameTitle.textContent = t("titleSums");
     else gameTitle.textContent = t("titleMath");
   }
   if (gameTagline) {
     if (mode === "english") gameTagline.textContent = t("taglineEnglish");
     else if (mode === "fractions") gameTagline.textContent = t("taglineFractions");
+    else if (mode === "sums") gameTagline.textContent = t("taglineSums");
     else gameTagline.textContent = t("taglineMath");
   }
   if (labelGameMode) labelGameMode.textContent = t("gameType");
@@ -256,9 +336,10 @@ function refreshChrome() {
   if (gameModeSelect) {
     gameModeSelect.setAttribute("aria-label", t("ariaGameMode"));
     const opts = gameModeSelect.querySelectorAll("option");
-    if (opts[0]) opts[0].textContent = t("modeMath");
-    if (opts[1]) opts[1].textContent = t("modeEnglish");
-    if (opts[2]) opts[2].textContent = t("modeFractions");
+    if (opts[0]) opts[0].textContent = t("modeEnglish");
+    if (opts[1]) opts[1].textContent = t("modeSums");
+    if (opts[2]) opts[2].textContent = t("modeMath");
+    if (opts[3]) opts[3].textContent = t("modeFractions");
   }
 
   if (pairCountSelect) pairCountSelect.setAttribute("aria-label", t("ariaPairs"));
@@ -269,9 +350,41 @@ function refreshChrome() {
     if (elo[1]) elo[1].textContent = t("englishLevelMedium");
     if (elo[2]) elo[2].textContent = t("englishLevelHard");
   }
+  if (sumsLevelSelect) {
+    sumsLevelSelect.setAttribute("aria-label", t("ariaSumsLevel"));
+    const slo = sumsLevelSelect.querySelectorAll("option");
+    if (slo[0]) slo[0].textContent = t("sumsLevelEasy");
+    if (slo[1]) slo[1].textContent = t("sumsLevelMedium");
+    if (slo[2]) slo[2].textContent = t("sumsLevelHard");
+  }
+  if (mathLevelSelect) {
+    mathLevelSelect.setAttribute("aria-label", t("ariaMathLevel"));
+    const mlo = mathLevelSelect.querySelectorAll("option");
+    if (mlo[0]) mlo[0].textContent = t("mathLevelEasy");
+    if (mlo[1]) mlo[1].textContent = t("mathLevelMedium");
+    if (mlo[2]) mlo[2].textContent = t("mathLevelHard");
+  }
+  if (fractionLevelSelect) {
+    fractionLevelSelect.setAttribute("aria-label", t("ariaFractionLevel"));
+    const flo = fractionLevelSelect.querySelectorAll("option");
+    if (flo[0]) flo[0].textContent = t("fractionLevelEasy");
+    if (flo[1]) flo[1].textContent = t("fractionLevelMedium");
+    if (flo[2]) flo[2].textContent = t("fractionLevelHard");
+  }
   if (labelEnglishLevel) labelEnglishLevel.textContent = t("englishLevel");
-  if (pairsField) pairsField.classList.toggle("is-hidden", mode === "english");
+  if (labelSumsLevel) labelSumsLevel.textContent = t("sumsLevel");
+  if (labelMathLevel) labelMathLevel.textContent = t("mathLevel");
+  if (labelFractionLevel) labelFractionLevel.textContent = t("fractionLevel");
+  if (pairsField) {
+    pairsField.classList.toggle(
+      "is-hidden",
+      mode === "english" || mode === "sums" || mode === "math" || mode === "fractions",
+    );
+  }
   if (englishLevelField) englishLevelField.classList.toggle("is-hidden", mode !== "english");
+  if (sumsLevelField) sumsLevelField.classList.toggle("is-hidden", mode !== "sums");
+  if (mathLevelField) mathLevelField.classList.toggle("is-hidden", mode !== "math");
+  if (fractionLevelField) fractionLevelField.classList.toggle("is-hidden", mode !== "fractions");
 
   if (tableMaxSelect) {
     tableMaxSelect.setAttribute(
@@ -297,7 +410,10 @@ function refreshChrome() {
   if (board) board.setAttribute("aria-label", t("ariaBoard"));
 
   if (tablesField) {
-    tablesField.classList.toggle("is-hidden", mode === "english");
+    tablesField.classList.toggle(
+      "is-hidden",
+      mode === "english" || mode === "sums" || mode === "math" || mode === "fractions",
+    );
   }
 
   refreshRecordsLabels();
@@ -306,11 +422,13 @@ function refreshChrome() {
 function refreshRecordsLabels() {
   const title = document.querySelector("#recordsTitle");
   const hMath = document.querySelector("#recordsHeadingMath");
+  const hSums = document.querySelector("#recordsHeadingSums");
   const hEng = document.querySelector("#recordsHeadingEnglish");
   const hFrac = document.querySelector("#recordsHeadingFractions");
   const close = document.querySelector("#closeRecords");
   if (title) title.textContent = t("recordsTitle");
   if (hMath) hMath.textContent = t("recordsMath");
+  if (hSums) hSums.textContent = t("recordsSums");
   if (hEng) hEng.textContent = t("recordsEnglish");
   if (hFrac) hFrac.textContent = t("recordsFractions");
   if (close) close.textContent = t("recordsClose");
@@ -318,6 +436,9 @@ function refreshRecordsLabels() {
     ["#recMathBestLabel", "recordsBestTime"],
     ["#recMathWonLabel", "recordsWon"],
     ["#recMathPlayedLabel", "recordsPlayed"],
+    ["#recSumsBestLabel", "recordsBestTime"],
+    ["#recSumsWonLabel", "recordsWon"],
+    ["#recSumsPlayedLabel", "recordsPlayed"],
     ["#recEngBestLabel", "recordsBestTime"],
     ["#recEngWonLabel", "recordsWon"],
     ["#recEngPlayedLabel", "recordsPlayed"],
@@ -339,6 +460,9 @@ function fillRecordsDialog() {
   const mMath = document.querySelector("#recMathBest");
   const mWon = document.querySelector("#recMathWon");
   const mPlayed = document.querySelector("#recMathPlayed");
+  const sBest = document.querySelector("#recSumsBest");
+  const sWon = document.querySelector("#recSumsWon");
+  const sPlayed = document.querySelector("#recSumsPlayed");
   const eBest = document.querySelector("#recEngBest");
   const eWon = document.querySelector("#recEngWon");
   const ePlayed = document.querySelector("#recEngPlayed");
@@ -348,6 +472,9 @@ function fillRecordsDialog() {
   if (mMath) mMath.textContent = formatDuration(data.math.bestTimeMs);
   if (mWon) mWon.textContent = String(data.math.gamesWon);
   if (mPlayed) mPlayed.textContent = String(data.math.gamesPlayed);
+  if (sBest) sBest.textContent = formatDuration(data.sums.bestTimeMs);
+  if (sWon) sWon.textContent = String(data.sums.gamesWon);
+  if (sPlayed) sPlayed.textContent = String(data.sums.gamesPlayed);
   if (eBest) eBest.textContent = formatDuration(data.english.bestTimeMs);
   if (eWon) eWon.textContent = String(data.english.gamesWon);
   if (ePlayed) ePlayed.textContent = String(data.english.gamesPlayed);
@@ -372,7 +499,7 @@ function closeRecords() {
  */
 function shareRecordsByEmail() {
   const data = loadRecords();
-  /** @param {"math" | "english" | "fractions"} mode */
+  /** @param {"math" | "sums" | "english" | "fractions"} mode */
   const block = (titleKey, mode) => {
     const m = data[mode];
     return [
@@ -387,6 +514,7 @@ function shareRecordsByEmail() {
     t("emailRecordsIntro", { name: getCurrentUser()?.name || t("userPlayingAs") }),
     "",
     ...block("recordsMath", "math"),
+    ...block("recordsSums", "sums"),
     ...block("recordsEnglish", "english"),
     ...block("recordsFractions", "fractions"),
   ];
@@ -406,8 +534,22 @@ function readOptions() {
     const { pairCount, englishSpeech } = getEnglishLevelSettings(level);
     return { pairCount, tableMax, englishLevel: level, englishSpeech };
   }
-  const pairCount = Math.min(24, Math.max(2, Number(pairCountSelect?.value ?? 6)));
-  return { pairCount, tableMax };
+  if (mode === "sums") {
+    const level = getSumsLevel();
+    const { pairCount, maxNumber } = getSumsLevelSettings(level);
+    return { pairCount, tableMax, sumsLevel: level, maxNumber };
+  }
+  if (mode === "math") {
+    const level = getMathLevel();
+    const { pairCount, tableMax: tm } = getMathLevelSettings(level);
+    return { pairCount, tableMax: tm, mathLevel: level };
+  }
+  if (mode === "fractions") {
+    const level = getFractionLevel();
+    const { pairCount, tableMax: tm } = getFractionLevelSettings(level);
+    return { pairCount, tableMax: tm, fractionLevel: level };
+  }
+  return { pairCount: 6, tableMax };
 }
 
 /**
@@ -415,6 +557,7 @@ function readOptions() {
  */
 function startGame(source) {
   cancelEnglishSpeech();
+  clearWinAutoRestart();
   const prev = state;
   const mode = getMode();
 
@@ -434,13 +577,14 @@ function startGame(source) {
   let englishSpeech;
 
   if (mode === "math") {
-    const { pairCount, tableMax } = readOptions();
+    const { pairCount, tableMax, mathLevel } = readOptions();
     const maxPairs = (tableMax * (tableMax + 1)) / 2;
     const count = Math.min(pairCount, maxPairs);
     const canVary = count < maxPairs;
 
     let facts = pickFacts(tableMax, count, rng);
-    signature = [...facts].map((f) => f.key).sort().join("\0");
+    signature =
+      `${mathLevel}\0` + [...facts].map((f) => f.key).sort().join("\0");
     let tries = 0;
     while (
       canVary &&
@@ -449,11 +593,34 @@ function startGame(source) {
       tries < 64
     ) {
       facts = pickFacts(tableMax, count, rng);
-      signature = [...facts].map((f) => f.key).sort().join("\0");
+      signature =
+        `${mathLevel}\0` + [...facts].map((f) => f.key).sort().join("\0");
       tries += 1;
     }
     lastSignature.math = signature;
     cards = shuffle(buildDeck(facts, rng), rng);
+  } else if (mode === "sums") {
+    const { pairCount, maxNumber, sumsLevel } = readOptions();
+    const pool = buildSumPool(maxNumber);
+    const maxPairs = pool.length;
+    const count = Math.min(pairCount, maxPairs);
+    let entries = pickSumEntries(pool, count, rng);
+    signature =
+      `${sumsLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
+    let tries = 0;
+    while (
+      lastSignature.sums !== null &&
+      signature === lastSignature.sums &&
+      tries < 64 &&
+      count < maxPairs
+    ) {
+      entries = pickSumEntries(pool, count, rng);
+      signature =
+        `${sumsLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
+      tries += 1;
+    }
+    lastSignature.sums = signature;
+    cards = shuffle(buildSumDeck(entries, rng), rng);
   } else if (mode === "english") {
     const { pairCount, englishLevel, englishSpeech: es } = readOptions();
     englishSpeech = es;
@@ -477,12 +644,13 @@ function startGame(source) {
     lastSignature.english = signature;
     cards = shuffle(buildEnglishDeck(entries), rng);
   } else {
-    const { pairCount, tableMax } = readOptions();
+    const { pairCount, tableMax, fractionLevel } = readOptions();
     const pool = buildFractionPool(tableMax);
     const maxPairs = pool.length;
     const count = Math.min(pairCount, maxPairs);
     let entries = pickFractionEntries(pool, count, rng);
-    signature = [...entries].map((e) => e.key).sort().join("\0");
+    signature =
+      `${fractionLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
     let tries = 0;
     while (
       lastSignature.fractions !== null &&
@@ -491,7 +659,8 @@ function startGame(source) {
       count < maxPairs
     ) {
       entries = pickFractionEntries(pool, count, rng);
-      signature = [...entries].map((e) => e.key).sort().join("\0");
+      signature =
+        `${fractionLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
       tries += 1;
     }
     lastSignature.fractions = signature;
@@ -503,6 +672,7 @@ function startGame(source) {
     cards,
     flipped: [],
     matched: new Set(),
+    matchPairByCardId: new Map(),
     moves: 0,
     lock: false,
     clockStart: null,
@@ -513,6 +683,7 @@ function startGame(source) {
   if (winMessage) {
     if (mode === "english") winMessage.textContent = t("winEnglish");
     else if (mode === "fractions") winMessage.textContent = t("winFractions");
+    else if (mode === "sums") winMessage.textContent = t("winSums");
     else winMessage.textContent = t("winMath");
     winMessage.hidden = true;
   }
@@ -555,6 +726,14 @@ function updateStats() {
       if (elapsed !== null && elapsed > 0) {
         recordWin(state.mode, elapsed);
       }
+      clearWinAutoRestart();
+      winAutoRestartTimer = window.setTimeout(() => {
+        winAutoRestartTimer = null;
+        if (!state) return;
+        const tp = state.cards.length / 2;
+        if (state.matched.size / 2 !== tp) return;
+        startGame("restart");
+      }, 1000);
     }
   }
 }
@@ -612,6 +791,13 @@ function renderBoard() {
     if (isUp) btn.classList.add("is-flipped");
     if (state.matched.has(card.id)) {
       btn.classList.add("is-matched");
+      const pairIdx = state.matchPairByCardId.get(card.id);
+      if (typeof pairIdx === "number") {
+        const hue = MATCH_PAIR_HUES[pairIdx % MATCH_PAIR_HUES.length];
+        btn.style.setProperty("--match-hue", String(hue));
+      } else {
+        btn.style.removeProperty("--match-hue");
+      }
       btn.disabled = true;
       const label =
         card.word ?? (card.label && card.label.trim() ? card.label : card.factKey);
@@ -670,8 +856,11 @@ function onCardClick(id) {
     if (!state) return;
     const scrollY = window.scrollY;
     if (match && a && b) {
+      const pairIdx = state.matched.size / 2;
       state.matched.add(a.id);
       state.matched.add(b.id);
+      state.matchPairByCardId.set(a.id, pairIdx);
+      state.matchPairByCardId.set(b.id, pairIdx);
       [a.id, b.id].forEach(syncCardDom);
     }
     state.flipped = [];
@@ -694,6 +883,13 @@ function syncCardDom(id) {
   const card = state.cards.find((c) => c.id === id);
   if (state.matched.has(id)) {
     btn.classList.add("is-matched");
+    const pairIdx = state.matchPairByCardId.get(id);
+    if (typeof pairIdx === "number") {
+      const hue = MATCH_PAIR_HUES[pairIdx % MATCH_PAIR_HUES.length];
+      btn.style.setProperty("--match-hue", String(hue));
+    } else {
+      btn.style.removeProperty("--match-hue");
+    }
     btn.disabled = true;
     const label =
       card?.word ??
@@ -955,13 +1151,17 @@ function renderAdminTableLocal(cur) {
   for (const u of listUsers()) {
     const st = loadRecordsForUser(u.slug);
     const total =
-      st.math.gamesPlayed + st.english.gamesPlayed + st.fractions.gamesPlayed;
+      st.math.gamesPlayed +
+      st.sums.gamesPlayed +
+      st.english.gamesPlayed +
+      st.fractions.gamesPlayed;
     const tr = document.createElement("tr");
     const cells = [
       u.name + (cur?.slug === u.slug ? " *" : ""),
       formatLastPlayed(u.lastPlayedAt ?? null),
       String(total),
       formatDuration(st.math.bestTimeMs),
+      formatDuration(st.sums.bestTimeMs),
       formatDuration(st.english.bestTimeMs),
       formatDuration(st.fractions.bestTimeMs),
     ];
@@ -982,7 +1182,10 @@ function appendCloudPlayerRow(row, cur) {
   if (!adminTableBody) return;
   const st = statsFromCloudRow(row.stats);
   const total =
-    st.math.gamesPlayed + st.english.gamesPlayed + st.fractions.gamesPlayed;
+    st.math.gamesPlayed +
+    st.sums.gamesPlayed +
+    st.english.gamesPlayed +
+    st.fractions.gamesPlayed;
   const rawLast = row.last_played_at;
   const lastNum =
     typeof rawLast === "number"
@@ -999,6 +1202,7 @@ function appendCloudPlayerRow(row, cur) {
     formatLastPlayed(Number.isFinite(lastNum) ? lastNum : null),
     String(total),
     formatDuration(st.math.bestTimeMs),
+    formatDuration(st.sums.bestTimeMs),
     formatDuration(st.english.bestTimeMs),
     formatDuration(st.fractions.bestTimeMs),
   ];
@@ -1024,10 +1228,19 @@ async function openAdminOverview() {
         "adminColLast",
         "adminColGames",
         "adminColMath",
+        "adminColSums",
         "adminColEng",
         "adminColFrac",
       ]
-    : ["adminColUser", "adminColLast", "adminColGames", "adminColMath", "adminColEng", "adminColFrac"];
+    : [
+        "adminColUser",
+        "adminColLast",
+        "adminColGames",
+        "adminColMath",
+        "adminColSums",
+        "adminColEng",
+        "adminColFrac",
+      ];
 
   buildAdminTableHeader(keys);
   adminTableBody.replaceChildren();
@@ -1070,13 +1283,14 @@ async function openAdminOverview() {
         "adminColLast",
         "adminColGames",
         "adminColMath",
+        "adminColSums",
         "adminColEng",
         "adminColFrac",
       ]);
       adminTableBody.replaceChildren();
       const er = document.createElement("tr");
       const ec = document.createElement("td");
-      ec.colSpan = 6;
+      ec.colSpan = 8;
       ec.textContent = t("adminCloudError", { message: msg });
       er.append(ec);
       adminTableBody.append(er);
@@ -1187,6 +1401,9 @@ adminDialog?.addEventListener("click", (e) => {
 newGameBtn?.addEventListener("click", () => startGame("restart"));
 pairCountSelect?.addEventListener("change", () => startGame("options"));
 englishLevelSelect?.addEventListener("change", () => startGame("options"));
+sumsLevelSelect?.addEventListener("change", () => startGame("options"));
+mathLevelSelect?.addEventListener("change", () => startGame("options"));
+fractionLevelSelect?.addEventListener("change", () => startGame("options"));
 tableMaxSelect?.addEventListener("change", () => startGame("options"));
 gameModeSelect?.addEventListener("change", () => startGame("options"));
 

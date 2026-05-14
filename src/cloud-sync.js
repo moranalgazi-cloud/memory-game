@@ -64,6 +64,7 @@ export function statsFromCloudRow(stats) {
   const s = stats && typeof stats === "object" ? stats : {};
   return {
     math: modeFrom(s.math),
+    sums: modeFrom(s.sums),
     english: modeFrom(s.english),
     fractions: modeFrom(s.fractions),
   };

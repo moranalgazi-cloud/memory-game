@@ -1,4 +1,4 @@
-/** @typedef {"math" | "english" | "fractions"} GameMode */
+/** @typedef {"math" | "sums" | "english" | "fractions"} GameMode */
 
 import { getCurrentUserSlug, USER_STATS_PREFIX, touchUserPlayed } from "./user-store.js";
 
@@ -14,7 +14,7 @@ function scheduleCloudSync(slug) {
 
 /**
  * @typedef {{ bestTimeMs: number | null; gamesWon: number; gamesPlayed: number }} ModeStats
- * @typedef {{ math: ModeStats; english: ModeStats; fractions: ModeStats }} AllStats
+ * @typedef {{ math: ModeStats; sums: ModeStats; english: ModeStats; fractions: ModeStats }} AllStats
  */
 
 function defaultMode() {
@@ -25,6 +25,7 @@ function defaultMode() {
 function emptyStats() {
   return {
     math: defaultMode(),
+    sums: defaultMode(),
     english: defaultMode(),
     fractions: defaultMode(),
   };
@@ -51,6 +52,7 @@ export function loadRecordsForUser(slug) {
         ...emptyStats(),
         ...parsed,
         math: { ...defaultMode(), ...parsed.math },
+        sums: { ...defaultMode(), ...parsed.sums },
         english: { ...defaultMode(), ...parsed.english },
         fractions: { ...defaultMode(), ...parsed.fractions },
       };
