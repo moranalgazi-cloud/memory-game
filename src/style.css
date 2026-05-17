@@ -312,6 +312,11 @@ body {
   text-align: start;
 }
 
+.settings-menu__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .settings-menu__field {
   width: 100%;
   align-items: stretch;
@@ -361,6 +366,27 @@ h1 {
 
 .toolbar--game {
   margin-bottom: 1rem;
+}
+
+.toolbar--game.is-locked {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.online-quit {
+  margin: 0 auto 0.75rem;
+  display: block;
+}
+
+.win-actions .online-play-again,
+.win-actions .online-leave-win {
+  margin-top: 0.75rem;
+  width: 100%;
+  max-width: 18rem;
+}
+
+.win-actions__icons.is-hidden {
+  display: none;
 }
 
 .settings-menu .field {
@@ -1424,44 +1450,102 @@ select:focus-visible {
   font-weight: 600;
 }
 
-.online-lobby {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
+.online-mode-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
 }
 
-.online-lobby__btn {
-  width: 100%;
-}
-
-.online-join {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.online-join__input {
-  font-family: ui-monospace, monospace;
+.online-mode-btn {
+  min-height: 3rem;
   font-size: 1.1rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 800;
 }
 
-.online-invite__row {
+.online-mode-btn.is-active {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.online-area {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-bottom: 0.5rem;
 }
 
-.online-invite__input {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.82rem;
+.online-area__hint {
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
-.online-invite__code {
+.online-area__or {
   margin: 0;
+  text-align: center;
   font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.online-action-btn {
+  width: 100%;
+  min-height: 3rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.online-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.online-host-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.online-host-setup__field {
+  margin: 0;
+}
+
+.online-code-display {
+  margin: 0;
+  text-align: center;
+  font-family: ui-monospace, "Rubik", monospace;
+  font-size: clamp(2.25rem, 10vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  line-height: 1.2;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 3px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.online-code-input {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: ui-monospace, "Rubik", monospace;
+  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.65rem 0.5rem;
+  border-radius: var(--radius-md);
+  border: 3px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.online-code-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .online-dialog__actions {

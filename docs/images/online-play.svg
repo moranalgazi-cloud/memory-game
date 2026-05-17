@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" role="img" aria-label="Online two-player flow illustration">
+  <rect width="480" height="200" rx="16" fill="#1a2744"/>
+  <text x="240" y="28" text-anchor="middle" fill="#f0c96a" font-family="Nunito, sans-serif" font-size="18" font-weight="700">Play with a friend</text>
+  <rect x="30" y="55" width="120" height="100" rx="12" fill="#2d3f66" stroke="#4ecdc4" stroke-width="2"/>
+  <text x="90" y="88" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Host</text>
+  <text x="90" y="108" text-anchor="middle" fill="#a8b8d0" font-size="11">Creates room</text>
+  <text x="90" y="132" text-anchor="middle" fill="#f0c96a" font-size="16" font-weight="700">AB12CD</text>
+  <path d="M165 105 H215" stroke="#4ecdc4" stroke-width="2" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#4ecdc4"/>
+    </marker>
+  </defs>
+  <text x="190" y="95" text-anchor="middle" fill="#a8b8d0" font-size="10">code / link</text>
+  <rect x="230" y="55" width="120" height="100" rx="12" fill="#2d3f66" stroke="#ffb347" stroke-width="2"/>
+  <text x="290" y="88" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Guest</text>
+  <text x="290" y="108" text-anchor="middle" fill="#a8b8d0" font-size="11">Joins game</text>
+  <text x="290" y="132" text-anchor="middle" fill="#fff" font-size="12">Same board</text>
+  <rect x="370" y="70" width="90" height="70" rx="10" fill="#3d2a66" stroke="#9b8cff" stroke-width="2"/>
+  <text x="415" y="100" text-anchor="middle" fill="#fff" font-size="11">WebRTC</text>
+  <text x="415" y="118" text-anchor="middle" fill="#a8b8d0" font-size="10">P2P play</text>
+  <path d="M150 105 Q 240 40 340 105" fill="none" stroke="#9b8cff" stroke-width="1.5" stroke-dasharray="4 3"/>
+</svg>

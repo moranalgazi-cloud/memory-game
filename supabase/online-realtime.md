@@ -13,7 +13,7 @@ Peer-to-peer play uses **Supabase Realtime broadcast** only for WebRTC signaling
 1. Open the deployed site in two browsers (or normal + incognito).
 2. Both players need cloud sync configured (same Supabase project).
 3. **Settings → Play online** → host creates a game; guest joins with link or code.
-4. v1 supports **multiplication** mode only; same deck is seeded on the host.
+4. Host picks any supported mode (English 1/2, sums, math, fractions) and level; the same seeded deck is sent to the guest.
 
 ## Later
 

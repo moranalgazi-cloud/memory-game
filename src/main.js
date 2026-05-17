@@ -61,12 +61,20 @@ import {
 } from "./cloud-sync.js";
 import { armCelebrationAudio, celebrateWin } from "./celebrate.js";
 import { applySnapshotToState } from "./multiplayer/protocol.js";
-import { leaveOnlineSession, getActiveOnlineSession } from "./multiplayer/online-session.js";
+import { buildOnlineHostConfig } from "./multiplayer/online-deck.js";
+import {
+  leaveOnlineSession,
+  getActiveOnlineSession,
+  getOnlineGameConfig,
+  adminFinishOnlineGame,
+} from "./multiplayer/online-session.js";
 import {
   initOnlinePlay,
   onlineLocalFlip,
   isOnlineGameActive,
   refreshOnlineLabels,
+  quitOnlineGame,
+  playOnlineAgain,
 } from "./online-ui.js";
 
 const board = document.querySelector("#board");
@@ -109,6 +117,9 @@ const newGameBtn = document.querySelector("#newGame");
 const restartDeckBtn = document.querySelector("#restartDeck");
 const winNewGameBtn = document.querySelector("#winNewGame");
 const winRestartDeckBtn = document.querySelector("#winRestartDeck");
+const onlineQuitBtn = document.querySelector("#onlineQuit");
+const onlinePlayAgainBtn = document.querySelector("#onlinePlayAgain");
+const onlineLeaveAfterWinBtn = document.querySelector("#onlineLeaveAfterWin");
 const gameActionsEl = document.querySelector("#gameActions");
 const winGameActionsEl = document.querySelector("#winGameActions");
 const openRecordsBtn = document.querySelector("#openRecords");
@@ -181,6 +192,9 @@ function isEnglishMode(mode) {
 
 let booted = false;
 
+/** @type {string[]} */
+let lastOnlineFlippedIds = [];
+
 /** @type {{ mode: GameMode; cards: unknown[] } | null} */
 let lastWinForQuiz = null;
 
@@ -208,14 +222,77 @@ function clearQuizAdvance() {
   }
 }
 
+/** @param {HTMLSelectElement | null} select */
+function applyGameModeOptionLabels(select) {
+  if (!select) return;
+  for (const opt of select.options) {
+    switch (opt.value) {
+      case "english1":
+        opt.textContent = t("modeEnglish1");
+        break;
+      case "english2":
+        opt.textContent = t("modeEnglish2");
+        break;
+      case "sums":
+        opt.textContent = t("modeSums");
+        break;
+      case "math":
+        opt.textContent = t("modeMath");
+        break;
+      case "fractions":
+        opt.textContent = t("modeFractions");
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+function isOnlineBoardActive() {
+  return Boolean(state?.online);
+}
+
+function refreshOnlineChrome() {
+  const playing = Boolean(state?.online && isOnlineGameActive());
+  const ended = Boolean(state?.online && state.winHandled);
+  const lockUserSwitch = isOnlineBoardActive();
+  if (openUserMenuBtn instanceof HTMLButtonElement) {
+    openUserMenuBtn.disabled = lockUserSwitch;
+    openUserMenuBtn.setAttribute(
+      "aria-label",
+      lockUserSwitch ? t("ariaUserMenuDisabledOnline") : t("ariaUserMenu"),
+    );
+  }
+  if (onlineQuitBtn) {
+    onlineQuitBtn.classList.toggle("is-hidden", !playing);
+  }
+  if (onlinePlayAgainBtn) {
+    onlinePlayAgainBtn.classList.toggle("is-hidden", !ended);
+  }
+  if (onlineLeaveAfterWinBtn) {
+    onlineLeaveAfterWinBtn.classList.toggle("is-hidden", !ended);
+  }
+  if (winGameActionsEl) {
+    winGameActionsEl.classList.toggle("is-hidden", ended && Boolean(state?.online));
+  }
+  if (winRestartDeckBtn) {
+    winRestartDeckBtn.classList.toggle(
+      "is-hidden",
+      Boolean(state?.online && (playing || ended)),
+    );
+  }
+}
+
 function hideWinActions() {
   if (winActions) winActions.hidden = true;
   if (testMeBtn) testMeBtn.hidden = true;
+  refreshOnlineChrome();
 }
 
 function showWinActions() {
   if (winActions) winActions.hidden = false;
   if (testMeBtn) testMeBtn.hidden = false;
+  refreshOnlineChrome();
 }
 
 function clearWinAutoRestart() {
@@ -453,13 +530,14 @@ function refreshChrome() {
 
   if (gameModeSelect) {
     gameModeSelect.setAttribute("aria-label", t("ariaGameMode"));
-    const opts = gameModeSelect.querySelectorAll("option");
-    if (opts[0]) opts[0].textContent = t("modeEnglish1");
-    if (opts[1]) opts[1].textContent = t("modeEnglish2");
-    if (opts[2]) opts[2].textContent = t("modeSums");
-    if (opts[3]) opts[3].textContent = t("modeMath");
-    if (opts[4]) opts[4].textContent = t("modeFractions");
+    applyGameModeOptionLabels(gameModeSelect);
   }
+  if (onlineQuitBtn) {
+    onlineQuitBtn.textContent = t("onlineQuit");
+    onlineQuitBtn.setAttribute("aria-label", t("ariaOnlineQuit"));
+  }
+  if (onlinePlayAgainBtn) onlinePlayAgainBtn.textContent = t("onlinePlayAgain");
+  if (onlineLeaveAfterWinBtn) onlineLeaveAfterWinBtn.textContent = t("onlineLeave");
 
   if (pairCountSelect) pairCountSelect.setAttribute("aria-label", t("ariaPairs"));
   if (englishLevelSelect) {
@@ -537,6 +615,7 @@ function refreshChrome() {
 
   refreshRecordsLabels();
   refreshOnlineLabels();
+  refreshOnlineChrome();
 }
 
 /**
@@ -573,17 +652,62 @@ function refreshOnlineBoardInPlace() {
 function applyOnlineSnapshot(snap, cards) {
   const scrollY = window.scrollY;
   const inPlace = boardMatchesCards(cards);
-  state = applySnapshotToState(snap, /** @type {any[]} */ (cards));
+  if (!inPlace) lastOnlineFlippedIds = [];
+  state = applySnapshotToState(snap, /** @type {any[]} */ (cards), getOnlineGameConfig());
   cancelEnglishSpeech();
   hideWinActions();
   if (winMessage) winMessage.textContent = "";
+  if (state && gameTagline) {
+    setPageTitleForMode(state.mode);
+    if (isEnglishMode(state.mode) && state.englishTopicId) {
+      const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
+      gameTagline.textContent = t(tagKey, {
+        topic: t(englishTopicMessageKey(state.englishTopicId)),
+      });
+    } else if (state.mode === "fractions") {
+      gameTagline.textContent = t("taglineFractions");
+    } else if (state.mode === "sums") {
+      gameTagline.textContent = t("taglineSums");
+    } else {
+      gameTagline.textContent = t("taglineMath");
+    }
+  }
+  syncOnlineEnglishSpeechFromFlipped();
   if (inPlace) {
     refreshOnlineBoardInPlace();
   } else {
     renderBoard();
   }
   updateStats();
+  refreshOnlineChrome();
   restoreViewportScrollAfterBoardRefresh(scrollY);
+}
+
+/**
+ * @param {string} cardId
+ */
+function speakEnglishCardIfNeeded(cardId) {
+  if (!state || !isEnglishMode(state.mode)) return;
+  const c = state.cards.find((x) => x.id === cardId);
+  const sp = state.englishSpeech;
+  if (!c?.word?.trim()) return;
+  if (state.mode === "english1") {
+    if (sp === "both") speakMemoryWord(c.word, "en");
+    else if (sp === "text" && c.side === "word") speakMemoryWord(c.word, "en");
+  } else if (state.mode === "english2") {
+    const lang = c.side === "he" ? "he" : "en";
+    if (sp === "both") speakMemoryWord(c.word, lang);
+    else if (sp === "text" && c.side === "en") speakMemoryWord(c.word, "en");
+  }
+}
+
+function syncOnlineEnglishSpeechFromFlipped() {
+  if (!state?.online || !isEnglishMode(state.mode)) return;
+  const prev = new Set(lastOnlineFlippedIds);
+  for (const id of state.flipped) {
+    if (!prev.has(id)) speakEnglishCardIfNeeded(id);
+  }
+  lastOnlineFlippedIds = [...state.flipped];
 }
 
 function refreshOnlineTagline() {
@@ -591,8 +715,15 @@ function refreshOnlineTagline() {
   const session = getActiveOnlineSession();
   const role = session?.role;
   if (!role) return;
-  gameTagline.textContent =
+  const turnText =
     state.turn === role ? t("onlineYourTurn") : t("onlineOpponentTurn");
+  if (isEnglishMode(state.mode) && state.englishTopicId) {
+    const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
+    const topic = t(englishTopicMessageKey(state.englishTopicId));
+    gameTagline.textContent = `${t(tagKey, { topic })}\n${turnText}`;
+  } else {
+    gameTagline.textContent = turnText;
+  }
 }
 
 /**
@@ -604,9 +735,10 @@ function showOnlineWin(message, hostScore, guestScore) {
   if (winMessage) {
     winMessage.textContent = `${message} (${hostScore}–${guestScore})`;
   }
-  if (testMeBtn) testMeBtn.hidden = true;
   showWinActions();
+  if (testMeBtn) testMeBtn.hidden = true;
   refreshAdminSpeedFinish();
+  refreshOnlineChrome();
 }
 
 function renderQuizPrompt(q) {
@@ -1306,13 +1438,16 @@ function formatElapsed(ms) {
 function refreshAdminSpeedFinish() {
   if (!adminSpeedFinishBtn) return;
   const cur = getCurrentUser();
+  const session = getActiveOnlineSession();
+  const onlineHost =
+    Boolean(state?.online && session?.role === "host" && session.phase === "playing");
   const show = Boolean(
     cur &&
       isAdminUser(cur) &&
       state &&
       !state.winHandled &&
-      !state.online &&
-      state.cards.length > 0,
+      state.cards.length > 0 &&
+      (!state.online || onlineHost),
   );
   adminSpeedFinishBtn.classList.toggle("is-hidden", !show);
 }
@@ -1367,6 +1502,14 @@ function speedFinishGame() {
   if (state.clockStart === null) {
     state.clockStart = Date.now() - 2000;
   }
+
+  if (state.online) {
+    const session = getActiveOnlineSession();
+    if (!session || session.role !== "host") return;
+    adminFinishOnlineGame(session.role);
+    return;
+  }
+
   markAllCardsMatched();
   renderBoard();
   updateStats();
@@ -1542,6 +1685,7 @@ function onCardClick(id) {
     if (!session || session.role !== state.turn) return;
     armCelebrationAudio();
     onlineLocalFlip(id);
+    speakEnglishCardIfNeeded(id);
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
@@ -1783,6 +1927,7 @@ async function removeUserFromPicker(slug) {
 }
 
 function openUserPickerDialog() {
+  if (isOnlineBoardActive()) return;
   closeSettingsMenu();
   refreshChrome();
   const users = listUsers();
@@ -2100,10 +2245,23 @@ initOnlinePlay({
   renderBoard,
   updateStats,
   getMode,
-  readMathOptions: () => getMathLevelSettings(getMathLevel()),
+  readOnlineHostConfig: () => {
+    const modeEl = document.querySelector("#onlineGameMode");
+    const levelEl = document.querySelector("#onlineLevel");
+    const mode = modeEl?.value ?? "math";
+    const level = levelEl?.value ?? "easy";
+    return buildOnlineHostConfig(
+      /** @type {import('./multiplayer/online-deck.js').OnlineGameMode} */ (mode),
+      /** @type {import('./multiplayer/online-deck.js').OnlineLevel} */ (level),
+    );
+  },
   t,
   hideWinActions,
   showOnlineWin,
+  onExitOnline: () => {
+    lastOnlineFlippedIds = [];
+    startGame("restart");
+  },
 });
 ensureUserRemoteIds();
 
@@ -2128,12 +2286,19 @@ userDialog?.addEventListener("cancel", (e) => {
 });
 
 openUserMenuBtn?.addEventListener("click", () => {
+  if (openUserMenuBtn instanceof HTMLButtonElement && openUserMenuBtn.disabled) return;
   openUserPickerDialog();
 });
 
 settingsMenuBtn?.addEventListener("click", (e) => {
   e.stopPropagation();
   setSettingsMenuOpen(!isSettingsMenuOpen());
+});
+
+settingsMenu?.addEventListener("click", (e) => {
+  const el = e.target;
+  if (!(el instanceof Element)) return;
+  if (el.closest("button")) closeSettingsMenu();
 });
 
 document.addEventListener("click", (e) => {
@@ -2203,7 +2368,10 @@ adminDialog?.addEventListener("click", (e) => {
 
 newGameBtn?.addEventListener("click", () => startGame("restart"));
 restartDeckBtn?.addEventListener("click", () => restartSameDeck());
-winNewGameBtn?.addEventListener("click", () => startGame("restart"));
+winNewGameBtn?.addEventListener("click", () => {
+  if (state?.online && state.winHandled) void playOnlineAgain();
+  else startGame("restart");
+});
 winRestartDeckBtn?.addEventListener("click", () => restartSameDeck());
 pairCountSelect?.addEventListener("change", () => startGame("options"));
 englishLevelSelect?.addEventListener("change", () => startGame("options"));
@@ -2211,6 +2379,9 @@ testMeBtn?.addEventListener("click", () => openQuiz());
 closeQuizBtn?.addEventListener("click", () => closeQuiz());
 dismissQuizBtn?.addEventListener("click", () => closeQuiz());
 adminSpeedFinishBtn?.addEventListener("click", () => speedFinishGame());
+onlineQuitBtn?.addEventListener("click", () => void quitOnlineGame());
+onlinePlayAgainBtn?.addEventListener("click", () => void playOnlineAgain());
+onlineLeaveAfterWinBtn?.addEventListener("click", () => void quitOnlineGame());
 quizDialog?.addEventListener("close", () => {
   clearQuizAdvance();
   quizSession = null;
@@ -2231,7 +2402,10 @@ function applyGameLocaleFromSelect(source) {
   }
 }
 
-localeSelect?.addEventListener("change", () => applyGameLocaleFromSelect(localeSelect));
+localeSelect?.addEventListener("change", () => {
+  applyGameLocaleFromSelect(localeSelect);
+  closeSettingsMenu();
+});
 userDialogLocale?.addEventListener("change", () => applyGameLocaleFromSelect(userDialogLocale));
 
 openRecordsBtn?.addEventListener("click", openRecords);

@@ -1,11 +1,11 @@
 /** @typedef {'host' | 'guest'} OnlinePlayerRole */
 
+/** @typedef {import('./online-deck.js').OnlineGameMode} OnlineGameMode */
+
+import { inferOnlineModeFromCards } from "./online-deck.js";
+
 /**
- * @typedef {Object} OnlineGameConfig
- * @property {'math'} mode
- * @property {number} tableMax
- * @property {number} pairCount
- * @property {number} seed
+ * @typedef {import('./online-deck.js').OnlineHostConfig} OnlineHostConfig
  */
 
 /**
@@ -42,11 +42,23 @@ export function snapshotFromGameState(state) {
 
 /**
  * @param {OnlineStateSnapshot} snap
- * @param {import('./math-online.js').MathOnlineCard[]} cards
+ * @param {unknown[]} cards
+ * @param {OnlineHostConfig | null} config
  */
-export function applySnapshotToState(snap, cards) {
+export function applySnapshotToState(snap, cards, config) {
+  const inferred = inferOnlineModeFromCards(cards);
+  const configMode = config?.mode;
+  const mode =
+    configMode === "english1" ||
+    configMode === "english2" ||
+    configMode === "sums" ||
+    configMode === "fractions" ||
+    configMode === "math"
+      ? configMode
+      : inferred;
+  const resolvedMode = mode === inferred ? mode : inferred;
   return {
-    mode: "math",
+    mode: resolvedMode,
     cards,
     flipped: [...snap.flipped],
     matched: new Set(snap.matched),
@@ -59,6 +71,8 @@ export function applySnapshotToState(snap, cards) {
     hostScore: snap.hostScore,
     guestScore: snap.guestScore,
     winner: snap.winner,
+    englishSpeech: config?.englishSpeech,
+    englishTopicId: config?.englishTopicId,
     online: true,
   };
 }

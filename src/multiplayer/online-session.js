@@ -1,13 +1,17 @@
 import { createSignalingChannel } from "./signaling.js";
 import { createGameConnection } from "./connection.js";
 import { generateRoomCode } from "./room-code.js";
-import { buildMathDeckFromSeed } from "./math-online.js";
+import { buildOnlineDeckFromSeed, inferOnlineModeFromCards } from "./online-deck.js";
 import {
   createInitialPlayState,
   tryFlipCard,
   resolveFlippedPair,
   exportSnapshot,
+  adminForceWin,
+  applyForfeit,
 } from "./host-game.js";
+import { buildOnlineHostConfig } from "./online-deck.js";
+import { isPairMatch } from "../game.js";
 import { isCloudSyncEnabled } from "../cloud-sync.js";
 
 const MATCH_PAUSE_MS = 400;
@@ -18,7 +22,7 @@ const MISMATCH_PAUSE_MS = 1000;
 /**
  * @typedef {Object} OnlineSessionCallbacks
  * @property {(status: string) => void} onStatus
- * @property {(snap: ReturnType<exportSnapshot>, cards: import('./math-online.js').MathOnlineCard[]) => void} onSync
+ * @property {(snap: ReturnType<exportSnapshot>, cards: unknown[]) => void} onSync
  * @property {(info: { winner: 'host' | 'guest' | null; hostScore: number; guestScore: number }) => void} onGameEnd
  * @property {(message: string) => void} onError
  */
@@ -26,18 +30,21 @@ const MISMATCH_PAUSE_MS = 1000;
 /** @type {OnlineSession | null} */
 let activeSession = null;
 
+/** @type {import('./online-deck.js').OnlineHostConfig | null} */
+let activeGameConfig = null;
+
 export class OnlineSession {
   /**
    * @param {'host' | 'guest'} role
    * @param {string} roomId
    * @param {OnlineSessionCallbacks} callbacks
-   * @param {{ tableMax: number; pairCount: number }} [hostOptions]
+   * @param {import('./online-deck.js').OnlineHostConfig} [hostOptions]
    */
   constructor(role, roomId, callbacks, hostOptions) {
     this.role = role;
     this.roomId = roomId;
     this.callbacks = callbacks;
-    this.hostOptions = hostOptions ?? { tableMax: 9, pairCount: 6 };
+    this.hostOptions = hostOptions ?? { mode: "math", level: "easy", pairCount: 4, tableMax: 5 };
     this.playerId =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
@@ -136,14 +143,15 @@ export class OnlineSession {
 
   startHostGame() {
     const seed = Math.floor(Math.random() * 1_000_000_000);
-    const { tableMax, pairCount } = this.hostOptions;
-    const cards = buildMathDeckFromSeed(tableMax, pairCount, seed);
+    const hostConfig = buildOnlineHostConfig(this.hostOptions.mode, this.hostOptions.level);
+    const { cards, config } = buildOnlineDeckFromSeed(hostConfig, seed);
+    activeGameConfig = { ...config, mode: inferOnlineModeFromCards(cards) };
     this.playState = createInitialPlayState(cards);
     this.phase = "playing";
     this.setStatus("online-status-playing");
     this.sendData({
       type: "game-start",
-      config: { mode: "math", tableMax, pairCount, seed },
+      config: activeGameConfig,
       cards,
     });
     this.broadcastSync();
@@ -163,6 +171,14 @@ export class OnlineSession {
 
     if (msg.type === "game-start" && this.role === "guest") {
       const cards = msg.cards;
+      const config = msg.config;
+      if (config && typeof config === "object") {
+        const inferred = inferOnlineModeFromCards(cards);
+        activeGameConfig = {
+          .../** @type {import('./online-deck.js').OnlineHostConfig} */ (config),
+          mode: inferred,
+        };
+      }
       this.playState = createInitialPlayState(cards);
       this.phase = "playing";
       this.setStatus("online-status-playing");
@@ -179,6 +195,12 @@ export class OnlineSession {
 
     if (msg.type === "flip-request" && this.role === "host" && this.playState) {
       this.hostFlip(/** @type {string} */ (msg.cardId), "guest");
+    }
+
+    if (msg.type === "forfeit" && this.role === "host" && this.playState) {
+      const player = msg.player === "guest" ? "guest" : "host";
+      applyForfeit(this.playState, player);
+      this.broadcastSync();
     }
   }
 
@@ -259,7 +281,7 @@ export class OnlineSession {
 
     if (st.flipped.length === 2 && beforeLen < 2) {
       const [a, b] = st.flipped.map((id) => st.cards.find((c) => c.id === id));
-      const match = a && b && a.factKey === b.factKey && a.side !== b.side;
+      const match = isPairMatch(a ?? null, b ?? null);
       const delay = match ? MATCH_PAUSE_MS : MISMATCH_PAUSE_MS;
       if (this.resolveTimer) clearTimeout(this.resolveTimer);
       this.resolveTimer = setTimeout(() => {
@@ -280,6 +302,36 @@ export class OnlineSession {
     }
   }
 
+  /**
+   * Host-only: instantly finish the online game (admin testing).
+   * @param {'host' | 'guest'} winnerRole
+   */
+  adminSpeedFinish(winnerRole) {
+    if (this.role !== "host" || !this.playState || this.phase !== "playing") return;
+    adminForceWin(this.playState, winnerRole);
+    this.broadcastSync();
+  }
+
+  forfeit() {
+    if (this.phase !== "playing" || !this.playState) return;
+    if (this.role === "host") {
+      applyForfeit(this.playState, "host");
+      this.broadcastSync();
+    } else {
+      this.sendData({ type: "forfeit", player: "guest" });
+    }
+  }
+
+  rematch() {
+    if (this.role !== "host" || !this.guestJoined || this.phase === "idle") return false;
+    if (this.resolveTimer) {
+      clearTimeout(this.resolveTimer);
+      this.resolveTimer = null;
+    }
+    this.startHostGame();
+    return true;
+  }
+
   onDisconnected() {
     if (this.phase === "ended") return;
     this.callbacks.onError("online-error-disconnected");
@@ -294,13 +346,16 @@ export class OnlineSession {
     this.conn?.close();
     await this.signaling?.close();
     this.phase = "ended";
-    if (activeSession === this) activeSession = null;
+    if (activeSession === this) {
+      activeSession = null;
+      activeGameConfig = null;
+    }
   }
 }
 
 /**
  * @param {OnlineSessionCallbacks} callbacks
- * @param {{ tableMax: number; pairCount: number }} options
+ * @param {import('./online-deck.js').OnlineHostConfig} options
  */
 export async function startOnlineHost(callbacks, options) {
   await leaveOnlineSession();
@@ -327,6 +382,7 @@ export async function leaveOnlineSession() {
   if (activeSession) {
     await activeSession.leave();
     activeSession = null;
+    activeGameConfig = null;
   }
 }
 
@@ -335,6 +391,26 @@ export function getActiveOnlineSession() {
   return activeSession;
 }
 
+/** @returns {import('./online-deck.js').OnlineHostConfig | null} */
+export function getOnlineGameConfig() {
+  return activeGameConfig;
+}
+
 export function isOnlinePlaying() {
   return activeSession?.phase === "playing";
+}
+
+/**
+ * @param {'host' | 'guest'} winnerRole
+ */
+export function adminFinishOnlineGame(winnerRole) {
+  activeSession?.adminSpeedFinish(winnerRole);
+}
+
+export function forfeitOnlineGame() {
+  activeSession?.forfeit();
+}
+
+export function rematchOnlineGame() {
+  return activeSession?.rematch() ?? false;
 }

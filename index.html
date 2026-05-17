@@ -139,6 +139,9 @@
             Finish
           </button>
         </div>
+        <button type="button" id="onlineQuit" class="btn btn--ghost online-quit is-hidden">
+          Quit game
+        </button>
         <dl class="stats">
           <div>
             <dt id="labelMoves">Moves</dt>
@@ -173,6 +176,12 @@
               </span>
             </button>
           </div>
+          <button type="button" id="onlinePlayAgain" class="btn btn--primary online-play-again is-hidden">
+            Play again with friend
+          </button>
+          <button type="button" id="onlineLeaveAfterWin" class="btn btn--ghost online-leave-win is-hidden">
+            Leave game
+          </button>
           <button type="button" id="testMeBtn" class="btn btn--primary win-actions__btn">Test me</button>
         </div>
       </main>
@@ -344,41 +353,78 @@
           </button>
         </div>
         <p id="onlineDialogLead" class="online-dialog__lead"></p>
-        <p id="onlineStatus" class="online-status" role="status"></p>
-        <div id="onlineLobby" class="online-lobby">
-          <button type="button" id="onlineHostBtn" class="btn btn--primary online-lobby__btn">
-            Create game
+        <div class="online-mode-row" role="group" aria-labelledby="onlineDialogTitle">
+          <button
+            type="button"
+            id="onlineModeStart"
+            class="btn btn--ghost online-mode-btn"
+            aria-pressed="false"
+          >
+            Start
           </button>
-          <div class="online-join">
-            <label class="field online-join__field">
-              <span id="labelOnlineRoom" class="field__label">Room code</span>
-              <input
-                id="onlineRoomInput"
-                class="online-join__input"
-                type="text"
-                maxlength="8"
-                autocomplete="off"
-                spellcheck="false"
-              />
+          <button
+            type="button"
+            id="onlineModeJoin"
+            class="btn btn--ghost online-mode-btn"
+            aria-pressed="false"
+          >
+            Join
+          </button>
+        </div>
+        <p id="onlineStatus" class="online-status" role="status"></p>
+        <div id="onlineHostArea" class="online-area" hidden>
+          <div id="onlineHostSetup" class="online-host-setup">
+            <label class="field online-host-setup__field">
+              <span id="labelOnlineGameMode" class="field__label">Game</span>
+              <select id="onlineGameMode" aria-labelledby="labelOnlineGameMode">
+                <option value="english1">English 1</option>
+                <option value="english2">English 2</option>
+                <option value="sums">Plus &amp; minus</option>
+                <option value="math" selected>Multiplication</option>
+                <option value="fractions">Fractions</option>
+              </select>
             </label>
-            <button type="button" id="onlineJoinBtn" class="btn btn--ghost online-lobby__btn">
-              Join game
+            <label class="field online-host-setup__field">
+              <span id="labelOnlineLevel" class="field__label">Level</span>
+              <select id="onlineLevel" aria-labelledby="labelOnlineLevel">
+                <option value="easy" selected>Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+            <button type="button" id="onlineCreateRoom" class="btn btn--primary online-action-btn">
+              Create room
+            </button>
+          </div>
+          <div id="onlineHostReady" class="online-host-ready" hidden>
+            <p id="onlineTellFriend" class="online-area__hint"></p>
+            <p id="onlineRoomCode" class="online-code-display" aria-live="polite"></p>
+            <p id="onlineTellFriendOr" class="online-area__or"></p>
+            <button type="button" id="onlineShareCode" class="btn btn--primary online-action-btn" disabled>
+              Send code to friend
+            </button>
+            <button type="button" id="onlineChangeGame" class="btn btn--ghost online-back-btn">
+              Change game
             </button>
           </div>
         </div>
-        <div id="onlineInvite" class="online-invite" hidden>
-          <p id="labelOnlineInvite" class="field__label">Invite link</p>
-          <div class="online-invite__row">
-            <input id="onlineInviteUrl" class="online-invite__input" type="text" readonly />
-            <button type="button" id="onlineCopyLink" class="btn btn--ghost">Copy</button>
-          </div>
-          <p class="online-invite__code">
-            <span id="labelOnlineCode">Code:</span>
-            <strong id="onlineRoomCode"></strong>
-          </p>
-        </div>
-        <div class="online-dialog__actions">
-          <button type="button" id="onlineLeaveBtn" class="btn btn--ghost" hidden>Leave game</button>
+        <div id="onlineJoinArea" class="online-area online-area--join" hidden>
+          <p id="onlineJoinHint" class="online-area__hint"></p>
+          <input
+            id="onlineRoomInput"
+            class="online-code-input"
+            type="text"
+            maxlength="6"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            disabled
+            aria-labelledby="onlineJoinHint"
+          />
+          <button type="button" id="onlineJoinBtn" class="btn btn--primary online-action-btn" disabled>
+            Let&apos;s play!
+          </button>
         </div>
       </div>
     </dialog>

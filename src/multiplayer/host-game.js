@@ -4,7 +4,7 @@ import { isPairMatch } from "../game.js";
 
 /**
  * @typedef {Object} OnlinePlayState
- * @property {import('./math-online.js').MathOnlineCard[]} cards
+ * @property {unknown[]} cards
  * @property {string[]} flipped
  * @property {Set<string>} matched
  * @property {Map<string, number>} matchPairByCardId
@@ -131,4 +131,56 @@ export function exportSnapshot(st) {
     winHandled: st.winHandled,
     winner: st.winner,
   };
+}
+
+/**
+ * Admin testing: end the game immediately with the given player as winner.
+ * @param {OnlinePlayState} st
+ * @param {OnlinePlayerRole} winnerRole
+ */
+export function adminForceWin(st, winnerRole) {
+  st.flipped = [];
+  st.lock = false;
+  st.matched.clear();
+  st.matchPairByCardId.clear();
+
+  /** @type {Map<string, string[]>} */
+  const byKey = new Map();
+  for (const card of st.cards) {
+    const c = /** @type {{ id: string; factKey?: string }} */ (card);
+    const key =
+      typeof c.factKey === "string" && c.factKey.length ? c.factKey : c.id;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(c.id);
+  }
+  let pairIdx = 0;
+  for (const ids of byKey.values()) {
+    for (const id of ids) {
+      st.matched.add(id);
+      st.matchPairByCardId.set(id, pairIdx);
+    }
+    pairIdx += 1;
+  }
+
+  const pairs = st.cards.length / 2;
+  if (winnerRole === "host") {
+    st.hostScore = pairs;
+    st.guestScore = 0;
+  } else {
+    st.guestScore = pairs;
+    st.hostScore = 0;
+  }
+  st.winHandled = true;
+  st.winner = winnerRole;
+}
+
+/**
+ * @param {OnlinePlayState} st
+ * @param {OnlinePlayerRole} forfeitingRole
+ */
+export function applyForfeit(st, forfeitingRole) {
+  st.flipped = [];
+  st.lock = false;
+  st.winHandled = true;
+  st.winner = forfeitingRole === "host" ? "guest" : "host";
 }

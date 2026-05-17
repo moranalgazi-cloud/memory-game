@@ -32,3 +32,13 @@ export function buildInviteUrl(roomCode) {
 export function roomCodeFromLocation() {
   return normalizeRoomCode(new URLSearchParams(window.location.search).get("room"));
 }
+
+/** Remove `?room=` from the address bar so refresh does not reopen the join flow. */
+export function clearRoomFromLocation() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has("room")) return;
+  url.searchParams.delete("room");
+  const qs = url.searchParams.toString();
+  const path = url.pathname + (qs ? `?${qs}` : "") + url.hash;
+  history.replaceState(null, "", path);
+}

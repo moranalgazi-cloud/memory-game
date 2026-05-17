@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 280" role="img" aria-label="Memory card grid illustration">
+  <rect width="420" height="280" rx="16" fill="#1a2744"/>
+  <text x="210" y="32" text-anchor="middle" fill="#f0c96a" font-family="Nunito, sans-serif" font-size="18" font-weight="700">Memory board</text>
+  <g transform="translate(40, 50)">
+    <rect width="70" height="90" rx="8" fill="#ffb347" stroke="#e89a2e" stroke-width="2"/>
+    <text x="35" y="52" text-anchor="middle" fill="#fff" font-size="28"></text>
+    <rect x="80" width="70" height="90" rx="8" fill="#4ecdc4" stroke="#3aa89f" stroke-width="2"/>
+    <text x="115" y="58" text-anchor="middle" fill="#1a2744" font-size="22" font-weight="700">7×8</text>
+    <rect x="160" width="70" height="90" rx="8" fill="#ffb347" stroke="#e89a2e" stroke-width="2"/>
+    <text x="195" y="52" text-anchor="middle" fill="#fff" font-size="28"></text>
+    <rect x="240" width="70" height="90" rx="8" fill="#9b8cff" stroke="#7a6de0" stroke-width="2"/>
+    <text x="275" y="58" text-anchor="middle" fill="#fff" font-size="20">Dog</text>
+    <rect y="100" width="70" height="90" rx="8" fill="#4ecdc4" stroke="#3aa89f" stroke-width="2"/>
+    <text x="35" y="158" text-anchor="middle" fill="#1a2744" font-size="22" font-weight="700">56</text>
+    <rect x="80" y="100" width="70" height="90" rx="8" fill="#ffb347" stroke="#e89a2e" stroke-width="2"/>
+    <text x="115" y="152" text-anchor="middle" fill="#fff" font-size="28"></text>
+    <rect x="160" y="100" width="70" height="90" rx="8" fill="#9b8cff" stroke="#7a6de0" stroke-width="2"/>
+    <text x="195" y="158" text-anchor="middle" fill="#fff" font-size="26">=</text>
+    <rect x="240" y="100" width="70" height="90" rx="8" fill="#4ecdc4" stroke="#3aa89f" stroke-width="2"/>
+    <text x="275" y="158" text-anchor="middle" fill="#1a2744" font-size="20">56</text>
+  </g>
+  <text x="210" y="262" text-anchor="middle" fill="#a8b8d0" font-family="Nunito, sans-serif" font-size="12">Flip two cards  find matching pairs</text>
+</svg>

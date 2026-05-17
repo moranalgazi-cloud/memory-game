@@ -5,26 +5,31 @@ import {
   leaveOnlineSession,
   getActiveOnlineSession,
   isOnlinePlaying,
+  forfeitOnlineGame,
+  rematchOnlineGame,
 } from "./multiplayer/online-session.js";
 import {
   buildInviteUrl,
   normalizeRoomCode,
   roomCodeFromLocation,
+  clearRoomFromLocation,
 } from "./multiplayer/room-code.js";
 import { celebrateWin } from "./celebrate.js";
 
 let onlineWinShown = false;
+
+/** @typedef {'start' | 'join' | null} OnlineMode */
 
 /**
  * @typedef {Object} OnlineUiDeps
  * @property {(snap: import('./multiplayer/protocol.js').OnlineStateSnapshot, cards: unknown[]) => void} applyOnlineSnapshot
  * @property {() => void} renderBoard
  * @property {() => void} updateStats
- * @property {() => import('./main.js').GameMode} getMode
- * @property {() => { tableMax: number; pairCount: number }} readMathOptions
+ * @property {() => import('./multiplayer/online-deck.js').OnlineHostConfig} readOnlineHostConfig
  * @property {(key: string, vars?: Record<string, string>) => string} t
  * @property {() => void} hideWinActions
  * @property {(message: string) => void} showOnlineWin
+ * @property {() => void} onExitOnline
  */
 
 /** @type {OnlineUiDeps | null} */
@@ -32,13 +37,32 @@ let deps = null;
 
 const onlineDialog = document.querySelector("#onlineDialog");
 const onlineStatus = document.querySelector("#onlineStatus");
-const onlineLobby = document.querySelector("#onlineLobby");
-const onlineInvite = document.querySelector("#onlineInvite");
-const onlineInviteUrl = document.querySelector("#onlineInviteUrl");
+const onlineModeStart = document.querySelector("#onlineModeStart");
+const onlineModeJoin = document.querySelector("#onlineModeJoin");
+const onlineHostArea = document.querySelector("#onlineHostArea");
+const onlineHostSetup = document.querySelector("#onlineHostSetup");
+const onlineHostReady = document.querySelector("#onlineHostReady");
+const onlineJoinArea = document.querySelector("#onlineJoinArea");
 const onlineRoomCode = document.querySelector("#onlineRoomCode");
 const onlineRoomInput = document.querySelector("#onlineRoomInput");
-const onlineLeaveBtn = document.querySelector("#onlineLeaveBtn");
+const onlineShareCode = document.querySelector("#onlineShareCode");
+const onlineJoinBtn = document.querySelector("#onlineJoinBtn");
+const onlineCreateRoom = document.querySelector("#onlineCreateRoom");
+const onlineChangeGame = document.querySelector("#onlineChangeGame");
+const onlineGameMode = document.querySelector("#onlineGameMode");
+const onlineLevel = document.querySelector("#onlineLevel");
 const openPlayOnlineBtn = document.querySelector("#openPlayOnline");
+const gameToolbar = document.querySelector(".toolbar--game");
+
+/** @type {OnlineMode} */
+let onlineMode = null;
+
+/** @type {string | null} */
+let hostRoomId = null;
+
+let onlineBusy = false;
+
+let exitingOnline = false;
 
 /**
  * @param {OnlineUiDeps} d
@@ -47,25 +71,116 @@ export function initOnlinePlay(d) {
   deps = d;
 
   openPlayOnlineBtn?.addEventListener("click", () => openOnlineDialog());
-  document.querySelector("#onlineHostBtn")?.addEventListener("click", () => void hostOnline());
-  document.querySelector("#onlineJoinBtn")?.addEventListener("click", () => void joinOnline());
-  document.querySelector("#onlineCopyLink")?.addEventListener("click", () => void copyInvite());
+  onlineModeStart?.addEventListener("click", () => void selectStartMode());
+  onlineModeJoin?.addEventListener("click", () => void selectJoinMode());
+  onlineCreateRoom?.addEventListener("click", () => void createHostRoom());
+  onlineChangeGame?.addEventListener("click", () => void resetHostRoom());
+  onlineShareCode?.addEventListener("click", () => void shareRoomCode());
+  onlineJoinBtn?.addEventListener("click", () => void joinOnline());
   document.querySelector("#dismissOnline")?.addEventListener("click", () => void closeOnlineDialog());
-  document.querySelector("#onlineLeaveBtn")?.addEventListener("click", () => void leaveOnline());
-  onlineDialog?.addEventListener("close", () => {
-    if (!isOnlinePlaying()) return;
-  });
 
   onlineRoomInput?.addEventListener("input", () => {
     if (onlineRoomInput instanceof HTMLInputElement) {
       onlineRoomInput.value = onlineRoomInput.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     }
+    syncOnlineControls();
+  });
+
+  onlineRoomInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && onlineJoinBtn && !onlineJoinBtn.disabled) {
+      e.preventDefault();
+      void joinOnline();
+    }
   });
 
   const fromUrl = roomCodeFromLocation();
   if (fromUrl && isCloudSyncEnabled()) {
-    queueMicrotask(() => openOnlineDialog(fromUrl));
+    clearRoomFromLocation();
+    queueMicrotask(() => void autoJoinFromInvite(fromUrl));
   }
+}
+
+function isJoinCodeReady() {
+  const raw = onlineRoomInput instanceof HTMLInputElement ? onlineRoomInput.value : "";
+  const code = normalizeRoomCode(raw);
+  return code != null && code.length >= 4;
+}
+
+function setMainToolbarLocked(locked) {
+  if (gameToolbar instanceof HTMLElement) {
+    gameToolbar.classList.toggle("is-locked", locked);
+    if (locked) gameToolbar.setAttribute("inert", "");
+    else gameToolbar.removeAttribute("inert");
+  }
+}
+
+function syncHostPanels() {
+  const isStart = onlineMode === "start";
+  const hasRoom = Boolean(hostRoomId);
+  if (onlineHostSetup) onlineHostSetup.hidden = !isStart || hasRoom;
+  if (onlineHostReady) onlineHostReady.hidden = !isStart || !hasRoom;
+}
+
+function syncOnlineControls() {
+  const isStart = onlineMode === "start";
+  const isJoin = onlineMode === "join";
+  const busy = onlineBusy;
+
+  if (onlineModeStart instanceof HTMLButtonElement) {
+    onlineModeStart.disabled = busy;
+    onlineModeStart.classList.toggle("btn--primary", isStart);
+    onlineModeStart.classList.toggle("btn--ghost", !isStart);
+    onlineModeStart.classList.toggle("is-active", isStart);
+    onlineModeStart.setAttribute("aria-pressed", String(isStart));
+  }
+
+  if (onlineModeJoin instanceof HTMLButtonElement) {
+    onlineModeJoin.disabled = busy;
+    onlineModeJoin.classList.toggle("btn--primary", isJoin);
+    onlineModeJoin.classList.toggle("btn--ghost", !isJoin);
+    onlineModeJoin.classList.toggle("is-active", isJoin);
+    onlineModeJoin.setAttribute("aria-pressed", String(isJoin));
+  }
+
+  if (onlineHostArea) onlineHostArea.hidden = !isStart;
+  if (onlineJoinArea) onlineJoinArea.hidden = !isJoin;
+
+  syncHostPanels();
+
+  if (onlineGameMode instanceof HTMLSelectElement) {
+    onlineGameMode.disabled = !isStart || busy || Boolean(hostRoomId);
+  }
+  if (onlineLevel instanceof HTMLSelectElement) {
+    onlineLevel.disabled = !isStart || busy || Boolean(hostRoomId);
+  }
+  if (onlineCreateRoom instanceof HTMLButtonElement) {
+    onlineCreateRoom.disabled = !isStart || busy || Boolean(hostRoomId);
+  }
+  if (onlineChangeGame instanceof HTMLButtonElement) {
+    onlineChangeGame.disabled = !isStart || busy || !hostRoomId;
+  }
+
+  if (onlineRoomInput instanceof HTMLInputElement) {
+    onlineRoomInput.disabled = !isJoin || busy;
+  }
+
+  if (onlineJoinBtn instanceof HTMLButtonElement) {
+    onlineJoinBtn.disabled = !isJoin || busy || !isJoinCodeReady();
+  }
+
+  if (onlineShareCode instanceof HTMLButtonElement) {
+    onlineShareCode.disabled = !isStart || busy || !hostRoomId;
+  }
+}
+
+function resetOnlineDialog() {
+  hostRoomId = null;
+  onlineMode = null;
+  onlineBusy = false;
+  if (onlineRoomInput instanceof HTMLInputElement) onlineRoomInput.value = "";
+  if (onlineRoomCode) onlineRoomCode.textContent = "";
+  setOnlineStatus("");
+  syncOnlineControls();
 }
 
 export function refreshOnlineLabels() {
@@ -73,35 +188,93 @@ export function refreshOnlineLabels() {
   const t = deps.t;
   const title = document.querySelector("#onlineDialogTitle");
   const lead = document.querySelector("#onlineDialogLead");
-  const hostBtn = document.querySelector("#onlineHostBtn");
-  const joinBtn = document.querySelector("#onlineJoinBtn");
-  const labelRoom = document.querySelector("#labelOnlineRoom");
-  const labelInvite = document.querySelector("#labelOnlineInvite");
-  const labelCode = document.querySelector("#labelOnlineCode");
-  const copyBtn = document.querySelector("#onlineCopyLink");
+  const labelGame = document.querySelector("#labelOnlineGameMode");
+  const labelLevel = document.querySelector("#labelOnlineLevel");
+  const tellFriend = document.querySelector("#onlineTellFriend");
+  const tellFriendOr = document.querySelector("#onlineTellFriendOr");
+  const joinHint = document.querySelector("#onlineJoinHint");
   const dismiss = document.querySelector("#dismissOnline");
   if (title) title.textContent = t("onlineTitle");
   if (lead) lead.textContent = t("onlineLead");
-  if (hostBtn) hostBtn.textContent = t("onlineCreate");
-  if (joinBtn) joinBtn.textContent = t("onlineJoin");
-  if (labelRoom) labelRoom.textContent = t("onlineRoomCode");
-  if (labelInvite) labelInvite.textContent = t("onlineInviteLink");
-  if (labelCode) labelCode.textContent = t("onlineCodeLabel");
-  if (copyBtn) copyBtn.textContent = t("onlineCopy");
+  if (onlineModeStart) onlineModeStart.textContent = t("onlineStart");
+  if (onlineModeJoin) onlineModeJoin.textContent = t("onlineJoinTab");
+  if (labelGame) labelGame.textContent = t("gameType");
+  if (labelLevel) labelLevel.textContent = t("onlineLevelLabel");
+  if (onlineCreateRoom) onlineCreateRoom.textContent = t("onlineCreateRoom");
+  if (tellFriend) tellFriend.textContent = t("onlineTellFriend");
+  if (tellFriendOr) tellFriendOr.textContent = t("onlineTellFriendOr");
+  if (onlineShareCode) onlineShareCode.textContent = t("onlineShareCode");
+  if (onlineChangeGame) onlineChangeGame.textContent = t("onlineChangeGame");
+  if (joinHint) joinHint.textContent = t("onlineJoinHint");
+  if (onlineJoinBtn) onlineJoinBtn.textContent = t("onlineJoinGo");
   if (dismiss) dismiss.setAttribute("aria-label", t("ariaCloseOnline"));
   if (openPlayOnlineBtn) {
     openPlayOnlineBtn.textContent = t("onlinePlay");
     openPlayOnlineBtn.classList.toggle("is-hidden", !isCloudSyncEnabled());
   }
-  if (onlineLeaveBtn) onlineLeaveBtn.textContent = t("onlineLeave");
+
+  if (onlineGameMode) {
+    for (const opt of onlineGameMode.options) {
+      switch (opt.value) {
+        case "english1":
+          opt.textContent = t("modeEnglish1");
+          break;
+        case "english2":
+          opt.textContent = t("modeEnglish2");
+          break;
+        case "sums":
+          opt.textContent = t("modeSums");
+          break;
+        case "math":
+          opt.textContent = t("modeMath");
+          break;
+        case "fractions":
+          opt.textContent = t("modeFractions");
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  refreshOnlineLevelOptions();
 }
 
 /**
- * @param {string} keyOrText
+ * @param {string} key
  */
 function setOnlineStatus(key) {
   if (!onlineStatus || !deps) return;
-  onlineStatus.textContent = deps.t(key);
+  onlineStatus.textContent = key ? deps.t(key) : "";
+}
+
+function refreshOnlineLevelOptions() {
+  if (!onlineLevel || !onlineGameMode || !deps) return;
+  const t = deps.t;
+  const mode = onlineGameMode.value;
+  const lvl = onlineLevel.querySelectorAll("option");
+  if (mode === "math") {
+    if (lvl[0]) lvl[0].textContent = t("mathLevelEasy");
+    if (lvl[1]) lvl[1].textContent = t("mathLevelMedium");
+    if (lvl[2]) lvl[2].textContent = t("mathLevelHard");
+  } else if (mode === "sums") {
+    if (lvl[0]) lvl[0].textContent = t("sumsLevelEasy");
+    if (lvl[1]) lvl[1].textContent = t("sumsLevelMedium");
+    if (lvl[2]) lvl[2].textContent = t("sumsLevelHard");
+  } else if (mode === "english1" || mode === "english2") {
+    if (lvl[0]) lvl[0].textContent = t("englishLevelEasy");
+    if (lvl[1]) lvl[1].textContent = t("englishLevelMedium");
+    if (lvl[2]) lvl[2].textContent = t("englishLevelHard");
+  } else {
+    if (lvl[0]) lvl[0].textContent = t("fractionLevelEasy");
+    if (lvl[1]) lvl[1].textContent = t("fractionLevelMedium");
+    if (lvl[2]) lvl[2].textContent = t("fractionLevelHard");
+  }
+}
+
+function setBusy(busy) {
+  onlineBusy = busy;
+  syncOnlineControls();
 }
 
 /**
@@ -109,44 +282,134 @@ function setOnlineStatus(key) {
  */
 export function openOnlineDialog(prefillCode) {
   if (!onlineDialog || !deps) return;
+  refreshOnlineLabels();
+  resetOnlineDialog();
   if (!isCloudSyncEnabled()) {
-    setOnlineStatus(deps.t("onlineNeedsSupabase"));
+    setOnlineStatus("onlineNeedsSupabase");
+    setMainToolbarLocked(true);
     onlineDialog.showModal();
     return;
   }
-  refreshOnlineLabels();
-  if (onlineLobby) onlineLobby.hidden = false;
-  if (onlineInvite) onlineInvite.hidden = true;
-  if (onlineLeaveBtn) onlineLeaveBtn.hidden = true;
-  setOnlineStatus("");
-  if (onlineRoomInput instanceof HTMLInputElement && prefillCode) {
+  if (prefillCode && onlineRoomInput instanceof HTMLInputElement) {
     onlineRoomInput.value = prefillCode;
   }
+  setOnlineStatus("onlinePickMode");
+  setMainToolbarLocked(true);
   onlineDialog.showModal();
 }
+
+onlineGameMode?.addEventListener("change", () => refreshOnlineLevelOptions());
 
 async function closeOnlineDialog() {
   if (isOnlinePlaying()) return;
   await leaveOnlineSession();
+  resetOnlineDialog();
+  setMainToolbarLocked(false);
   onlineDialog?.close();
 }
 
-async function leaveOnline() {
+/**
+ * @param {{ resetBoard?: boolean }} [options]
+ */
+async function leaveOnline(options = {}) {
+  const { resetBoard = true } = options;
   onlineWinShown = false;
   await leaveOnlineSession();
   deps?.hideWinActions();
-  if (onlineLobby) onlineLobby.hidden = false;
-  if (onlineInvite) onlineInvite.hidden = true;
-  if (onlineLeaveBtn) onlineLeaveBtn.hidden = true;
+  resetOnlineDialog();
+  setMainToolbarLocked(false);
   onlineDialog?.close();
   document.querySelector("#appRoot")?.classList.remove("is-online-active");
+  if (resetBoard) deps?.onExitOnline();
 }
 
-function copyInvite() {
-  const url = onlineInviteUrl instanceof HTMLInputElement ? onlineInviteUrl.value : "";
-  if (!url) return;
-  void navigator.clipboard?.writeText(url);
-  setOnlineStatus("online-copied");
+async function resetHostRoom() {
+  if (onlineBusy || onlineMode !== "start" || !hostRoomId) return;
+  await leaveOnlineSession();
+  hostRoomId = null;
+  if (onlineRoomCode) onlineRoomCode.textContent = "";
+  setOnlineStatus("onlineHostPickGame");
+  syncOnlineControls();
+}
+
+async function selectStartMode() {
+  if (onlineBusy || !deps) return;
+
+  if (onlineMode === "join") {
+    await leaveOnlineSession();
+    hostRoomId = null;
+    if (onlineRoomCode) onlineRoomCode.textContent = "";
+  } else if (onlineMode === "start" && hostRoomId) {
+    await resetHostRoom();
+    return;
+  }
+
+  onlineMode = "start";
+  setOnlineStatus("onlineHostPickGame");
+  syncOnlineControls();
+}
+
+async function selectJoinMode() {
+  if (onlineBusy || !deps) return;
+
+  if (onlineMode === "start" && hostRoomId) {
+    await leaveOnlineSession();
+    hostRoomId = null;
+    if (onlineRoomCode) onlineRoomCode.textContent = "";
+  }
+
+  onlineMode = "join";
+  setOnlineStatus("");
+  syncOnlineControls();
+  if (onlineRoomInput instanceof HTMLInputElement) {
+    queueMicrotask(() => onlineRoomInput.focus());
+  }
+}
+
+async function createHostRoom() {
+  if (!deps || onlineMode !== "start" || hostRoomId) return;
+  await hostOnline();
+}
+
+async function shareRoomCode() {
+  if (!hostRoomId || !deps || onlineMode !== "start") return;
+  const code = hostRoomId;
+  const url = buildInviteUrl(code);
+  const shareTitle = deps.t("onlineShareTitle");
+  const shareText = deps.t("onlineShareText", { code });
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: shareTitle, text: shareText, url });
+      return;
+    }
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") return;
+  }
+
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(code);
+    setOnlineStatus("online-copied");
+  }
+}
+
+async function autoJoinFromInvite(code) {
+  if (!deps || !onlineDialog) return;
+  refreshOnlineLabels();
+  resetOnlineDialog();
+  onlineMode = "join";
+  if (onlineRoomInput instanceof HTMLInputElement) onlineRoomInput.value = code;
+  syncOnlineControls();
+  setMainToolbarLocked(true);
+  onlineDialog.showModal();
+  setBusy(true);
+  setOnlineStatus("online-status-connecting");
+  try {
+    await joinOnlineGuest(code, sessionCallbacks());
+  } catch {
+    setOnlineStatus("online-error-generic");
+    setBusy(false);
+  }
 }
 
 /** @returns {import('./multiplayer/online-session.js').OnlineSessionCallbacks} */
@@ -154,15 +417,15 @@ function sessionCallbacks() {
   return {
     onStatus: setOnlineStatus,
     onSync: (snap, cards) => {
+      setBusy(false);
+      if (!snap.winHandled) onlineWinShown = false;
       deps?.applyOnlineSnapshot(snap, cards);
-      if (onlineLobby) onlineLobby.hidden = true;
-      if (onlineInvite) onlineInvite.hidden = true;
-      if (onlineLeaveBtn) onlineLeaveBtn.hidden = false;
+      setMainToolbarLocked(false);
       onlineDialog?.close();
       document.querySelector("#appRoot")?.classList.add("is-online-active");
     },
     onGameEnd: ({ winner, hostScore, guestScore }) => {
-      if (onlineWinShown) return;
+      if (onlineWinShown || exitingOnline) return;
       onlineWinShown = true;
       const session = getActiveOnlineSession();
       const role = session?.role;
@@ -178,11 +441,14 @@ function sessionCallbacks() {
             ? (deps?.t("onlineEndWin") ?? "You win!")
             : (deps?.t("onlineEndLoss") ?? "Opponent wins!");
       }
-      celebrateWin();
+      const won =
+        (winner === "host" && role === "host") ||
+        (winner === "guest" && role === "guest");
+      if (won || winner === null) celebrateWin();
       deps?.showOnlineWin(message, hostScore, guestScore);
-      if (onlineLeaveBtn) onlineLeaveBtn.hidden = false;
     },
     onError: (key) => {
+      setBusy(false);
       setOnlineStatus(key.startsWith("online-") ? key : "online-error-generic");
       if (key === "online-error-disconnected") {
         void leaveOnline();
@@ -193,31 +459,29 @@ function sessionCallbacks() {
 
 async function hostOnline() {
   if (!deps) return;
-  if (deps.getMode() !== "math") {
-    setOnlineStatus("online-math-only");
-    return;
-  }
-  const options = deps.readMathOptions();
+  const options = deps.readOnlineHostConfig();
   try {
+    setBusy(true);
     setOnlineStatus("online-status-connecting");
     const { roomId } = await startOnlineHost(sessionCallbacks(), options);
-    if (onlineInvite) onlineInvite.hidden = false;
-    if (onlineInviteUrl instanceof HTMLInputElement) {
-      onlineInviteUrl.value = buildInviteUrl(roomId);
-    }
+    hostRoomId = roomId;
     if (onlineRoomCode) onlineRoomCode.textContent = roomId;
-    if (onlineLobby) onlineLobby.hidden = true;
-    if (onlineLeaveBtn) onlineLeaveBtn.hidden = false;
+    setOnlineStatus("online-status-waiting");
+    setBusy(false);
+    syncOnlineControls();
   } catch (e) {
     const msg = e instanceof Error && e.message === "online-requires-supabase"
       ? "onlineNeedsSupabase"
       : "online-error-generic";
     setOnlineStatus(msg);
+    setBusy(false);
+    hostRoomId = null;
+    syncOnlineControls();
   }
 }
 
 async function joinOnline() {
-  if (!deps) return;
+  if (!deps || onlineMode !== "join") return;
   const code = normalizeRoomCode(
     onlineRoomInput instanceof HTMLInputElement ? onlineRoomInput.value : "",
   );
@@ -226,12 +490,12 @@ async function joinOnline() {
     return;
   }
   try {
+    setBusy(true);
     setOnlineStatus("online-status-connecting");
     await joinOnlineGuest(code, sessionCallbacks());
-    if (onlineLobby) onlineLobby.hidden = true;
-    if (onlineLeaveBtn) onlineLeaveBtn.hidden = false;
   } catch {
     setOnlineStatus("online-error-generic");
+    setBusy(false);
   }
 }
 
@@ -244,4 +508,35 @@ export function onlineLocalFlip(cardId) {
 
 export function isOnlineGameActive() {
   return isOnlinePlaying();
+}
+
+export async function quitOnlineGame() {
+  exitingOnline = true;
+  try {
+    const session = getActiveOnlineSession();
+    if (session?.phase === "playing") {
+      forfeitOnlineGame();
+      if (session.role === "guest") {
+        await new Promise((r) => setTimeout(r, 350));
+      }
+    }
+    await leaveOnline();
+  } finally {
+    exitingOnline = false;
+  }
+}
+
+export async function playOnlineAgain() {
+  onlineWinShown = false;
+  deps?.hideWinActions();
+  const session = getActiveOnlineSession();
+  if (session?.role === "host" && rematchOnlineGame()) {
+    return;
+  }
+  if (session?.role === "guest" && session.phase === "ended") {
+    setOnlineStatus("onlineWaitingRematch");
+    return;
+  }
+  await leaveOnline({ resetBoard: false });
+  openOnlineDialog();
 }
