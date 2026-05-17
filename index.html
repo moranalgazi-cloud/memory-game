@@ -511,16 +511,29 @@
         <p id="adminUnlockHint" class="user-dialog__hint"></p>
         <label class="field user-dialog__new">
           <span id="labelAdminPassword" class="field__label">Password</span>
-          <input
-            id="adminPasswordInput"
-            type="password"
-            maxlength="64"
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="false"
-            enterkeyhint="go"
-          />
+          <div class="admin-password-field">
+            <input
+              id="adminPasswordInput"
+              type="password"
+              name="memory-admin-pin"
+              maxlength="64"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              enterkeyhint="go"
+            />
+            <button
+              type="button"
+              id="adminPasswordToggle"
+              class="admin-password-toggle"
+              aria-pressed="false"
+            >
+              Show
+            </button>
+          </div>
         </label>
         <p id="adminUnlockError" class="admin-unlock-error is-hidden" role="alert"></p>
         <div class="user-dialog__actions">

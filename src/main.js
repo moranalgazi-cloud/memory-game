@@ -155,6 +155,7 @@ const userDialogContinue = document.querySelector("#userDialogContinue");
 const adminUnlockDialog = document.querySelector("#adminUnlockDialog");
 const adminUnlockForm = document.querySelector("#adminUnlockForm");
 const adminPasswordInput = document.querySelector("#adminPasswordInput");
+const adminPasswordToggle = document.querySelector("#adminPasswordToggle");
 const adminUnlockSubmit = document.querySelector("#adminUnlockSubmit");
 const adminUnlockCancel = document.querySelector("#adminUnlockCancel");
 const adminUnlockError = document.querySelector("#adminUnlockError");
@@ -534,6 +535,7 @@ function refreshChrome() {
   if (lap) lap.textContent = t("labelAdminPassword");
   if (adminUnlockCancel) adminUnlockCancel.textContent = t("adminUnlockCancel");
   if (adminUnlockSubmit) adminUnlockSubmit.textContent = t("adminUnlockSubmit");
+  updateAdminPasswordToggleLabel();
 
   if (gameModeSelect) {
     gameModeSelect.setAttribute("aria-label", t("ariaGameMode"));
@@ -2060,8 +2062,26 @@ async function confirmUserChoiceAsync() {
   }
 }
 
+function updateAdminPasswordToggleLabel() {
+  if (!adminPasswordToggle || !adminPasswordInput) return;
+  const visible = adminPasswordInput.type === "text";
+  adminPasswordToggle.textContent = t(visible ? "adminHidePassword" : "adminShowPassword");
+  adminPasswordToggle.setAttribute("aria-pressed", visible ? "true" : "false");
+  adminPasswordToggle.setAttribute(
+    "aria-label",
+    t(visible ? "adminHidePassword" : "adminShowPassword"),
+  );
+}
+
+function setAdminPasswordVisible(visible) {
+  if (!adminPasswordInput) return;
+  adminPasswordInput.type = visible ? "text" : "password";
+  updateAdminPasswordToggleLabel();
+}
+
 function resetAdminUnlockUI() {
   if (adminPasswordInput) adminPasswordInput.value = "";
+  setAdminPasswordVisible(false);
   if (adminUnlockError) {
     adminUnlockError.textContent = "";
     adminUnlockError.classList.add("is-hidden");
@@ -2386,6 +2406,10 @@ openAdminBtn?.addEventListener("click", () => {
 adminUnlockForm?.addEventListener("submit", (e) => {
   e.preventDefault();
   void submitAdminUnlock();
+});
+
+adminPasswordToggle?.addEventListener("click", () => {
+  setAdminPasswordVisible(adminPasswordInput?.type !== "text");
 });
 
 adminUnlockCancel?.addEventListener("click", () => {

@@ -7,27 +7,29 @@ const SESSION_KEY = "memory-admin-unlocked-v1";
 const expectedHex = ADMIN_PASSWORD_SHA256_HEX.trim().toLowerCase();
 
 /**
- * @param {string} text
- * @returns {Promise<string>}
+ * @param {string} password
+ * @returns {string}
  */
-async function sha256HexUtf8(text) {
+export function normalizeAdminPassword(password) {
+  return String(password).normalize("NFC").trim();
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function sha256HexUtf8(text) {
   const data = new TextEncoder().encode(text);
-  if (typeof crypto !== "undefined" && crypto.subtle && typeof crypto.subtle.digest === "function") {
-    try {
-      const buf = await crypto.subtle.digest("SHA-256", data);
-      return [...new Uint8Array(buf)]
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-    } catch {
-      /* e.g. non-secure context where subtle exists but digest rejects */
-    }
-  }
-  /* LAN http://192.168… has no subtle — use pure JS (same digest as Node crypto for UTF-8). */
+  /* Single path everywhere (desktop, phone, http LAN) — avoids subtle vs fallback mismatches. */
   return bytesToHex(sha256(data));
 }
 
 export function isAdminSessionUnlocked() {
-  return sessionStorage.getItem(SESSION_KEY) === "1";
+  try {
+    return sessionStorage.getItem(SESSION_KEY) === "1";
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -35,19 +37,32 @@ export function isAdminSessionUnlocked() {
  * @returns {Promise<boolean>}
  */
 export async function tryUnlockAdminSession(password) {
-  let hex;
+  if (expectedHex.length !== 64) {
+    console.warn("[admin-auth] ADMIN_PASSWORD_SHA256_HEX is not configured");
+    return false;
+  }
   try {
-    hex = await sha256HexUtf8(String(password));
+    const normalized = normalizeAdminPassword(password);
+    if (!normalized.length) return false;
+    const hex = sha256HexUtf8(normalized);
+    if (hex === expectedHex) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, "1");
+      } catch {
+        /* unlocked for this page load even if storage is blocked */
+      }
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
-  if (hex === expectedHex) {
-    sessionStorage.setItem(SESSION_KEY, "1");
-    return true;
-  }
-  return false;
 }
 
 export function clearAdminSession() {
-  sessionStorage.removeItem(SESSION_KEY);
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* ignore */
+  }
 }
