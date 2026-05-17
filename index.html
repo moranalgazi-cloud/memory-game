@@ -45,6 +45,9 @@
                   <option value="he">עברית</option>
                 </select>
               </label>
+              <button type="button" id="openPlayOnline" class="btn btn--ghost settings-menu__btn">
+                Play online
+              </button>
               <button type="button" id="openRecords" class="btn btn--ghost settings-menu__btn">
                 Records
               </button>
@@ -323,6 +326,59 @@
         <p id="quizSummary" class="quiz-summary" hidden></p>
         <div class="quiz-dialog__actions">
           <button type="button" id="closeQuiz" class="btn btn--primary" hidden>Done</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="onlineDialog" class="online-dialog">
+      <div class="online-dialog__inner">
+        <div class="online-dialog__header">
+          <h2 id="onlineDialogTitle" class="online-dialog__title">Play online</h2>
+          <button
+            type="button"
+            id="dismissOnline"
+            class="online-dialog__dismiss btn btn--ghost btn--icon"
+            aria-label="Close"
+          >
+            <span class="icon-close" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p id="onlineDialogLead" class="online-dialog__lead"></p>
+        <p id="onlineStatus" class="online-status" role="status"></p>
+        <div id="onlineLobby" class="online-lobby">
+          <button type="button" id="onlineHostBtn" class="btn btn--primary online-lobby__btn">
+            Create game
+          </button>
+          <div class="online-join">
+            <label class="field online-join__field">
+              <span id="labelOnlineRoom" class="field__label">Room code</span>
+              <input
+                id="onlineRoomInput"
+                class="online-join__input"
+                type="text"
+                maxlength="8"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </label>
+            <button type="button" id="onlineJoinBtn" class="btn btn--ghost online-lobby__btn">
+              Join game
+            </button>
+          </div>
+        </div>
+        <div id="onlineInvite" class="online-invite" hidden>
+          <p id="labelOnlineInvite" class="field__label">Invite link</p>
+          <div class="online-invite__row">
+            <input id="onlineInviteUrl" class="online-invite__input" type="text" readonly />
+            <button type="button" id="onlineCopyLink" class="btn btn--ghost">Copy</button>
+          </div>
+          <p class="online-invite__code">
+            <span id="labelOnlineCode">Code:</span>
+            <strong id="onlineRoomCode"></strong>
+          </p>
+        </div>
+        <div class="online-dialog__actions">
+          <button type="button" id="onlineLeaveBtn" class="btn btn--ghost" hidden>Leave game</button>
         </div>
       </div>
     </dialog>

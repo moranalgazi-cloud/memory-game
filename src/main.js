@@ -60,6 +60,15 @@ import {
   statsFromCloudRow,
 } from "./cloud-sync.js";
 import { armCelebrationAudio, celebrateWin } from "./celebrate.js";
+import { applySnapshotToState } from "./multiplayer/protocol.js";
+import { readMathOptionsFromDom } from "./multiplayer/math-online.js";
+import { leaveOnlineSession, getActiveOnlineSession } from "./multiplayer/online-session.js";
+import {
+  initOnlinePlay,
+  onlineLocalFlip,
+  isOnlineGameActive,
+  refreshOnlineLabels,
+} from "./online-ui.js";
 
 const board = document.querySelector("#board");
 const movesEl = document.querySelector("#moves");
@@ -145,7 +154,7 @@ const settingsMenu = document.querySelector("#settingsMenu");
 /** @typedef {"easy" | "medium" | "hard"} MathLevel */
 /** @typedef {"easy" | "medium" | "hard"} FractionLevel */
 
-/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string } | null} */
+/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string; online?: boolean; turn?: 'host' | 'guest'; hostScore?: number; guestScore?: number; winner?: 'host' | 'guest' | null } | null} */
 let state = null;
 
 /** @type {string | null} */
@@ -528,6 +537,77 @@ function refreshChrome() {
   }
 
   refreshRecordsLabels();
+  refreshOnlineLabels();
+}
+
+/**
+ * @param {unknown[]} cards
+ */
+function boardMatchesCards(cards) {
+  if (!board) return false;
+  const typed = /** @type {{ id: string }[]} */ (cards);
+  const buttons = board.querySelectorAll("button[data-id]");
+  if (buttons.length !== typed.length) return false;
+  for (let i = 0; i < typed.length; i += 1) {
+    const btn = buttons[i];
+    if (!(btn instanceof HTMLButtonElement) || btn.dataset.id !== typed[i].id) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function refreshOnlineBoardInPlace() {
+  if (!board || !state) return;
+  for (const card of state.cards) {
+    syncCardDom(card.id);
+  }
+  const session = getActiveOnlineSession();
+  const myTurn = session?.role != null && state.turn === session.role;
+  board.classList.toggle("board--waiting-turn", !myTurn && !state.lock);
+}
+
+/**
+ * @param {import('./multiplayer/protocol.js').OnlineStateSnapshot} snap
+ * @param {unknown[]} cards
+ */
+function applyOnlineSnapshot(snap, cards) {
+  const scrollY = window.scrollY;
+  const inPlace = boardMatchesCards(cards);
+  state = applySnapshotToState(snap, /** @type {any[]} */ (cards));
+  cancelEnglishSpeech();
+  hideWinActions();
+  if (winMessage) winMessage.textContent = "";
+  if (inPlace) {
+    refreshOnlineBoardInPlace();
+  } else {
+    renderBoard();
+  }
+  updateStats();
+  restoreViewportScrollAfterBoardRefresh(scrollY);
+}
+
+function refreshOnlineTagline() {
+  if (!state?.online || !gameTagline) return;
+  const session = getActiveOnlineSession();
+  const role = session?.role;
+  if (!role) return;
+  gameTagline.textContent =
+    state.turn === role ? t("onlineYourTurn") : t("onlineOpponentTurn");
+}
+
+/**
+ * @param {string} message
+ * @param {number} hostScore
+ * @param {number} guestScore
+ */
+function showOnlineWin(message, hostScore, guestScore) {
+  if (winMessage) {
+    winMessage.textContent = `${message} (${hostScore}–${guestScore})`;
+  }
+  if (testMeBtn) testMeBtn.hidden = true;
+  showWinActions();
+  refreshAdminSpeedFinish();
 }
 
 function renderQuizPrompt(q) {
@@ -1001,6 +1081,10 @@ function restartSameDeck() {
  * @param {"init" | "restart" | "options" | "switch-user"} source
  */
 function startGame(source) {
+  if (isOnlineGameActive()) {
+    void leaveOnlineSession();
+    appRoot?.classList.remove("is-online-active");
+  }
   cancelEnglishSpeech();
   clearWinAutoRestart();
   clearQuizAdvance();
@@ -1228,6 +1312,7 @@ function refreshAdminSpeedFinish() {
       isAdminUser(cur) &&
       state &&
       !state.winHandled &&
+      !state.online &&
       state.cards.length > 0,
   );
   adminSpeedFinishBtn.classList.toggle("is-hidden", !show);
@@ -1290,6 +1375,34 @@ function speedFinishGame() {
 
 function updateStats() {
   if (!state) return;
+
+  if (state.online) {
+    const session = getActiveOnlineSession();
+    const role = session?.role;
+    const myScore = role === "host" ? (state.hostScore ?? 0) : (state.guestScore ?? 0);
+    const theirScore = role === "host" ? (state.guestScore ?? 0) : (state.hostScore ?? 0);
+    if (movesEl) movesEl.textContent = String(state.moves);
+    if (matchesEl) {
+      matchesEl.textContent = t("onlineScore", {
+        mine: String(myScore),
+        theirs: String(theirScore),
+      });
+    }
+    if (elapsedEl) {
+      if (state.clockStart !== null) {
+        elapsedEl.textContent = formatElapsed(Date.now() - state.clockStart);
+      } else {
+        elapsedEl.textContent = "0:00";
+      }
+    }
+    refreshOnlineTagline();
+    if (board) {
+      const myTurn = role != null && state.turn === role;
+      board.classList.toggle("board--waiting-turn", !myTurn && !state.lock);
+    }
+    return;
+  }
+
   const totalPairs = state.cards.length / 2;
   const matchedPairs = state.matched.size / 2;
   if (movesEl) movesEl.textContent = String(state.moves);
@@ -1303,6 +1416,8 @@ function updateStats() {
     }
   }
 
+  if (board) board.classList.remove("board--waiting-turn");
+
   if (matchedPairs === totalPairs && winActions) {
     completeGameWin();
   }
@@ -1310,6 +1425,11 @@ function updateStats() {
 
 function renderBoard() {
   if (!board || !state) return;
+  if (state.online) {
+    const session = getActiveOnlineSession();
+    const myTurn = session?.role != null && state.turn === session.role;
+    board.classList.toggle("board--waiting-turn", !myTurn && !state.lock);
+  }
   board.replaceChildren();
 
   const cols = Math.ceil(Math.sqrt(state.cards.length));
@@ -1418,6 +1538,17 @@ function onCardClick(id) {
   if (state.matched.has(id)) return;
   if (state.flipped.includes(id)) return;
 
+  if (state.online) {
+    const session = getActiveOnlineSession();
+    if (!session || session.role !== state.turn) return;
+    armCelebrationAudio();
+    onlineLocalFlip(id);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    return;
+  }
+
   armCelebrationAudio();
 
   if (state.clockStart === null) {
@@ -1478,9 +1609,10 @@ function syncCardDom(id) {
   if (!board || !state) return;
   const btn = board.querySelector(`button[data-id="${CSS.escape(id)}"]`);
   if (!(btn instanceof HTMLButtonElement)) return;
+  const card = state.cards.find((c) => c.id === id);
   const up = state.flipped.includes(id) || state.matched.has(id);
   btn.classList.toggle("is-flipped", up);
-  const card = state.cards.find((c) => c.id === id);
+
   if (state.matched.has(id)) {
     btn.classList.add("is-matched");
     const pairIdx = state.matchPairByCardId.get(id);
@@ -1500,7 +1632,14 @@ function syncCardDom(id) {
       "aria-label",
       card ? t("ariaMatched", { label }) : t("ariaMatchedUnknown"),
     );
-  } else if (up && (card?.symbol || card?.imageUrl) && card.word) {
+    return;
+  }
+
+  btn.classList.remove("is-matched");
+  btn.disabled = false;
+  btn.style.removeProperty("--match-hue");
+
+  if (up && (card?.symbol || card?.imageUrl) && card.word) {
     btn.setAttribute("aria-label", t("ariaPictureCard", { word: card.word }));
   } else if (up && card?.side === "he" && card.label) {
     btn.setAttribute("aria-label", String(card.label));
@@ -1510,6 +1649,10 @@ function syncCardDom(id) {
     btn.setAttribute("aria-label", t("ariaFractionPie", { word: card.word }));
   } else if (up && card?.side === "fraction" && card.label) {
     btn.setAttribute("aria-label", String(card.label));
+  } else if (up && card?.label) {
+    btn.setAttribute("aria-label", String(card.label));
+  } else {
+    btn.setAttribute("aria-label", t("ariaHiddenCard"));
   }
 }
 
@@ -1953,6 +2096,17 @@ async function openAdminOverview() {
 }
 
 initLocale();
+initOnlinePlay({
+  applyOnlineSnapshot,
+  renderBoard,
+  updateStats,
+  getMode,
+  readMathOptions: () =>
+    readMathOptionsFromDom(tableMaxSelect?.value, pairCountSelect?.value),
+  t,
+  hideWinActions,
+  showOnlineWin,
+});
 ensureUserRemoteIds();
 
 if (getCurrentUser()) {
