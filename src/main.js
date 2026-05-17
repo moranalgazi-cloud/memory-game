@@ -76,6 +76,8 @@ const quizChoices = document.querySelector("#quizChoices");
 const quizFeedback = document.querySelector("#quizFeedback");
 const quizSummary = document.querySelector("#quizSummary");
 const closeQuizBtn = document.querySelector("#closeQuiz");
+const dismissQuizBtn = document.querySelector("#dismissQuiz");
+const adminSpeedFinishBtn = document.querySelector("#adminSpeedFinish");
 const gameModeSelect = document.querySelector("#gameMode");
 const pairCountSelect = document.querySelector("#pairCount");
 const englishLevelSelect = document.querySelector("#englishLevel");
@@ -96,6 +98,11 @@ const localeSelect = document.querySelector("#locale");
 const userDialogLocale = document.querySelector("#userDialogLocale");
 const labelUserDialogLanguage = document.querySelector("#labelUserDialogLanguage");
 const newGameBtn = document.querySelector("#newGame");
+const restartDeckBtn = document.querySelector("#restartDeck");
+const winNewGameBtn = document.querySelector("#winNewGame");
+const winRestartDeckBtn = document.querySelector("#winRestartDeck");
+const gameActionsEl = document.querySelector("#gameActions");
+const winGameActionsEl = document.querySelector("#winGameActions");
 const openRecordsBtn = document.querySelector("#openRecords");
 const recordsDialog = document.querySelector("#recordsDialog");
 const closeRecordsBtn = document.querySelector("#closeRecords");
@@ -146,6 +153,18 @@ let pendingUserSlug = null;
 
 /** @type {Record<GameMode, string | null>} */
 const lastSignature = { math: null, sums: null, english1: null, english2: null, fractions: null };
+
+/**
+ * Last built deck content — used to reshuffle the same questions on board.
+ * @type {{
+ *   mode: GameMode;
+ *   facts?: import("./game.js").MultiplicationFact[];
+ *   entries?: unknown[];
+ *   englishTopicId?: string;
+ *   englishSpeech?: "both" | "text" | "none";
+ * } | null}
+ */
+let lastDeckSource = null;
 
 /** @param {GameMode} mode */
 function isEnglishMode(mode) {
@@ -356,8 +375,21 @@ function refreshChrome() {
   if (labelMoves) labelMoves.textContent = t("moves");
   if (labelMatches) labelMatches.textContent = t("matches");
   if (labelTime) labelTime.textContent = t("time");
-  if (newGameBtn) newGameBtn.textContent = t("newGame");
+  if (gameActionsEl) gameActionsEl.setAttribute("aria-label", t("ariaGameActions"));
+  if (winGameActionsEl) winGameActionsEl.setAttribute("aria-label", t("ariaWinGameActions"));
+  for (const [btn, key] of [
+    [newGameBtn, "ariaNewGame"],
+    [restartDeckBtn, "ariaRestartDeck"],
+    [winNewGameBtn, "ariaNewGame"],
+    [winRestartDeckBtn, "ariaRestartDeck"],
+  ]) {
+    if (btn instanceof HTMLButtonElement) {
+      btn.setAttribute("aria-label", t(key));
+      btn.setAttribute("title", t(key));
+    }
+  }
   if (testMeBtn) testMeBtn.textContent = t("testMe");
+  if (dismissQuizBtn) dismissQuizBtn.setAttribute("aria-label", t("ariaCloseQuiz"));
   if (openRecordsBtn) {
     openRecordsBtn.textContent = t("records");
     openRecordsBtn.setAttribute("aria-label", t("ariaRecords"));
@@ -375,6 +407,11 @@ function refreshChrome() {
     openAdminBtn.classList.toggle("is-hidden", !show);
     openAdminBtn.textContent = t("adminOverview");
     openAdminBtn.setAttribute("aria-label", t("ariaAdmin"));
+  }
+  refreshAdminSpeedFinish();
+  if (adminSpeedFinishBtn) {
+    adminSpeedFinishBtn.textContent = t("adminSpeedFinish");
+    adminSpeedFinishBtn.setAttribute("aria-label", t("ariaAdminSpeedFinish"));
   }
   const udt = document.querySelector("#userDialogTitle");
   const udl = document.querySelector("#userDialogLead");
@@ -535,6 +572,19 @@ function renderQuizQuestion() {
 
   quizChoices.replaceChildren();
   quizChoices.setAttribute("aria-label", t("ariaQuizChoices"));
+  const pieChoices = q.pieChoices;
+  if (pieChoices?.length) {
+    pieChoices.forEach((pie, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-choice quiz-choice--pie";
+      btn.setAttribute("aria-label", pie.key);
+      btn.append(createPieSvg(pie.n, pie.d, 80));
+      btn.addEventListener("click", () => handleQuizAnswer(i));
+      quizChoices.append(btn);
+    });
+    return;
+  }
   q.choices.forEach((label, i) => {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -861,6 +911,93 @@ function readOptions() {
 }
 
 /**
+ * @param {"init" | "restart" | "options" | "switch-user" | "restart-same"} source
+ */
+function maybeRecordAbandoned(source) {
+  const prev = state;
+  if (!booted || !prev || prev.matched.size >= prev.cards.length) return;
+  const touched =
+    prev.moves > 0 || prev.matched.size > 0 || prev.clockStart !== null;
+  if (touched && source !== "init" && source !== "switch-user") {
+    recordAbandoned(prev.mode);
+  }
+}
+
+/**
+ * @param {NonNullable<typeof lastDeckSource>} src
+ * @param {() => number} rng
+ */
+function buildCardsFromDeckSource(src, rng) {
+  if (src.mode === "math" && src.facts?.length) {
+    return shuffle(buildDeck(src.facts, rng), rng);
+  }
+  if (src.mode === "sums" && src.entries?.length) {
+    return shuffle(buildSumDeck(/** @type {any[]} */ (src.entries), rng), rng);
+  }
+  if (isEnglishMode(src.mode) && src.entries?.length) {
+    return shuffle(
+      buildEnglishDeck(/** @type {any[]} */ (src.entries), src.mode),
+      rng,
+    );
+  }
+  if (src.mode === "fractions" && src.entries?.length) {
+    return shuffle(buildFractionDeck(/** @type {any[]} */ (src.entries)), rng);
+  }
+  return [];
+}
+
+function restartSameDeck() {
+  cancelEnglishSpeech();
+  clearWinAutoRestart();
+  clearQuizAdvance();
+  hideWinActions();
+  lastWinForQuiz = null;
+  if (quizDialog?.open) quizDialog.close();
+  quizSession = null;
+
+  if (!lastDeckSource) {
+    startGame("restart");
+    return;
+  }
+
+  const src = lastDeckSource;
+  const rng = randomUnit;
+  const cards = buildCardsFromDeckSource(src, rng);
+  if (!cards.length) {
+    startGame("restart");
+    return;
+  }
+
+  maybeRecordAbandoned("restart-same");
+
+  state = {
+    mode: src.mode,
+    cards,
+    flipped: [],
+    matched: new Set(),
+    matchPairByCardId: new Map(),
+    moves: 0,
+    lock: false,
+    clockStart: null,
+    winHandled: false,
+    englishSpeech: src.englishSpeech,
+    englishTopicId: src.englishTopicId,
+  };
+
+  if (isEnglishMode(src.mode) && src.englishTopicId && gameTagline) {
+    const tagKey = src.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
+    gameTagline.textContent = t(tagKey, {
+      topic: t(englishTopicMessageKey(src.englishTopicId)),
+    });
+  }
+
+  hideWinActions();
+  refreshChrome();
+  renderBoard();
+  updateStats();
+}
+
+/**
  * @param {"init" | "restart" | "options" | "switch-user"} source
  */
 function startGame(source) {
@@ -871,16 +1008,9 @@ function startGame(source) {
   lastWinForQuiz = null;
   if (quizDialog?.open) quizDialog.close();
   quizSession = null;
-  const prev = state;
   let mode = getMode();
 
-  if (booted && prev && prev.matched.size < prev.cards.length) {
-    const touched =
-      prev.moves > 0 || prev.matched.size > 0 || prev.clockStart !== null;
-    if (touched && source !== "init" && source !== "switch-user") {
-      recordAbandoned(prev.mode);
-    }
-  }
+  maybeRecordAbandoned(source);
 
   const rng = randomUnit;
   /** @type {any[]} */
@@ -914,6 +1044,7 @@ function startGame(source) {
         tries += 1;
       }
       lastSignature.math = signature;
+      lastDeckSource = { mode: "math", facts: [...facts] };
       cards = shuffle(buildDeck(facts, rng), rng);
     } else if (mode === "sums") {
       const { pairCount, maxNumber, sumsLevel } = readOptions();
@@ -936,6 +1067,7 @@ function startGame(source) {
         tries += 1;
       }
       lastSignature.sums = signature;
+      lastDeckSource = { mode: "sums", entries: [...entries] };
       cards = shuffle(buildSumDeck(entries, rng), rng);
     } else if (isEnglishMode(mode)) {
       const { pairCount, englishLevel, englishSpeech: es } = readOptions();
@@ -963,6 +1095,12 @@ function startGame(source) {
         tries += 1;
       }
       lastSignature[sigKey] = signature;
+      lastDeckSource = {
+        mode,
+        entries: [...entries],
+        englishTopicId: topicId,
+        englishSpeech: es,
+      };
       cards = shuffle(buildEnglishDeck(entries, mode), rng);
       englishTopicId = topicId;
       if (gameTagline) {
@@ -992,12 +1130,15 @@ function startGame(source) {
         tries += 1;
       }
       lastSignature.fractions = signature;
+      lastDeckSource = { mode: "fractions", entries: [...entries] };
       cards = shuffle(buildFractionDeck(entries), rng);
     }
   } catch (err) {
     console.error("[app] startGame deck build:", err);
     englishSpeech = undefined;
-    cards = shuffle(buildDeck(pickFacts(2, 1, rng), rng), rng);
+    const facts = pickFacts(2, 1, rng);
+    lastDeckSource = { mode: "math", facts: [...facts] };
+    cards = shuffle(buildDeck(facts, rng), rng);
     mode = "math";
     if (gameModeSelect) gameModeSelect.value = "math";
   }
@@ -1008,19 +1149,35 @@ function startGame(source) {
       const topicId = pickEnglishTopicId(rng);
       const pool = getEnglishPool(topicId);
       const picked = pool.length ? pickEnglishEntries(pool, 1, mode, rng) : [];
-      if (picked.length) cards = shuffle(buildEnglishDeck(picked, mode), rng);
+      if (picked.length) {
+        lastDeckSource = {
+          mode,
+          entries: [...picked],
+          englishTopicId: topicId,
+          englishSpeech,
+        };
+        cards = shuffle(buildEnglishDeck(picked, mode), rng);
+      }
       englishTopicId = topicId;
     } else if (mode === "sums") {
       const pool = buildSumPool(10);
       const entries = pool.length ? pickSumEntries(pool, 1, rng) : [];
-      if (entries.length) cards = shuffle(buildSumDeck(entries, rng), rng);
+      if (entries.length) {
+        lastDeckSource = { mode: "sums", entries: [...entries] };
+        cards = shuffle(buildSumDeck(entries, rng), rng);
+      }
     } else if (mode === "fractions") {
       const pool = buildFractionPool(5);
       const entries = pool.length ? pickFractionEntries(pool, 1, rng) : [];
-      if (entries.length) cards = shuffle(buildFractionDeck(entries), rng);
+      if (entries.length) {
+        lastDeckSource = { mode: "fractions", entries: [...entries] };
+        cards = shuffle(buildFractionDeck(entries), rng);
+      }
     }
     if (cards.length === 0) {
-      cards = shuffle(buildDeck(pickFacts(2, 1, rng), rng), rng);
+      const facts = pickFacts(2, 1, rng);
+      lastDeckSource = { mode: "math", facts: [...facts] };
+      cards = shuffle(buildDeck(facts, rng), rng);
       mode = "math";
       englishSpeech = undefined;
       if (gameModeSelect) gameModeSelect.value = "math";
@@ -1063,6 +1220,74 @@ function formatElapsed(ms) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
+function refreshAdminSpeedFinish() {
+  if (!adminSpeedFinishBtn) return;
+  const cur = getCurrentUser();
+  const show = Boolean(
+    cur &&
+      isAdminUser(cur) &&
+      state &&
+      !state.winHandled &&
+      state.cards.length > 0,
+  );
+  adminSpeedFinishBtn.classList.toggle("is-hidden", !show);
+}
+
+function completeGameWin() {
+  if (!state || state.winHandled) return;
+  state.winHandled = true;
+  celebrateWin();
+  const elapsed =
+    state.clockStart !== null ? Date.now() - state.clockStart : null;
+  if (elapsed !== null && elapsed > 0) {
+    recordWin(state.mode, elapsed);
+  }
+  lastWinForQuiz = { mode: state.mode, cards: [...state.cards] };
+  clearWinAutoRestart();
+  showWinActions();
+  refreshAdminSpeedFinish();
+}
+
+function markAllCardsMatched() {
+  if (!state) return;
+  state.flipped = [];
+  state.lock = false;
+  state.matched.clear();
+  state.matchPairByCardId.clear();
+  /** @type {Map<string, string[]>} */
+  const byKey = new Map();
+  for (const card of state.cards) {
+    const key =
+      typeof card.factKey === "string" && card.factKey.length
+        ? card.factKey
+        : card.id;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(card.id);
+  }
+  let pairIdx = 0;
+  for (const ids of byKey.values()) {
+    for (const id of ids) {
+      state.matched.add(id);
+      state.matchPairByCardId.set(id, pairIdx);
+    }
+    pairIdx += 1;
+  }
+}
+
+function speedFinishGame() {
+  const cur = getCurrentUser();
+  if (!state || state.winHandled || !cur || !isAdminUser(cur)) return;
+
+  cancelEnglishSpeech();
+  armCelebrationAudio();
+  if (state.clockStart === null) {
+    state.clockStart = Date.now() - 2000;
+  }
+  markAllCardsMatched();
+  renderBoard();
+  updateStats();
+}
+
 function updateStats() {
   if (!state) return;
   const totalPairs = state.cards.length / 2;
@@ -1079,18 +1304,7 @@ function updateStats() {
   }
 
   if (matchedPairs === totalPairs && winActions) {
-    if (!state.winHandled) {
-      state.winHandled = true;
-      celebrateWin();
-      const elapsed =
-        state.clockStart !== null ? Date.now() - state.clockStart : null;
-      if (elapsed !== null && elapsed > 0) {
-        recordWin(state.mode, elapsed);
-      }
-      lastWinForQuiz = { mode: state.mode, cards: [...state.cards] };
-      clearWinAutoRestart();
-      showWinActions();
-    }
+    completeGameWin();
   }
 }
 
@@ -1113,7 +1327,7 @@ function renderBoard() {
 
     const back = document.createElement("span");
     back.className = "card-face card-face--back";
-    back.textContent = "?";
+    back.textContent = "★";
     back.setAttribute("aria-hidden", "true");
 
     const front = document.createElement("span");
@@ -1836,10 +2050,15 @@ adminDialog?.addEventListener("click", (e) => {
 });
 
 newGameBtn?.addEventListener("click", () => startGame("restart"));
+restartDeckBtn?.addEventListener("click", () => restartSameDeck());
+winNewGameBtn?.addEventListener("click", () => startGame("restart"));
+winRestartDeckBtn?.addEventListener("click", () => restartSameDeck());
 pairCountSelect?.addEventListener("change", () => startGame("options"));
 englishLevelSelect?.addEventListener("change", () => startGame("options"));
 testMeBtn?.addEventListener("click", () => openQuiz());
 closeQuizBtn?.addEventListener("click", () => closeQuiz());
+dismissQuizBtn?.addEventListener("click", () => closeQuiz());
+adminSpeedFinishBtn?.addEventListener("click", () => speedFinishGame());
 quizDialog?.addEventListener("close", () => {
   clearQuizAdvance();
   quizSession = null;

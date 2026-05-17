@@ -104,13 +104,13 @@ function playApplause() {
 }
 
 const CONFETTI_COLORS = [
-  "#5b9fd4",
-  "#4caf7a",
-  "#e8b44a",
-  "#c678dd",
-  "#e06c75",
-  "#56b6c2",
-  "#f4f7fb",
+  "#ff6bcb",
+  "#ffd166",
+  "#4dd4ac",
+  "#5b8cff",
+  "#ff9f1c",
+  "#7b5cff",
+  "#fffef8",
 ];
 
 function burstConfetti() {

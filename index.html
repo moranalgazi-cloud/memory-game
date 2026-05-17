@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Memory games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Rubik:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="appRoot" class="app">
@@ -107,7 +113,28 @@
               <option value="12">1–12</option>
             </select>
           </label>
-          <button type="button" id="newGame" class="btn btn--primary">New game</button>
+          <div class="game-actions" role="group" id="gameActions" aria-label="Game actions">
+            <button type="button" id="newGame" class="btn btn--icon btn--primary game-actions__btn">
+              <span class="mem-icon mem-icon--new" aria-hidden="true">
+                <span class="mem-icon__card mem-icon__card--back"></span>
+                <span class="mem-icon__card mem-icon__card--front"></span>
+                <span class="mem-icon__badge">+</span>
+              </span>
+            </button>
+            <button type="button" id="restartDeck" class="btn btn--icon btn--ghost game-actions__btn">
+              <span class="mem-icon mem-icon--shuffle" aria-hidden="true">
+                <span class="mem-icon__card mem-icon__card--left"></span>
+                <span class="mem-icon__card mem-icon__card--right"></span>
+              </span>
+            </button>
+          </div>
+          <button
+            type="button"
+            id="adminSpeedFinish"
+            class="btn btn--ghost btn--admin-finish is-hidden"
+          >
+            Finish
+          </button>
         </div>
         <dl class="stats">
           <div>
@@ -128,6 +155,21 @@
         <div id="board" class="board" role="grid" aria-label="Memory cards"></div>
         <div id="winActions" class="win-actions" hidden>
           <p id="winMessage" class="win-message"></p>
+          <div class="win-actions__icons" role="group" id="winGameActions" aria-label="Play again">
+            <button type="button" id="winNewGame" class="btn btn--icon btn--primary game-actions__btn">
+              <span class="mem-icon mem-icon--new" aria-hidden="true">
+                <span class="mem-icon__card mem-icon__card--back"></span>
+                <span class="mem-icon__card mem-icon__card--front"></span>
+                <span class="mem-icon__badge">+</span>
+              </span>
+            </button>
+            <button type="button" id="winRestartDeck" class="btn btn--icon btn--ghost game-actions__btn">
+              <span class="mem-icon mem-icon--shuffle" aria-hidden="true">
+                <span class="mem-icon__card mem-icon__card--left"></span>
+                <span class="mem-icon__card mem-icon__card--right"></span>
+              </span>
+            </button>
+          </div>
           <button type="button" id="testMeBtn" class="btn btn--primary win-actions__btn">Test me</button>
         </div>
       </main>
@@ -263,7 +305,17 @@
 
     <dialog id="quizDialog" class="quiz-dialog">
       <div class="quiz-dialog__inner">
-        <h2 id="quizTitle" class="quiz-dialog__title">Test me</h2>
+        <div class="quiz-dialog__header">
+          <h2 id="quizTitle" class="quiz-dialog__title">Test me</h2>
+          <button
+            type="button"
+            id="dismissQuiz"
+            class="quiz-dialog__dismiss btn btn--ghost btn--icon"
+            aria-label="Close quiz"
+          >
+            <span class="icon-close" aria-hidden="true"></span>
+          </button>
+        </div>
         <p id="quizProgress" class="quiz-progress"></p>
         <p id="quizPrompt" class="quiz-prompt"></p>
         <div id="quizChoices" class="quiz-choices" role="group"></div>
