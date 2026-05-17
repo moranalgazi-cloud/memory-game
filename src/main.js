@@ -29,6 +29,13 @@ import {
 } from "./sums-game.js";
 import { initLocale, setLocale, getLocale, t, setPageTitleForMode } from "./i18n.js";
 import {
+  initDisclaimerUi,
+  openDisclaimerDialog,
+  refreshDisclaimerLabels,
+  hasAcceptedDisclaimer,
+} from "./disclaimer-ui.js";
+import { initAboutUi, refreshAboutLabels } from "./about-ui.js";
+import {
   loadRecords,
   loadRecordsForUser,
   recordWin,
@@ -615,6 +622,8 @@ function refreshChrome() {
 
   refreshRecordsLabels();
   refreshOnlineLabels();
+  refreshDisclaimerLabels();
+  refreshAboutLabels();
   refreshOnlineChrome();
 }
 
@@ -1926,6 +1935,20 @@ async function removeUserFromPicker(slug) {
   }
 }
 
+function syncUserAddDisclaimerGate() {
+  const accepted = hasAcceptedDisclaimer();
+  const hint = document.querySelector("#disclaimerRequiredHint");
+  if (newUserNameInput instanceof HTMLInputElement) {
+    newUserNameInput.disabled = !accepted;
+  }
+  if (addUserBtn instanceof HTMLButtonElement) {
+    addUserBtn.disabled = !accepted;
+  }
+  if (hint) hint.classList.toggle("is-hidden", accepted);
+  const gate = document.querySelector("#disclaimerGate");
+  if (gate) gate.classList.toggle("disclaimer-gate--locked", !accepted);
+}
+
 function openUserPickerDialog() {
   if (isOnlineBoardActive()) return;
   closeSettingsMenu();
@@ -1936,7 +1959,11 @@ function openUserPickerDialog() {
   renderUserPickerList();
   if (newUserNameInput) newUserNameInput.value = "";
   syncUserDialogButtonEmphasis();
+  syncUserAddDisclaimerGate();
   userDialog?.showModal();
+  if (!hasAcceptedDisclaimer() && users.length === 0) {
+    openDisclaimerDialog("accept");
+  }
 }
 
 function tryAddUser() {
@@ -1945,6 +1972,10 @@ function tryAddUser() {
 
 async function tryAddUserAsync() {
   hideUserAddError();
+  if (!hasAcceptedDisclaimer()) {
+    openDisclaimerDialog("accept");
+    return;
+  }
   const raw = newUserNameInput?.value ?? "";
   const result = addUser(raw);
   if (result.ok) {
@@ -2240,6 +2271,17 @@ async function openAdminOverview() {
 }
 
 initLocale();
+initDisclaimerUi({
+  t,
+  onAccepted: () => syncUserAddDisclaimerGate(),
+  onGateChange: () => syncUserAddDisclaimerGate(),
+});
+initAboutUi({ t });
+
+document.querySelector("#openDisclaimerFromUser")?.addEventListener("click", () => {
+  openDisclaimerDialog(hasAcceptedDisclaimer() ? "view" : "accept");
+});
+
 initOnlinePlay({
   applyOnlineSnapshot,
   renderBoard,
