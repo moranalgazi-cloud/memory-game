@@ -4,28 +4,40 @@ import {
   buildDeck,
   shuffle,
   isPairMatch,
+  uniqueProductCount,
 } from "./game.js";
 import {
-  ENGLISH_LEXICON_KID,
+  ENGLISH_TOPIC_IDS,
+  englishTopicMessageKey,
+  getEnglishPool,
+  pickEnglishTopicId,
   pickEnglishEntries,
   buildEnglishDeck,
 } from "./english-game.js";
-import { speakEnglishMemoryWord, cancelEnglishSpeech } from "./english-speech.js";
+import { speakMemoryWord, cancelEnglishSpeech } from "./english-speech.js";
 import {
   buildFractionPool,
   pickFractionEntries,
   buildFractionDeck,
   createPieSvg,
 } from "./fraction-game.js";
-import { buildSumPool, pickSumEntries, buildSumDeck } from "./sums-game.js";
+import {
+  buildSumPool,
+  pickSumEntries,
+  buildSumDeck,
+  uniqueSumResultCount,
+} from "./sums-game.js";
 import { initLocale, setLocale, getLocale, t, setPageTitleForMode } from "./i18n.js";
 import {
   loadRecords,
   loadRecordsForUser,
   recordWin,
   recordAbandoned,
+  recordTestResult,
   formatDuration,
+  formatScorePercent,
 } from "./records.js";
+import { buildQuizFromGame, scorePercent } from "./quiz.js";
 import {
   listUsers,
   addUser,
@@ -54,6 +66,16 @@ const movesEl = document.querySelector("#moves");
 const matchesEl = document.querySelector("#matches");
 const elapsedEl = document.querySelector("#elapsed");
 const winMessage = document.querySelector("#winMessage");
+const winActions = document.querySelector("#winActions");
+const testMeBtn = document.querySelector("#testMeBtn");
+const quizDialog = document.querySelector("#quizDialog");
+const quizTitle = document.querySelector("#quizTitle");
+const quizProgress = document.querySelector("#quizProgress");
+const quizPrompt = document.querySelector("#quizPrompt");
+const quizChoices = document.querySelector("#quizChoices");
+const quizFeedback = document.querySelector("#quizFeedback");
+const quizSummary = document.querySelector("#quizSummary");
+const closeQuizBtn = document.querySelector("#closeQuiz");
 const gameModeSelect = document.querySelector("#gameMode");
 const pairCountSelect = document.querySelector("#pairCount");
 const englishLevelSelect = document.querySelector("#englishLevel");
@@ -110,25 +132,64 @@ const closeAdminBtn = document.querySelector("#closeAdmin");
 const settingsMenuBtn = document.querySelector("#settingsMenuBtn");
 const settingsMenu = document.querySelector("#settingsMenu");
 
-/** @typedef {"math" | "sums" | "english" | "fractions"} GameMode */
+/** @typedef {"math" | "sums" | "english1" | "english2" | "fractions"} GameMode */
 /** @typedef {"easy" | "medium" | "hard"} EnglishLevel */
 /** @typedef {"easy" | "medium" | "hard"} SumsLevel */
 /** @typedef {"easy" | "medium" | "hard"} MathLevel */
 /** @typedef {"easy" | "medium" | "hard"} FractionLevel */
 
-/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none" } | null} */
+/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string } | null} */
 let state = null;
 
 /** @type {string | null} */
 let pendingUserSlug = null;
 
 /** @type {Record<GameMode, string | null>} */
-const lastSignature = { math: null, sums: null, english: null, fractions: null };
+const lastSignature = { math: null, sums: null, english1: null, english2: null, fractions: null };
+
+/** @param {GameMode} mode */
+function isEnglishMode(mode) {
+  return mode === "english1" || mode === "english2";
+}
 
 let booted = false;
 
+/** @type {{ mode: GameMode; cards: unknown[] } | null} */
+let lastWinForQuiz = null;
+
+/**
+ * @type {{
+ *   mode: GameMode;
+ *   questions: import("./quiz.js").QuizQuestion[];
+ *   index: number;
+ *   correct: number;
+ *   locked: boolean;
+ * } | null}
+ */
+let quizSession = null;
+
 /** @type {ReturnType<typeof setTimeout> | null} */
 let winAutoRestartTimer = null;
+
+/** @type {ReturnType<typeof setTimeout> | null} */
+let quizAdvanceTimer = null;
+
+function clearQuizAdvance() {
+  if (quizAdvanceTimer != null) {
+    window.clearTimeout(quizAdvanceTimer);
+    quizAdvanceTimer = null;
+  }
+}
+
+function hideWinActions() {
+  if (winActions) winActions.hidden = true;
+  if (testMeBtn) testMeBtn.hidden = true;
+}
+
+function showWinActions() {
+  if (winActions) winActions.hidden = false;
+  if (testMeBtn) testMeBtn.hidden = false;
+}
 
 function clearWinAutoRestart() {
   if (winAutoRestartTimer != null) {
@@ -185,7 +246,7 @@ function randomUnit() {
 
 function getMode() {
   const v = gameModeSelect?.value;
-  if (v === "english") return "english";
+  if (v === "english1" || v === "english2") return v;
   if (v === "fractions") return "fractions";
   if (v === "sums") return "sums";
   return "math";
@@ -263,13 +324,24 @@ function refreshChrome() {
   const mode = getMode();
   setPageTitleForMode(mode);
   if (gameTitle) {
-    if (mode === "english") gameTitle.textContent = t("titleEnglish");
+    if (mode === "english1") gameTitle.textContent = t("titleEnglish1");
+    else if (mode === "english2") gameTitle.textContent = t("titleEnglish2");
     else if (mode === "fractions") gameTitle.textContent = t("titleFractions");
     else if (mode === "sums") gameTitle.textContent = t("titleSums");
     else gameTitle.textContent = t("titleMath");
   }
   if (gameTagline) {
-    if (mode === "english") gameTagline.textContent = t("taglineEnglish");
+    if (
+      state &&
+      isEnglishMode(state.mode) &&
+      state.englishTopicId
+    ) {
+      const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
+      gameTagline.textContent = t(tagKey, {
+        topic: t(englishTopicMessageKey(state.englishTopicId)),
+      });
+    } else if (mode === "english1") gameTagline.textContent = t("taglineEnglish1Generic");
+    else if (mode === "english2") gameTagline.textContent = t("taglineEnglish2Generic");
     else if (mode === "fractions") gameTagline.textContent = t("taglineFractions");
     else if (mode === "sums") gameTagline.textContent = t("taglineSums");
     else gameTagline.textContent = t("taglineMath");
@@ -285,6 +357,7 @@ function refreshChrome() {
   if (labelMatches) labelMatches.textContent = t("matches");
   if (labelTime) labelTime.textContent = t("time");
   if (newGameBtn) newGameBtn.textContent = t("newGame");
+  if (testMeBtn) testMeBtn.textContent = t("testMe");
   if (openRecordsBtn) {
     openRecordsBtn.textContent = t("records");
     openRecordsBtn.setAttribute("aria-label", t("ariaRecords"));
@@ -336,10 +409,11 @@ function refreshChrome() {
   if (gameModeSelect) {
     gameModeSelect.setAttribute("aria-label", t("ariaGameMode"));
     const opts = gameModeSelect.querySelectorAll("option");
-    if (opts[0]) opts[0].textContent = t("modeEnglish");
-    if (opts[1]) opts[1].textContent = t("modeSums");
-    if (opts[2]) opts[2].textContent = t("modeMath");
-    if (opts[3]) opts[3].textContent = t("modeFractions");
+    if (opts[0]) opts[0].textContent = t("modeEnglish1");
+    if (opts[1]) opts[1].textContent = t("modeEnglish2");
+    if (opts[2]) opts[2].textContent = t("modeSums");
+    if (opts[3]) opts[3].textContent = t("modeMath");
+    if (opts[4]) opts[4].textContent = t("modeFractions");
   }
 
   if (pairCountSelect) pairCountSelect.setAttribute("aria-label", t("ariaPairs"));
@@ -378,10 +452,10 @@ function refreshChrome() {
   if (pairsField) {
     pairsField.classList.toggle(
       "is-hidden",
-      mode === "english" || mode === "sums" || mode === "math" || mode === "fractions",
+      isEnglishMode(mode) || mode === "sums" || mode === "math" || mode === "fractions",
     );
   }
-  if (englishLevelField) englishLevelField.classList.toggle("is-hidden", mode !== "english");
+  if (englishLevelField) englishLevelField.classList.toggle("is-hidden", !isEnglishMode(mode));
   if (sumsLevelField) sumsLevelField.classList.toggle("is-hidden", mode !== "sums");
   if (mathLevelField) mathLevelField.classList.toggle("is-hidden", mode !== "math");
   if (fractionLevelField) fractionLevelField.classList.toggle("is-hidden", mode !== "fractions");
@@ -412,24 +486,185 @@ function refreshChrome() {
   if (tablesField) {
     tablesField.classList.toggle(
       "is-hidden",
-      mode === "english" || mode === "sums" || mode === "math" || mode === "fractions",
+      isEnglishMode(mode) || mode === "sums" || mode === "math" || mode === "fractions",
     );
   }
 
   refreshRecordsLabels();
 }
 
+function renderQuizPrompt(q) {
+  if (!quizPrompt) return;
+  quizPrompt.className = "quiz-prompt";
+  if (quizSession?.mode === "english1" && q.prompt.length <= 4) {
+    quizPrompt.classList.add("quiz-prompt--symbol");
+    quizPrompt.textContent = q.prompt;
+    return;
+  }
+  if (quizSession?.mode === "english2") {
+    quizPrompt.classList.add("quiz-prompt--hebrew");
+    quizPrompt.textContent = `${t("quizEnglishFor")} ${q.prompt}`;
+    return;
+  }
+  if (quizSession?.mode === "english1") {
+    quizPrompt.textContent = `${t("quizChooseWord")} ${q.prompt}`;
+    return;
+  }
+  quizPrompt.textContent = q.prompt;
+}
+
+function renderQuizQuestion() {
+  if (!quizSession || !quizChoices || !quizProgress) return;
+  const { questions, index } = quizSession;
+  const q = questions[index];
+  if (!q) return;
+
+  quizProgress.textContent = t("quizProgress", {
+    current: String(index + 1),
+    total: String(questions.length),
+  });
+  renderQuizPrompt(q);
+
+  if (quizFeedback) {
+    quizFeedback.hidden = true;
+    quizFeedback.textContent = "";
+    quizFeedback.className = "quiz-feedback";
+  }
+  if (quizSummary) quizSummary.hidden = true;
+  if (closeQuizBtn) closeQuizBtn.hidden = true;
+
+  quizChoices.replaceChildren();
+  quizChoices.setAttribute("aria-label", t("ariaQuizChoices"));
+  q.choices.forEach((label, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "quiz-choice";
+    if (quizSession?.mode === "english2") btn.classList.add("quiz-choice--hebrew");
+    btn.textContent = label;
+    btn.addEventListener("click", () => handleQuizAnswer(i));
+    quizChoices.append(btn);
+  });
+}
+
+/**
+ * @param {number} choiceIndex
+ */
+function handleQuizAnswer(choiceIndex) {
+  if (!quizSession || quizSession.locked) return;
+  const q = quizSession.questions[quizSession.index];
+  if (!q) return;
+
+  quizSession.locked = true;
+  const correct = choiceIndex === q.correctIndex;
+  if (correct) quizSession.correct += 1;
+
+  const buttons = quizChoices?.querySelectorAll(".quiz-choice");
+  buttons?.forEach((btn, i) => {
+    if (!(btn instanceof HTMLButtonElement)) return;
+    btn.disabled = true;
+    if (i === q.correctIndex) btn.classList.add("is-correct");
+    else if (i === choiceIndex && !correct) btn.classList.add("is-wrong");
+  });
+
+  if (quizFeedback) {
+    quizFeedback.hidden = false;
+    quizFeedback.className = correct ? "quiz-feedback is-correct" : "quiz-feedback is-wrong";
+    quizFeedback.textContent = correct
+      ? t("quizCorrect")
+      : t("quizWrong", { answer: q.choices[q.correctIndex] });
+  }
+
+  clearQuizAdvance();
+  quizAdvanceTimer = window.setTimeout(() => {
+    quizAdvanceTimer = null;
+    if (!quizSession) return;
+    quizSession.locked = false;
+    quizSession.index += 1;
+    if (quizSession.index >= quizSession.questions.length) {
+      finishQuiz();
+    } else {
+      renderQuizQuestion();
+    }
+  }, correct ? 700 : 1200);
+}
+
+function finishQuiz() {
+  if (!quizSession) return;
+  const { mode, questions, correct } = quizSession;
+  const total = questions.length;
+  recordTestResult(mode, correct, total);
+  const pct = scorePercent(correct, total);
+
+  if (quizChoices) quizChoices.replaceChildren();
+  if (quizPrompt) quizPrompt.textContent = "";
+  if (quizProgress) quizProgress.textContent = "";
+
+  if (quizFeedback) quizFeedback.hidden = true;
+  if (quizSummary) {
+    quizSummary.hidden = false;
+    quizSummary.textContent =
+      correct === total
+        ? `${t("quizSummaryPerfect")} ${t("quizSummary", {
+            correct: String(correct),
+            total: String(total),
+            percent: String(pct),
+          })}`
+        : t("quizSummary", {
+            correct: String(correct),
+            total: String(total),
+            percent: String(pct),
+          });
+  }
+  if (closeQuizBtn) closeQuizBtn.hidden = false;
+  quizSession = null;
+}
+
+function openQuiz() {
+  if (!lastWinForQuiz || !quizDialog) return;
+  const questions = buildQuizFromGame(
+    lastWinForQuiz.mode,
+    lastWinForQuiz.cards,
+    randomUnit,
+  );
+  if (!questions.length) return;
+
+  quizSession = {
+    mode: lastWinForQuiz.mode,
+    questions,
+    index: 0,
+    correct: 0,
+    locked: false,
+  };
+
+  if (quizTitle) quizTitle.textContent = t("quizTitle");
+  if (closeQuizBtn) closeQuizBtn.textContent = t("quizDone");
+  renderQuizQuestion();
+  quizDialog.showModal();
+}
+
+function closeQuiz() {
+  clearQuizAdvance();
+  quizSession = null;
+  quizDialog?.close();
+}
+
 function refreshRecordsLabels() {
   const title = document.querySelector("#recordsTitle");
+  const gamesHeading = document.querySelector("#recordsGamesHeading");
+  const testsHeading = document.querySelector("#recordsTestsHeading");
   const hMath = document.querySelector("#recordsHeadingMath");
   const hSums = document.querySelector("#recordsHeadingSums");
-  const hEng = document.querySelector("#recordsHeadingEnglish");
+  const hEng1 = document.querySelector("#recordsHeadingEnglish1");
+  const hEng2 = document.querySelector("#recordsHeadingEnglish2");
   const hFrac = document.querySelector("#recordsHeadingFractions");
   const close = document.querySelector("#closeRecords");
   if (title) title.textContent = t("recordsTitle");
+  if (gamesHeading) gamesHeading.textContent = t("recordsGamesHeading");
+  if (testsHeading) testsHeading.textContent = t("recordsTestsHeading");
   if (hMath) hMath.textContent = t("recordsMath");
   if (hSums) hSums.textContent = t("recordsSums");
-  if (hEng) hEng.textContent = t("recordsEnglish");
+  if (hEng1) hEng1.textContent = t("recordsEnglish1");
+  if (hEng2) hEng2.textContent = t("recordsEnglish2");
   if (hFrac) hFrac.textContent = t("recordsFractions");
   if (close) close.textContent = t("recordsClose");
   for (const [id, key] of [
@@ -439,13 +674,42 @@ function refreshRecordsLabels() {
     ["#recSumsBestLabel", "recordsBestTime"],
     ["#recSumsWonLabel", "recordsWon"],
     ["#recSumsPlayedLabel", "recordsPlayed"],
-    ["#recEngBestLabel", "recordsBestTime"],
-    ["#recEngWonLabel", "recordsWon"],
-    ["#recEngPlayedLabel", "recordsPlayed"],
+    ["#recEng1BestLabel", "recordsBestTime"],
+    ["#recEng1WonLabel", "recordsWon"],
+    ["#recEng1PlayedLabel", "recordsPlayed"],
+    ["#recEng2BestLabel", "recordsBestTime"],
+    ["#recEng2WonLabel", "recordsWon"],
+    ["#recEng2PlayedLabel", "recordsPlayed"],
     ["#recFracBestLabel", "recordsBestTime"],
     ["#recFracWonLabel", "recordsWon"],
     ["#recFracPlayedLabel", "recordsPlayed"],
+    ["#recTestMathBestLabel", "recordsBestScore"],
+    ["#recTestMathPassedLabel", "recordsTestsPassed"],
+    ["#recTestMathTakenLabel", "recordsTestsTaken"],
+    ["#recTestSumsBestLabel", "recordsBestScore"],
+    ["#recTestSumsPassedLabel", "recordsTestsPassed"],
+    ["#recTestSumsTakenLabel", "recordsTestsTaken"],
+    ["#recTestEng1BestLabel", "recordsBestScore"],
+    ["#recTestEng1PassedLabel", "recordsTestsPassed"],
+    ["#recTestEng1TakenLabel", "recordsTestsTaken"],
+    ["#recTestEng2BestLabel", "recordsBestScore"],
+    ["#recTestEng2PassedLabel", "recordsTestsPassed"],
+    ["#recTestEng2TakenLabel", "recordsTestsTaken"],
+    ["#recTestFracBestLabel", "recordsBestScore"],
+    ["#recTestFracPassedLabel", "recordsTestsPassed"],
+    ["#recTestFracTakenLabel", "recordsTestsTaken"],
   ]) {
+    const el = document.querySelector(id);
+    if (el) el.textContent = t(key);
+  }
+  const testHeadings = [
+    ["#recordsTestHeadingMath", "recordsMath"],
+    ["#recordsTestHeadingSums", "recordsSums"],
+    ["#recordsTestHeadingEnglish1", "recordsEnglish1"],
+    ["#recordsTestHeadingEnglish2", "recordsEnglish2"],
+    ["#recordsTestHeadingFractions", "recordsFractions"],
+  ];
+  for (const [id, key] of testHeadings) {
     const el = document.querySelector(id);
     if (el) el.textContent = t(key);
   }
@@ -463,9 +727,12 @@ function fillRecordsDialog() {
   const sBest = document.querySelector("#recSumsBest");
   const sWon = document.querySelector("#recSumsWon");
   const sPlayed = document.querySelector("#recSumsPlayed");
-  const eBest = document.querySelector("#recEngBest");
-  const eWon = document.querySelector("#recEngWon");
-  const ePlayed = document.querySelector("#recEngPlayed");
+  const e1Best = document.querySelector("#recEng1Best");
+  const e1Won = document.querySelector("#recEng1Won");
+  const e1Played = document.querySelector("#recEng1Played");
+  const e2Best = document.querySelector("#recEng2Best");
+  const e2Won = document.querySelector("#recEng2Won");
+  const e2Played = document.querySelector("#recEng2Played");
   const fBest = document.querySelector("#recFracBest");
   const fWon = document.querySelector("#recFracWon");
   const fPlayed = document.querySelector("#recFracPlayed");
@@ -475,12 +742,34 @@ function fillRecordsDialog() {
   if (sBest) sBest.textContent = formatDuration(data.sums.bestTimeMs);
   if (sWon) sWon.textContent = String(data.sums.gamesWon);
   if (sPlayed) sPlayed.textContent = String(data.sums.gamesPlayed);
-  if (eBest) eBest.textContent = formatDuration(data.english.bestTimeMs);
-  if (eWon) eWon.textContent = String(data.english.gamesWon);
-  if (ePlayed) ePlayed.textContent = String(data.english.gamesPlayed);
+  if (e1Best) e1Best.textContent = formatDuration(data.english1.bestTimeMs);
+  if (e1Won) e1Won.textContent = String(data.english1.gamesWon);
+  if (e1Played) e1Played.textContent = String(data.english1.gamesPlayed);
+  if (e2Best) e2Best.textContent = formatDuration(data.english2.bestTimeMs);
+  if (e2Won) e2Won.textContent = String(data.english2.gamesWon);
+  if (e2Played) e2Played.textContent = String(data.english2.gamesPlayed);
   if (fBest) fBest.textContent = formatDuration(data.fractions.bestTimeMs);
   if (fWon) fWon.textContent = String(data.fractions.gamesWon);
   if (fPlayed) fPlayed.textContent = String(data.fractions.gamesPlayed);
+
+  const tMath = data.tests.math;
+  const tSums = data.tests.sums;
+  const tE1 = data.tests.english1;
+  const tE2 = data.tests.english2;
+  const tFrac = data.tests.fractions;
+  const setTest = (bestId, passedId, takenId, stats) => {
+    const b = document.querySelector(bestId);
+    const p = document.querySelector(passedId);
+    const n = document.querySelector(takenId);
+    if (b) b.textContent = formatScorePercent(stats.bestScorePercent);
+    if (p) p.textContent = String(stats.testsPassed);
+    if (n) n.textContent = String(stats.testsTaken);
+  };
+  setTest("#recTestMathBest", "#recTestMathPassed", "#recTestMathTaken", tMath);
+  setTest("#recTestSumsBest", "#recTestSumsPassed", "#recTestSumsTaken", tSums);
+  setTest("#recTestEng1Best", "#recTestEng1Passed", "#recTestEng1Taken", tE1);
+  setTest("#recTestEng2Best", "#recTestEng2Passed", "#recTestEng2Taken", tE2);
+  setTest("#recTestFracBest", "#recTestFracPassed", "#recTestFracTaken", tFrac);
 }
 
 function openRecords() {
@@ -499,7 +788,7 @@ function closeRecords() {
  */
 function shareRecordsByEmail() {
   const data = loadRecords();
-  /** @param {"math" | "sums" | "english" | "fractions"} mode */
+  /** @param {import("./records.js").GameMode} mode */
   const block = (titleKey, mode) => {
     const m = data[mode];
     return [
@@ -510,13 +799,32 @@ function shareRecordsByEmail() {
       "",
     ];
   };
+  /** @param {string} titleKey @param {import("./records.js").GameMode} mode */
+  const testBlock = (titleKey, mode) => {
+    const m = data.tests[mode];
+    return [
+      t(titleKey),
+      `${t("recordsBestScore")}: ${formatScorePercent(m.bestScorePercent)}`,
+      `${t("recordsTestsPassed")}: ${m.testsPassed}`,
+      `${t("recordsTestsTaken")}: ${m.testsTaken}`,
+      "",
+    ];
+  };
   const lines = [
     t("emailRecordsIntro", { name: getCurrentUser()?.name || t("userPlayingAs") }),
     "",
+    t("recordsGamesHeading"),
     ...block("recordsMath", "math"),
     ...block("recordsSums", "sums"),
-    ...block("recordsEnglish", "english"),
+    ...block("recordsEnglish1", "english1"),
+    ...block("recordsEnglish2", "english2"),
     ...block("recordsFractions", "fractions"),
+    t("recordsTestsHeading"),
+    ...testBlock("recordsMath", "math"),
+    ...testBlock("recordsSums", "sums"),
+    ...testBlock("recordsEnglish1", "english1"),
+    ...testBlock("recordsEnglish2", "english2"),
+    ...testBlock("recordsFractions", "fractions"),
   ];
   while (lines.length > 0 && lines[lines.length - 1] === "") {
     lines.pop();
@@ -529,7 +837,7 @@ function shareRecordsByEmail() {
 function readOptions() {
   const mode = getMode();
   const tableMax = Math.min(12, Math.max(2, Number(tableMaxSelect?.value ?? 9)));
-  if (mode === "english") {
+  if (isEnglishMode(mode)) {
     const level = getEnglishLevel();
     const { pairCount, englishSpeech } = getEnglishLevelSettings(level);
     return { pairCount, tableMax, englishLevel: level, englishSpeech };
@@ -558,8 +866,13 @@ function readOptions() {
 function startGame(source) {
   cancelEnglishSpeech();
   clearWinAutoRestart();
+  clearQuizAdvance();
+  hideWinActions();
+  lastWinForQuiz = null;
+  if (quizDialog?.open) quizDialog.close();
+  quizSession = null;
   const prev = state;
-  const mode = getMode();
+  let mode = getMode();
 
   if (booted && prev && prev.matched.size < prev.cards.length) {
     const touched =
@@ -575,96 +888,143 @@ function startGame(source) {
   let signature = "";
   /** @type {"both" | "text" | "none" | undefined} */
   let englishSpeech;
+  /** @type {string | undefined} */
+  let englishTopicId;
 
-  if (mode === "math") {
-    const { pairCount, tableMax, mathLevel } = readOptions();
-    const maxPairs = (tableMax * (tableMax + 1)) / 2;
-    const count = Math.min(pairCount, maxPairs);
-    const canVary = count < maxPairs;
+  try {
+    if (mode === "math") {
+      const { pairCount, tableMax, mathLevel } = readOptions();
+      const maxPairs = uniqueProductCount(tableMax);
+      const count = Math.min(pairCount, maxPairs);
+      const canVary = count < maxPairs;
 
-    let facts = pickFacts(tableMax, count, rng);
-    signature =
-      `${mathLevel}\0` + [...facts].map((f) => f.key).sort().join("\0");
-    let tries = 0;
-    while (
-      canVary &&
-      lastSignature.math !== null &&
-      signature === lastSignature.math &&
-      tries < 64
-    ) {
-      facts = pickFacts(tableMax, count, rng);
+      let facts = pickFacts(tableMax, count, rng);
       signature =
         `${mathLevel}\0` + [...facts].map((f) => f.key).sort().join("\0");
-      tries += 1;
-    }
-    lastSignature.math = signature;
-    cards = shuffle(buildDeck(facts, rng), rng);
-  } else if (mode === "sums") {
-    const { pairCount, maxNumber, sumsLevel } = readOptions();
-    const pool = buildSumPool(maxNumber);
-    const maxPairs = pool.length;
-    const count = Math.min(pairCount, maxPairs);
-    let entries = pickSumEntries(pool, count, rng);
-    signature =
-      `${sumsLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
-    let tries = 0;
-    while (
-      lastSignature.sums !== null &&
-      signature === lastSignature.sums &&
-      tries < 64 &&
-      count < maxPairs
-    ) {
-      entries = pickSumEntries(pool, count, rng);
+      let tries = 0;
+      while (
+        canVary &&
+        lastSignature.math !== null &&
+        signature === lastSignature.math &&
+        tries < 64
+      ) {
+        facts = pickFacts(tableMax, count, rng);
+        signature =
+          `${mathLevel}\0` + [...facts].map((f) => f.key).sort().join("\0");
+        tries += 1;
+      }
+      lastSignature.math = signature;
+      cards = shuffle(buildDeck(facts, rng), rng);
+    } else if (mode === "sums") {
+      const { pairCount, maxNumber, sumsLevel } = readOptions();
+      const pool = buildSumPool(maxNumber);
+      const maxPairs = uniqueSumResultCount(pool);
+      const count = Math.min(pairCount, maxPairs);
+      let entries = pickSumEntries(pool, count, rng);
       signature =
         `${sumsLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
-      tries += 1;
-    }
-    lastSignature.sums = signature;
-    cards = shuffle(buildSumDeck(entries, rng), rng);
-  } else if (mode === "english") {
-    const { pairCount, englishLevel, englishSpeech: es } = readOptions();
-    englishSpeech = es;
-    const maxPairs = ENGLISH_LEXICON_KID.length;
-    const count = Math.min(pairCount, maxPairs);
-    let entries = pickEnglishEntries(ENGLISH_LEXICON_KID, count, rng);
-    signature =
-      `${englishLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
-    let tries = 0;
-    while (
-      lastSignature.english !== null &&
-      signature === lastSignature.english &&
-      tries < 64 &&
-      count < maxPairs
-    ) {
-      entries = pickEnglishEntries(ENGLISH_LEXICON_KID, count, rng);
+      let tries = 0;
+      while (
+        lastSignature.sums !== null &&
+        signature === lastSignature.sums &&
+        tries < 64 &&
+        count < maxPairs
+      ) {
+        entries = pickSumEntries(pool, count, rng);
+        signature =
+          `${sumsLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
+        tries += 1;
+      }
+      lastSignature.sums = signature;
+      cards = shuffle(buildSumDeck(entries, rng), rng);
+    } else if (isEnglishMode(mode)) {
+      const { pairCount, englishLevel, englishSpeech: es } = readOptions();
+      englishSpeech = es;
+      const topicId = pickEnglishTopicId(rng);
+      const pool = getEnglishPool(topicId);
+      const maxPairs = pool.length;
+      const count = Math.min(pairCount, maxPairs);
+      let entries = pickEnglishEntries(pool, count, mode, rng);
+      const sigKey = mode === "english1" ? "english1" : "english2";
       signature =
-        `${englishLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
-      tries += 1;
-    }
-    lastSignature.english = signature;
-    cards = shuffle(buildEnglishDeck(entries), rng);
-  } else {
-    const { pairCount, tableMax, fractionLevel } = readOptions();
-    const pool = buildFractionPool(tableMax);
-    const maxPairs = pool.length;
-    const count = Math.min(pairCount, maxPairs);
-    let entries = pickFractionEntries(pool, count, rng);
-    signature =
-      `${fractionLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
-    let tries = 0;
-    while (
-      lastSignature.fractions !== null &&
-      signature === lastSignature.fractions &&
-      tries < 64 &&
-      count < maxPairs
-    ) {
-      entries = pickFractionEntries(pool, count, rng);
+        `${englishLevel}\0${topicId}\0` +
+        [...entries].map((e) => e.key).sort().join("\0");
+      let tries = 0;
+      while (
+        lastSignature[sigKey] !== null &&
+        signature === lastSignature[sigKey] &&
+        tries < 64 &&
+        count < maxPairs
+      ) {
+        entries = pickEnglishEntries(pool, count, mode, rng);
+        signature =
+          `${englishLevel}\0${topicId}\0` +
+          [...entries].map((e) => e.key).sort().join("\0");
+        tries += 1;
+      }
+      lastSignature[sigKey] = signature;
+      cards = shuffle(buildEnglishDeck(entries, mode), rng);
+      englishTopicId = topicId;
+      if (gameTagline) {
+        const tagKey = mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
+        gameTagline.textContent = t(tagKey, {
+          topic: t(englishTopicMessageKey(topicId)),
+        });
+      }
+    } else {
+      const { pairCount, tableMax, fractionLevel } = readOptions();
+      const pool = buildFractionPool(tableMax);
+      const maxPairs = pool.length;
+      const count = Math.min(pairCount, maxPairs);
+      let entries = pickFractionEntries(pool, count, rng);
       signature =
         `${fractionLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
-      tries += 1;
+      let tries = 0;
+      while (
+        lastSignature.fractions !== null &&
+        signature === lastSignature.fractions &&
+        tries < 64 &&
+        count < maxPairs
+      ) {
+        entries = pickFractionEntries(pool, count, rng);
+        signature =
+          `${fractionLevel}\0` + [...entries].map((e) => e.key).sort().join("\0");
+        tries += 1;
+      }
+      lastSignature.fractions = signature;
+      cards = shuffle(buildFractionDeck(entries), rng);
     }
-    lastSignature.fractions = signature;
-    cards = shuffle(buildFractionDeck(entries), rng);
+  } catch (err) {
+    console.error("[app] startGame deck build:", err);
+    englishSpeech = undefined;
+    cards = shuffle(buildDeck(pickFacts(2, 1, rng), rng), rng);
+    mode = "math";
+    if (gameModeSelect) gameModeSelect.value = "math";
+  }
+
+  if (cards.length === 0) {
+    console.warn("[app] Empty deck after build; applying mode-specific fallback.");
+    if (isEnglishMode(mode) && ENGLISH_TOPIC_IDS.length > 0) {
+      const topicId = pickEnglishTopicId(rng);
+      const pool = getEnglishPool(topicId);
+      const picked = pool.length ? pickEnglishEntries(pool, 1, mode, rng) : [];
+      if (picked.length) cards = shuffle(buildEnglishDeck(picked, mode), rng);
+      englishTopicId = topicId;
+    } else if (mode === "sums") {
+      const pool = buildSumPool(10);
+      const entries = pool.length ? pickSumEntries(pool, 1, rng) : [];
+      if (entries.length) cards = shuffle(buildSumDeck(entries, rng), rng);
+    } else if (mode === "fractions") {
+      const pool = buildFractionPool(5);
+      const entries = pool.length ? pickFractionEntries(pool, 1, rng) : [];
+      if (entries.length) cards = shuffle(buildFractionDeck(entries), rng);
+    }
+    if (cards.length === 0) {
+      cards = shuffle(buildDeck(pickFacts(2, 1, rng), rng), rng);
+      mode = "math";
+      englishSpeech = undefined;
+      if (gameModeSelect) gameModeSelect.value = "math";
+    }
   }
 
   state = {
@@ -678,15 +1038,17 @@ function startGame(source) {
     clockStart: null,
     winHandled: false,
     englishSpeech,
+    englishTopicId,
   };
 
   if (winMessage) {
-    if (mode === "english") winMessage.textContent = t("winEnglish");
+    if (mode === "english1") winMessage.textContent = t("winEnglish1");
+    else if (mode === "english2") winMessage.textContent = t("winEnglish2");
     else if (mode === "fractions") winMessage.textContent = t("winFractions");
     else if (mode === "sums") winMessage.textContent = t("winSums");
     else winMessage.textContent = t("winMath");
-    winMessage.hidden = true;
   }
+  hideWinActions();
   refreshChrome();
   renderBoard();
   updateStats();
@@ -716,8 +1078,7 @@ function updateStats() {
     }
   }
 
-  if (matchedPairs === totalPairs && winMessage) {
-    winMessage.hidden = false;
+  if (matchedPairs === totalPairs && winActions) {
     if (!state.winHandled) {
       state.winHandled = true;
       celebrateWin();
@@ -726,14 +1087,9 @@ function updateStats() {
       if (elapsed !== null && elapsed > 0) {
         recordWin(state.mode, elapsed);
       }
+      lastWinForQuiz = { mode: state.mode, cards: [...state.cards] };
       clearWinAutoRestart();
-      winAutoRestartTimer = window.setTimeout(() => {
-        winAutoRestartTimer = null;
-        if (!state) return;
-        const tp = state.cards.length / 2;
-        if (state.matched.size / 2 !== tp) return;
-        startGame("restart");
-      }, 1000);
+      showWinActions();
     }
   }
 }
@@ -766,7 +1122,22 @@ function renderBoard() {
     const pieD = card.d ?? card.den;
     if (card.side === "diagram" && pieN != null && pieD != null) {
       front.classList.add("card-face--diagram");
-      front.append(createPieSvg(pieN, pieD));
+      try {
+        front.append(createPieSvg(pieN, pieD));
+      } catch (e) {
+        console.warn("[app] fraction pie SVG:", e);
+        front.textContent =
+          card.label && String(card.label).trim()
+            ? String(card.label)
+            : `${pieN}/${pieD}`;
+      }
+    } else if (card.symbol && card.side === "picture") {
+      front.classList.add("card-face--picture");
+      const sym = document.createElement("span");
+      sym.className = "card-symbol";
+      sym.textContent = card.symbol;
+      sym.setAttribute("aria-hidden", "true");
+      front.append(sym);
     } else if (card.imageUrl) {
       front.classList.add("card-face--picture");
       const img = document.createElement("img");
@@ -781,6 +1152,11 @@ function renderBoard() {
       front.classList.add("card-face--fraction");
       front.textContent = card.label;
     } else {
+      if (card.side === "he" || (card.side === "word" && card.lang === "he")) {
+        front.classList.add("card-face--hebrew");
+      } else if (card.side === "en") {
+        front.classList.add("card-face--english");
+      }
       front.textContent = card.label;
     }
 
@@ -802,8 +1178,12 @@ function renderBoard() {
       const label =
         card.word ?? (card.label && card.label.trim() ? card.label : card.factKey);
       btn.setAttribute("aria-label", t("ariaMatched", { label }));
-    } else if (isUp && card.imageUrl && card.word) {
+    } else if (isUp && (card.symbol || card.imageUrl) && card.word) {
       btn.setAttribute("aria-label", t("ariaPictureCard", { word: card.word }));
+    } else if (isUp && card.side === "he" && card.label) {
+      btn.setAttribute("aria-label", card.label);
+    } else if (isUp && card.side === "en" && card.label) {
+      btn.setAttribute("aria-label", card.label);
     } else if (isUp && card.side === "diagram" && card.word) {
       btn.setAttribute("aria-label", t("ariaFractionPie", { word: card.word }));
     } else if (isUp && card.side === "fraction" && card.label) {
@@ -832,12 +1212,18 @@ function onCardClick(id) {
 
   state.flipped.push(id);
   syncCardDom(id);
-  if (state.mode === "english") {
+  if (isEnglishMode(state.mode)) {
     const c = state.cards.find((x) => x.id === id);
     const sp = state.englishSpeech;
     if (c?.word?.trim()) {
-      if (sp === "both") speakEnglishMemoryWord(c.word);
-      else if (sp === "text" && c.side === "word") speakEnglishMemoryWord(c.word);
+      if (state.mode === "english1") {
+        if (sp === "both") speakMemoryWord(c.word, "en");
+        else if (sp === "text" && c.side === "word") speakMemoryWord(c.word, "en");
+      } else if (state.mode === "english2") {
+        const lang = c.side === "he" ? "he" : "en";
+        if (sp === "both") speakMemoryWord(c.word, lang);
+        else if (sp === "text" && c.side === "en") speakMemoryWord(c.word, "en");
+      }
     }
   }
 
@@ -900,8 +1286,12 @@ function syncCardDom(id) {
       "aria-label",
       card ? t("ariaMatched", { label }) : t("ariaMatchedUnknown"),
     );
-  } else if (up && card?.imageUrl && card.word) {
+  } else if (up && (card?.symbol || card?.imageUrl) && card.word) {
     btn.setAttribute("aria-label", t("ariaPictureCard", { word: card.word }));
+  } else if (up && card?.side === "he" && card.label) {
+    btn.setAttribute("aria-label", String(card.label));
+  } else if (up && card?.side === "en" && card.label) {
+    btn.setAttribute("aria-label", String(card.label));
   } else if (up && card?.side === "diagram" && card.word) {
     btn.setAttribute("aria-label", t("ariaFractionPie", { word: card.word }));
   } else if (up && card?.side === "fraction" && card.label) {
@@ -998,18 +1388,27 @@ async function removeUserFromPicker(slug) {
   const res = removeUser(slug);
   if (!res.ok) {
     if (res.reason === "last") showUserAddError(t("userErrorLastPlayer"));
+    if (res.reason === "storage") showUserAddError(t("userErrorStorage"));
     return;
   }
   if (isCloudSyncEnabled()) {
     if (addUserBtn) addUserBtn.disabled = true;
     if (userDialogContinue) userDialogContinue.disabled = true;
-    const cloud = await commitPlayerListToCloud({ cancelSlug: slug, removed: res.removed });
-    if (addUserBtn) addUserBtn.disabled = false;
+    try {
+      const cloud = await commitPlayerListToCloud({ cancelSlug: slug, removed: res.removed });
       if (!cloud.ok) {
-      const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
-      showUserAddError(t("userErrorCloudSync", { detail }));
-    } else {
-      hideUserAddError();
+        const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
+        showUserAddError(t("userErrorCloudSync", { detail }));
+      } else {
+        hideUserAddError();
+      }
+    } catch (e) {
+      const detail = e instanceof Error ? e.message : String(e);
+      console.warn("[app] remove user cloud sync:", e);
+      showUserAddError(t("userErrorCloudSync", { detail: detail.slice(0, 220) }));
+    } finally {
+      if (addUserBtn) addUserBtn.disabled = false;
+      if (userDialogContinue) userDialogContinue.disabled = false;
     }
   } else {
     hideUserAddError();
@@ -1054,16 +1453,24 @@ async function tryAddUserAsync() {
     if (userDialogContinue) userDialogContinue.disabled = false;
     if (isCloudSyncEnabled()) {
       if (addUserBtn) addUserBtn.disabled = true;
-      const cloud = await commitPlayerListToCloud({});
-      if (addUserBtn) addUserBtn.disabled = false;
-      if (!cloud.ok) {
-        const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
-        showUserAddError(t("userErrorCloudSync", { detail }));
+      try {
+        const cloud = await commitPlayerListToCloud({});
+        if (!cloud.ok) {
+          const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
+          showUserAddError(t("userErrorCloudSync", { detail }));
+        }
+      } catch (e) {
+        const detail = e instanceof Error ? e.message : String(e);
+        console.warn("[app] add user cloud sync:", e);
+        showUserAddError(t("userErrorCloudSync", { detail: detail.slice(0, 220) }));
+      } finally {
+        if (addUserBtn) addUserBtn.disabled = false;
       }
     }
     return;
   }
   if (result.reason === "duplicate") showUserAddError(t("userErrorDuplicateName"));
+  else if (result.reason === "storage") showUserAddError(t("userErrorStorage"));
   else showUserAddError(t("userErrorLengthName"));
 }
 
@@ -1074,35 +1481,50 @@ function confirmUserChoice() {
 async function confirmUserChoiceAsync() {
   if (!pendingUserSlug) return;
   const cont = userDialogContinue;
-  if (isCloudSyncEnabled()) {
-    if (cont) {
-      cont.disabled = true;
-      cont.textContent = t("userCloudSaving");
+  try {
+    if (isCloudSyncEnabled()) {
+      if (cont) {
+        cont.disabled = true;
+        cont.textContent = t("userCloudSaving");
+      }
+      let cloud = { ok: true, failures: /** @type {string[]} */ ([]) };
+      try {
+        cloud = await commitPlayerListToCloud({});
+      } catch (e) {
+        const detail = e instanceof Error ? e.message : String(e);
+        console.warn("[app] confirm user cloud sync:", e);
+        showUserAddError(t("userErrorCloudSync", { detail: detail.slice(0, 220) }));
+        return;
+      }
+      if (!cloud.ok) {
+        const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
+        showUserAddError(t("userErrorCloudSync", { detail }));
+        syncUserDialogButtonEmphasis();
+        return;
+      }
+      hideUserAddError();
     }
-    const cloud = await commitPlayerListToCloud({});
+    clearAdminSession();
+    if (!setCurrentUserSlug(pendingUserSlug)) {
+      showUserAddError(t("userErrorStorage"));
+      return;
+    }
+    userDialog?.close();
+    appRoot?.classList.remove("is-hidden");
+    if (!booted) {
+      refreshChrome();
+      startGame("init");
+    } else {
+      cancelEnglishSpeech();
+      refreshChrome();
+      startGame("switch-user");
+    }
+  } finally {
     if (cont) {
       cont.textContent = t("userContinue");
       cont.disabled = !pendingUserSlug;
     }
-    if (!cloud.ok) {
-      const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
-      showUserAddError(t("userErrorCloudSync", { detail }));
-      syncUserDialogButtonEmphasis();
-      return;
-    }
-    hideUserAddError();
-  }
-  clearAdminSession();
-  setCurrentUserSlug(pendingUserSlug);
-  userDialog?.close();
-  appRoot?.classList.remove("is-hidden");
-  if (!booted) {
-    refreshChrome();
-    startGame("init");
-  } else {
-    cancelEnglishSpeech();
-    refreshChrome();
-    startGame("switch-user");
+    syncUserDialogButtonEmphasis();
   }
 }
 
@@ -1122,13 +1544,21 @@ function openAdminUnlockDialog() {
 }
 
 async function submitAdminUnlock() {
-  const pw = adminPasswordInput?.value ?? "";
-  if (await tryUnlockAdminSession(pw)) {
-    adminUnlockDialog?.close();
-    await openAdminOverview();
-  } else if (adminUnlockError) {
-    adminUnlockError.textContent = t("adminBadPassword");
-    adminUnlockError.classList.remove("is-hidden");
+  try {
+    const pw = adminPasswordInput?.value ?? "";
+    if (await tryUnlockAdminSession(pw)) {
+      adminUnlockDialog?.close();
+      await openAdminOverview();
+    } else if (adminUnlockError) {
+      adminUnlockError.textContent = t("adminBadPassword");
+      adminUnlockError.classList.remove("is-hidden");
+    }
+  } catch (e) {
+    console.warn("[app] admin unlock:", e);
+    if (adminUnlockError) {
+      adminUnlockError.textContent = t("adminUnlockFailed");
+      adminUnlockError.classList.remove("is-hidden");
+    }
   }
 }
 
@@ -1153,7 +1583,8 @@ function renderAdminTableLocal(cur) {
     const total =
       st.math.gamesPlayed +
       st.sums.gamesPlayed +
-      st.english.gamesPlayed +
+      st.english1.gamesPlayed +
+      st.english2.gamesPlayed +
       st.fractions.gamesPlayed;
     const tr = document.createElement("tr");
     const cells = [
@@ -1162,7 +1593,8 @@ function renderAdminTableLocal(cur) {
       String(total),
       formatDuration(st.math.bestTimeMs),
       formatDuration(st.sums.bestTimeMs),
-      formatDuration(st.english.bestTimeMs),
+      formatDuration(st.english1.bestTimeMs),
+      formatDuration(st.english2.bestTimeMs),
       formatDuration(st.fractions.bestTimeMs),
     ];
     for (const text of cells) {
@@ -1184,7 +1616,8 @@ function appendCloudPlayerRow(row, cur) {
   const total =
     st.math.gamesPlayed +
     st.sums.gamesPlayed +
-    st.english.gamesPlayed +
+    st.english1.gamesPlayed +
+    st.english2.gamesPlayed +
     st.fractions.gamesPlayed;
   const rawLast = row.last_played_at;
   const lastNum =
@@ -1203,7 +1636,8 @@ function appendCloudPlayerRow(row, cur) {
     String(total),
     formatDuration(st.math.bestTimeMs),
     formatDuration(st.sums.bestTimeMs),
-    formatDuration(st.english.bestTimeMs),
+    formatDuration(st.english1.bestTimeMs),
+    formatDuration(st.english2.bestTimeMs),
     formatDuration(st.fractions.bestTimeMs),
   ];
   const tr = document.createElement("tr");
@@ -1229,7 +1663,8 @@ async function openAdminOverview() {
         "adminColGames",
         "adminColMath",
         "adminColSums",
-        "adminColEng",
+        "adminColEng1",
+        "adminColEng2",
         "adminColFrac",
       ]
     : [
@@ -1238,7 +1673,8 @@ async function openAdminOverview() {
         "adminColGames",
         "adminColMath",
         "adminColSums",
-        "adminColEng",
+        "adminColEng1",
+        "adminColEng2",
         "adminColFrac",
       ];
 
@@ -1284,13 +1720,14 @@ async function openAdminOverview() {
         "adminColGames",
         "adminColMath",
         "adminColSums",
-        "adminColEng",
+        "adminColEng1",
+        "adminColEng2",
         "adminColFrac",
       ]);
       adminTableBody.replaceChildren();
       const er = document.createElement("tr");
       const ec = document.createElement("td");
-      ec.colSpan = 8;
+      ec.colSpan = 9;
       ec.textContent = t("adminCloudError", { message: msg });
       er.append(ec);
       adminTableBody.append(er);
@@ -1401,6 +1838,12 @@ adminDialog?.addEventListener("click", (e) => {
 newGameBtn?.addEventListener("click", () => startGame("restart"));
 pairCountSelect?.addEventListener("change", () => startGame("options"));
 englishLevelSelect?.addEventListener("change", () => startGame("options"));
+testMeBtn?.addEventListener("click", () => openQuiz());
+closeQuizBtn?.addEventListener("click", () => closeQuiz());
+quizDialog?.addEventListener("close", () => {
+  clearQuizAdvance();
+  quizSession = null;
+});
 sumsLevelSelect?.addEventListener("change", () => startGame("options"));
 mathLevelSelect?.addEventListener("change", () => startGame("options"));
 fractionLevelSelect?.addEventListener("change", () => startGame("options"));

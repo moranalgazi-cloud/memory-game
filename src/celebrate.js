@@ -193,7 +193,81 @@ function burstConfetti() {
   requestAnimationFrame(frame);
 }
 
+const WIN_EMOJIS = ["👏", "👍", "🙌"];
+
+function burstWinEmojis() {
+  if (typeof document === "undefined") return;
+
+  const layer = document.createElement("div");
+  layer.setAttribute("aria-hidden", "true");
+  layer.style.cssText =
+    "position:fixed;inset:0;pointer-events:none;z-index:10000;overflow:hidden";
+  document.body.append(layer);
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const count = Math.min(36, Math.max(18, Math.floor((w * h) / 28000)));
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement("span");
+    el.textContent = WIN_EMOJIS[(Math.random() * WIN_EMOJIS.length) | 0];
+    el.setAttribute("aria-hidden", "true");
+    const size = 28 + Math.random() * 22;
+    const x = Math.random() * Math.max(1, w - size);
+    const startY = h * (0.55 + Math.random() * 0.38);
+    const drift = (Math.random() - 0.5) * w * 0.18;
+    el.style.cssText = [
+      "position:absolute",
+      `left:${x}px`,
+      `top:${startY}px`,
+      `font-size:${size}px`,
+      "line-height:1",
+      "will-change:transform,opacity",
+      "user-select:none",
+    ].join(";");
+    layer.append(el);
+
+    const duration = 2200 + Math.random() * 1400;
+    const rise = h * (0.35 + Math.random() * 0.25);
+    el.animate(
+      [
+        { transform: "translate(0, 0) scale(0.4) rotate(-12deg)", opacity: 0 },
+        {
+          transform: `translate(${drift * 0.35}px, ${-rise * 0.35}px) scale(1) rotate(6deg)`,
+          opacity: 1,
+          offset: 0.18,
+        },
+        {
+          transform: `translate(${drift}px, ${-rise}px) scale(1.05) rotate(-4deg)`,
+          opacity: 0.95,
+          offset: 0.72,
+        },
+        {
+          transform: `translate(${drift * 1.1}px, ${-rise * 1.15}px) scale(0.85) rotate(8deg)`,
+          opacity: 0,
+        },
+      ],
+      { duration, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)", fill: "forwards" },
+    );
+  }
+
+  window.setTimeout(() => layer.remove(), 3800);
+}
+
 export function celebrateWin() {
-  playApplause();
-  burstConfetti();
+  try {
+    playApplause();
+  } catch (e) {
+    console.warn("[celebrate] audio:", e);
+  }
+  try {
+    burstConfetti();
+  } catch (e) {
+    console.warn("[celebrate] confetti:", e);
+  }
+  try {
+    burstWinEmojis();
+  } catch (e) {
+    console.warn("[celebrate] emojis:", e);
+  }
 }

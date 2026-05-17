@@ -55,6 +55,10 @@ Output is written to `dist/`. Preview that build locally:
 npm run preview
 ```
 
+## Mobile app (Capacitor — Android first)
+
+See **[docs/CAPACITOR.md](docs/CAPACITOR.md)** for Android Studio setup, **`npm run cap:sync`**, and Play Store **AAB** steps. iOS can be added later on a Mac (same doc).
+
 ## Test
 
 Watch mode (re-runs on file changes):
@@ -73,7 +77,7 @@ npm run test:run
 
 | Script            | Purpose                                      |
 | ----------------- | -------------------------------------------- |
-| `npm run build:lexicon` | Regenerates English lexicon data (see `scripts/`) |
+| `npm run build:lexicon` | Validates curated English vocabulary (`scripts/build-english-lexicon.mjs`) |
 | `npm run fix:utf8`      | Normalizes text file encodings (also runs around install/dev/build) |
 
 ## Project layout (short)

@@ -4,6 +4,7 @@ import {
   buildSumPool,
   pickSumEntries,
   buildSumDeck,
+  uniqueSumResultCount,
 } from "./sums-game.js";
 import { isPairMatch } from "./game.js";
 
@@ -49,6 +50,21 @@ describe("pickSumEntries", () => {
     const picked = pickSumEntries(pool, 6, seeded(42));
     expect(picked).toHaveLength(6);
     expect(new Set(picked.map((p) => p.key)).size).toBe(6);
+  });
+
+  it("never picks two facts with the same result", () => {
+    const pool = buildSumPool(10);
+    const picked = pickSumEntries(pool, 6, seeded(99));
+    const results = picked.map((p) => p.result);
+    expect(new Set(results).size).toBe(results.length);
+  });
+});
+
+describe("uniqueSumResultCount", () => {
+  it("is at most the pool size", () => {
+    const pool = buildSumPool(10);
+    expect(uniqueSumResultCount(pool)).toBeLessThanOrEqual(pool.length);
+    expect(uniqueSumResultCount(pool)).toBeGreaterThanOrEqual(6);
   });
 });
 

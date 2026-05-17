@@ -1,3 +1,5 @@
+import { pickWithUniqueValues, rngUnit } from "./game.js";
+
 /**
  * Addition & subtraction memory facts.
  * @typedef {{ op: "+" | "-"; a: number; b: number; result: number; key: string }} SumFact
@@ -55,6 +57,11 @@ export function buildSumPool(maxN) {
   return pool;
 }
 
+/** @param {SumFact[]} pool */
+export function uniqueSumResultCount(pool) {
+  return new Set(pool.map((f) => f.result)).size;
+}
+
 /**
  * @param {SumFact[]} pool
  * @param {number} count
@@ -62,14 +69,7 @@ export function buildSumPool(maxN) {
  * @returns {SumFact[]}
  */
 export function pickSumEntries(pool, count, rng = Math.random) {
-  const bag = [...pool];
-  const chosen = [];
-  const n = Math.min(count, bag.length);
-  while (chosen.length < n && bag.length) {
-    const i = Math.floor(rng() * bag.length);
-    chosen.push(bag.splice(i, 1)[0]);
-  }
-  return chosen;
+  return pickWithUniqueValues(pool, count, (f) => f.result, rng);
 }
 
 /**
@@ -84,7 +84,7 @@ export function buildSumDeck(entries, rng = Math.random) {
   for (const f of entries) {
     let left = f.a;
     let right = f.b;
-    if (f.op === "+" && f.a !== f.b && rng() >= 0.5) {
+    if (f.op === "+" && f.a !== f.b && rngUnit(rng) >= 0.5) {
       left = f.b;
       right = f.a;
     }

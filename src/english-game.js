@@ -1,63 +1,98 @@
-import lexicon from "./english-lexicon.json";
+import vocabulary from "./english-vocabulary.json";
+import { rngUnit } from "./game.js";
 
 /**
- * @typedef {{ key: string; word: string; image: string }} EnglishLexEntry
- * @typedef {{ id: string; factKey: string; side: "picture" | "word"; label: string; imageUrl?: string; word?: string }} EnglishCard
+ * @typedef {{ key: string; word: string; wordHe: string; symbol: string }} EnglishLexEntry
+ * @typedef {{ id: string; entries: EnglishLexEntry[] }} EnglishTopic
+ * @typedef {"en" | "he"} EnglishDeckLang
+ * @typedef {"english1" | "english2"} EnglishDeckKind
+ * @typedef {{ id: string; factKey: string; side: "picture" | "word" | "he" | "en"; label: string; symbol?: string; word?: string; lang?: EnglishDeckLang }} EnglishCard
  */
 
-/** @type {EnglishLexEntry[]} */
-export const ENGLISH_LEXICON = /** @type {EnglishLexEntry[]} */ (lexicon);
+/** @type {EnglishTopic[]} */
+export const ENGLISH_TOPICS = /** @type {EnglishTopic[]} */ (vocabulary.topics);
 
-/** GitHub serves national / territory flags as two regional-indicator codepoints in the filename. */
-function isRegionalFlagImageUrl(url) {
-  return typeof url === "string" && /\/unicode\/1f1[a-f0-9]{2}-1f1[a-f0-9]{2}\.png/i.test(url);
+/** @type {string[]} */
+export const ENGLISH_TOPIC_IDS = ENGLISH_TOPICS.map((t) => t.id);
+
+/**
+ * @param {string} topicId
+ * @returns {EnglishTopic | undefined}
+ */
+export function getEnglishTopic(topicId) {
+  return ENGLISH_TOPICS.find((t) => t.id === topicId);
 }
 
 /**
- * Keeps vocabulary easy for ~10-year-olds: short phrases (≤2 words), no flag tiles,
- * no skin-tone variant keys, no arrow UI clutter, no digits in the spoken label.
- * @param {EnglishLexEntry} e
+ * @param {string} topicId
+ * @returns {EnglishLexEntry[]}
  */
-export function isKidFriendlyEnglishEntry(e) {
-  if (!e || typeof e.key !== "string" || typeof e.word !== "string") return false;
-  if (isRegionalFlagImageUrl(e.image)) return false;
+export function getEnglishPool(topicId) {
+  const topic = getEnglishTopic(topicId);
+  return topic ? [...topic.entries] : [];
+}
 
-  const w = e.word.trim();
-  if (!w || /\d/.test(w)) return false;
+/**
+ * @param {() => number} [rng]
+ * @returns {string}
+ */
+export function pickEnglishTopicId(rng = Math.random) {
+  const i = Math.floor(rngUnit(rng) * ENGLISH_TOPIC_IDS.length);
+  return ENGLISH_TOPIC_IDS[i] ?? ENGLISH_TOPIC_IDS[0];
+}
 
-  const words = w.split(/\s+/).filter(Boolean);
+/**
+ * @param {EnglishLexEntry} e
+ * @param {EnglishDeckLang} lang
+ */
+export function entryLabel(e, lang) {
+  return lang === "he" ? e.wordHe : e.word;
+}
+
+/**
+ * @param {EnglishLexEntry} e
+ * @param {EnglishDeckLang} [lang]
+ */
+export function isValidEnglishEntry(e, lang = "en") {
+  if (!e || typeof e.key !== "string") return false;
+  if (typeof e.symbol !== "string" || !e.symbol.trim()) return false;
+  const label = entryLabel(
+    /** @type {EnglishLexEntry} */ ({ ...e, word: e.word ?? "", wordHe: e.wordHe ?? "" }),
+    lang,
+  );
+  if (typeof label !== "string" || !label.trim()) return false;
+  if (lang === "en" && (typeof e.word !== "string" || !e.word.trim())) return false;
+  if (lang === "he" && (typeof e.wordHe !== "string" || !e.wordHe.trim())) return false;
+  if (/\d/.test(label)) return false;
+  const words = label.trim().split(/\s+/).filter(Boolean);
   if (words.length > 2) return false;
-  if (w.length > 24) return false;
+  if (label.length > 24) return false;
   for (const part of words) {
     if (part.length > 15) return false;
   }
-
-  const k = e.key.toLowerCase();
-  if (/(?:^|_)(?:flag|flags)(?:_|$)/i.test(k)) return false;
-  if (/^arrow_/i.test(k)) return false;
-  if (/_skin_tone|_tone[1-5]|_type-[1-6]/i.test(k)) return false;
-
-  const keyParts = e.key.split(/[-_]/).filter(Boolean);
-  if (keyParts.length > 2) return false;
-
   return true;
 }
 
-/** Filtered pool for the English memory game (still large for variety). */
-export const ENGLISH_LEXICON_KID = ENGLISH_LEXICON.filter(isKidFriendlyEnglishEntry);
+/** @param {EnglishLexEntry} e */
+export function isValidBilingualEntry(e) {
+  return isValidEnglishEntry(e, "en") && isValidEnglishEntry(e, "he");
+}
 
 /**
  * @param {EnglishLexEntry[]} pool
  * @param {number} count
+ * @param {EnglishDeckKind} deckKind
  * @param {() => number} rng
  * @returns {EnglishLexEntry[]}
  */
-export function pickEnglishEntries(pool, count, rng = Math.random) {
-  const bag = [...pool];
+export function pickEnglishEntries(pool, count, deckKind = "english1", rng = Math.random) {
+  const bag = pool.filter((e) =>
+    deckKind === "english2" ? isValidBilingualEntry(e) : isValidEnglishEntry(e, "en"),
+  );
   const chosen = [];
   const n = Math.min(count, bag.length);
   while (chosen.length < n && bag.length) {
-    const i = Math.floor(rng() * bag.length);
+    const i = Math.floor(rngUnit(rng) * bag.length);
     chosen.push(bag.splice(i, 1)[0]);
   }
   return chosen;
@@ -65,32 +100,59 @@ export function pickEnglishEntries(pool, count, rng = Math.random) {
 
 /**
  * @param {EnglishLexEntry[]} entries
- * @param {() => number} [rng]
+ * @param {EnglishDeckKind} [deckKind]
  * @returns {EnglishCard[]}
  */
-export function buildEnglishDeck(entries) {
+export function buildEnglishDeck(entries, deckKind = "english1") {
   /** @type {EnglishCard[]} */
   const cards = [];
   let n = 0;
   for (const e of entries) {
+    if (deckKind === "english2") {
+      if (!isValidBilingualEntry(e)) continue;
+      cards.push({
+        id: `e${n++}`,
+        factKey: e.key,
+        side: "he",
+        label: e.wordHe,
+        word: e.wordHe,
+        lang: "he",
+      });
+      cards.push({
+        id: `e${n++}`,
+        factKey: e.key,
+        side: "en",
+        label: e.word,
+        word: e.word,
+        lang: "en",
+      });
+      continue;
+    }
+    if (!isValidEnglishEntry(e, "en")) continue;
     cards.push({
       id: `e${n++}`,
       factKey: e.key,
       side: "picture",
       label: "",
-      imageUrl: e.image,
+      symbol: e.symbol,
       word: e.word,
+      lang: "en",
     });
     cards.push({
       id: `e${n++}`,
       factKey: e.key,
       side: "word",
       label: e.word,
-      imageUrl: "",
       word: e.word,
+      lang: "en",
     });
   }
   return cards;
+}
+
+/** i18n message key for a topic id (e.g. englishTopic_days). */
+export function englishTopicMessageKey(topicId) {
+  return `englishTopic_${topicId}`;
 }
 
 export { shuffle, isPairMatch } from "./game.js";

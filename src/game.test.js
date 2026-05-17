@@ -5,7 +5,23 @@ import {
   buildDeck,
   shuffle,
   isPairMatch,
+  rngUnit,
+  uniqueProductCount,
 } from "./game.js";
+
+describe("rngUnit", () => {
+  it("returns a finite value in [0, 1) for a normal RNG", () => {
+    const u = rngUnit(() => 0.37);
+    expect(u).toBeGreaterThanOrEqual(0);
+    expect(u).toBeLessThan(1);
+  });
+
+  it("falls back when RNG returns non-finite values", () => {
+    const u = rngUnit(() => NaN);
+    expect(u).toBeGreaterThanOrEqual(0);
+    expect(u).toBeLessThan(1);
+  });
+});
 
 describe("factKey", () => {
   it("orders factors for a stable key", () => {
@@ -27,6 +43,19 @@ describe("pickFacts", () => {
   it("never exceeds available combinations", () => {
     const facts = pickFacts(2, 99, () => 0);
     expect(facts.length).toBeLessThanOrEqual(3);
+  });
+
+  it("never picks two facts with the same product", () => {
+    const facts = pickFacts(10, 9, seeded(7));
+    const products = facts.map((f) => f.product);
+    expect(new Set(products).size).toBe(products.length);
+  });
+});
+
+describe("uniqueProductCount", () => {
+  it("counts distinct products, not factor pairs", () => {
+    expect(uniqueProductCount(2)).toBe(3);
+    expect(uniqueProductCount(10)).toBeGreaterThanOrEqual(9);
   });
 });
 

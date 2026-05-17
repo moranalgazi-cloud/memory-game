@@ -53,6 +53,8 @@ export default defineConfig(({ mode }) => {
   const supaUrl = (fromFile.VITE_SUPABASE_URL || fromVite.VITE_SUPABASE_URL || "").trim();
   const supaKey = (fromFile.VITE_SUPABASE_ANON_KEY || fromVite.VITE_SUPABASE_ANON_KEY || "").trim();
   return {
+    /** Relative asset paths so the app works inside Capacitor’s WebView (`capacitor://localhost`). */
+    base: "./",
     define: {
       __APP_SUPABASE_URL__: JSON.stringify(supaUrl),
       __APP_SUPABASE_KEY__: JSON.stringify(supaKey),

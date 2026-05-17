@@ -1,0 +1,1775 @@
+{
+  "topics": [
+    {
+      "id": "days",
+      "entries": [
+        {
+          "key": "monday",
+          "word": "Monday",
+          "wordHe": "יום שני",
+          "symbol": "1️⃣"
+        },
+        {
+          "key": "tuesday",
+          "word": "Tuesday",
+          "wordHe": "יום שלישי",
+          "symbol": "2️⃣"
+        },
+        {
+          "key": "wednesday",
+          "word": "Wednesday",
+          "wordHe": "יום רביעי",
+          "symbol": "3️⃣"
+        },
+        {
+          "key": "thursday",
+          "word": "Thursday",
+          "wordHe": "יום חמישי",
+          "symbol": "4️⃣"
+        },
+        {
+          "key": "friday",
+          "word": "Friday",
+          "wordHe": "יום שישי",
+          "symbol": "5️⃣"
+        },
+        {
+          "key": "saturday",
+          "word": "Saturday",
+          "wordHe": "יום שבת",
+          "symbol": "6️⃣"
+        },
+        {
+          "key": "sunday",
+          "word": "Sunday",
+          "wordHe": "יום ראשון",
+          "symbol": "7️⃣"
+        },
+        {
+          "key": "today",
+          "word": "Today",
+          "wordHe": "היום",
+          "symbol": "📍"
+        },
+        {
+          "key": "tomorrow",
+          "word": "Tomorrow",
+          "wordHe": "מחר",
+          "symbol": "🔜"
+        },
+        {
+          "key": "yesterday",
+          "word": "Yesterday",
+          "wordHe": "אתמול",
+          "symbol": "⏪"
+        },
+        {
+          "key": "morning",
+          "word": "Morning",
+          "wordHe": "בוקר",
+          "symbol": "🌅"
+        },
+        {
+          "key": "night",
+          "word": "Night",
+          "wordHe": "לילה",
+          "symbol": "🌙"
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "entries": [
+        {
+          "key": "car",
+          "word": "Car",
+          "wordHe": "מכונית",
+          "symbol": "🚗"
+        },
+        {
+          "key": "bus",
+          "word": "Bus",
+          "wordHe": "אוטובוס",
+          "symbol": "🚌"
+        },
+        {
+          "key": "train",
+          "word": "Train",
+          "wordHe": "רכבת",
+          "symbol": "🚆"
+        },
+        {
+          "key": "bike",
+          "word": "Bike",
+          "wordHe": "אופניים",
+          "symbol": "🚲"
+        },
+        {
+          "key": "plane",
+          "word": "Plane",
+          "wordHe": "מטוס",
+          "symbol": "✈️"
+        },
+        {
+          "key": "boat",
+          "word": "Boat",
+          "wordHe": "סירה",
+          "symbol": "⛵"
+        },
+        {
+          "key": "truck",
+          "word": "Truck",
+          "wordHe": "משאית",
+          "symbol": "🚚"
+        },
+        {
+          "key": "taxi",
+          "word": "Taxi",
+          "wordHe": "מונית",
+          "symbol": "🚕"
+        },
+        {
+          "key": "subway",
+          "word": "Subway",
+          "wordHe": "רכבת תחתית",
+          "symbol": "🚇"
+        },
+        {
+          "key": "helicopter",
+          "word": "Helicopter",
+          "wordHe": "מסוק",
+          "symbol": "🚁"
+        },
+        {
+          "key": "scooter",
+          "word": "Scooter",
+          "wordHe": "קורקינט",
+          "symbol": "🛴"
+        },
+        {
+          "key": "ship",
+          "word": "Ship",
+          "wordHe": "אונייה",
+          "symbol": "🚢"
+        }
+      ]
+    },
+    {
+      "id": "land_animals",
+      "entries": [
+        {
+          "key": "dog",
+          "word": "Dog",
+          "wordHe": "כלב",
+          "symbol": "🐕"
+        },
+        {
+          "key": "cat",
+          "word": "Cat",
+          "wordHe": "חתול",
+          "symbol": "🐈"
+        },
+        {
+          "key": "lion",
+          "word": "Lion",
+          "wordHe": "אריה",
+          "symbol": "🦁"
+        },
+        {
+          "key": "tiger",
+          "word": "Tiger",
+          "wordHe": "נמר",
+          "symbol": "🐯"
+        },
+        {
+          "key": "elephant",
+          "word": "Elephant",
+          "wordHe": "פיל",
+          "symbol": "🐘"
+        },
+        {
+          "key": "bear",
+          "word": "Bear",
+          "wordHe": "דוב",
+          "symbol": "🐻"
+        },
+        {
+          "key": "rabbit",
+          "word": "Rabbit",
+          "wordHe": "ארנב",
+          "symbol": "🐰"
+        },
+        {
+          "key": "horse",
+          "word": "Horse",
+          "wordHe": "סוס",
+          "symbol": "🐴"
+        },
+        {
+          "key": "cow",
+          "word": "Cow",
+          "wordHe": "פרה",
+          "symbol": "🐄"
+        },
+        {
+          "key": "pig",
+          "word": "Pig",
+          "wordHe": "חזיר",
+          "symbol": "🐷"
+        },
+        {
+          "key": "sheep",
+          "word": "Sheep",
+          "wordHe": "כבשה",
+          "symbol": "🐑"
+        },
+        {
+          "key": "monkey",
+          "word": "Monkey",
+          "wordHe": "קוף",
+          "symbol": "🐒"
+        }
+      ]
+    },
+    {
+      "id": "sea_animals",
+      "entries": [
+        {
+          "key": "fish",
+          "word": "Fish",
+          "wordHe": "דג",
+          "symbol": "🐟"
+        },
+        {
+          "key": "whale",
+          "word": "Whale",
+          "wordHe": "לווייתן",
+          "symbol": "🐋"
+        },
+        {
+          "key": "dolphin",
+          "word": "Dolphin",
+          "wordHe": "דולפין",
+          "symbol": "🐬"
+        },
+        {
+          "key": "shark",
+          "word": "Shark",
+          "wordHe": "כריש",
+          "symbol": "🦈"
+        },
+        {
+          "key": "octopus",
+          "word": "Octopus",
+          "wordHe": "תמנון",
+          "symbol": "🐙"
+        },
+        {
+          "key": "crab",
+          "word": "Crab",
+          "wordHe": "סרטן",
+          "symbol": "🦀"
+        },
+        {
+          "key": "jellyfish",
+          "word": "Jellyfish",
+          "wordHe": "מדוזה",
+          "symbol": "🪼"
+        },
+        {
+          "key": "turtle",
+          "word": "Turtle",
+          "wordHe": "צב",
+          "symbol": "🐢"
+        },
+        {
+          "key": "seal",
+          "word": "Seal",
+          "wordHe": "כלב ים",
+          "symbol": "🦭"
+        },
+        {
+          "key": "starfish",
+          "word": "Starfish",
+          "wordHe": "כוכב ים",
+          "symbol": "⭐"
+        },
+        {
+          "key": "lobster",
+          "word": "Lobster",
+          "wordHe": "לובסטר",
+          "symbol": "🦞"
+        },
+        {
+          "key": "seahorse",
+          "word": "Seahorse",
+          "wordHe": "סוס ים",
+          "symbol": "🐚"
+        }
+      ]
+    },
+    {
+      "id": "birds",
+      "entries": [
+        {
+          "key": "eagle",
+          "word": "Eagle",
+          "wordHe": "נשר",
+          "symbol": "🦅"
+        },
+        {
+          "key": "owl",
+          "word": "Owl",
+          "wordHe": "ינשוף",
+          "symbol": "🦉"
+        },
+        {
+          "key": "parrot",
+          "word": "Parrot",
+          "wordHe": "תוכי",
+          "symbol": "🦜"
+        },
+        {
+          "key": "duck",
+          "word": "Duck",
+          "wordHe": "ברווז",
+          "symbol": "🦆"
+        },
+        {
+          "key": "chicken",
+          "word": "Chicken",
+          "wordHe": "תרנגולת",
+          "symbol": "🐔"
+        },
+        {
+          "key": "penguin",
+          "word": "Penguin",
+          "wordHe": "פינגווין",
+          "symbol": "🐧"
+        },
+        {
+          "key": "flamingo",
+          "word": "Flamingo",
+          "wordHe": "פלמינגו",
+          "symbol": "🦩"
+        },
+        {
+          "key": "sparrow",
+          "word": "Sparrow",
+          "wordHe": "דרור",
+          "symbol": "🐦"
+        },
+        {
+          "key": "peacock",
+          "word": "Peacock",
+          "wordHe": "טווס",
+          "symbol": "🦚"
+        },
+        {
+          "key": "swan",
+          "word": "Swan",
+          "wordHe": "ברבור",
+          "symbol": "🦢"
+        },
+        {
+          "key": "crow",
+          "word": "Crow",
+          "wordHe": "עורב",
+          "symbol": "🐦‍⬛"
+        },
+        {
+          "key": "hummingbird",
+          "word": "Hummingbird",
+          "wordHe": "יונק דבש",
+          "symbol": "🪺"
+        }
+      ]
+    },
+    {
+      "id": "school",
+      "entries": [
+        {
+          "key": "book",
+          "word": "Book",
+          "wordHe": "ספר",
+          "symbol": "📚"
+        },
+        {
+          "key": "pencil",
+          "word": "Pencil",
+          "wordHe": "עיפרון",
+          "symbol": "✏️"
+        },
+        {
+          "key": "eraser",
+          "word": "Eraser",
+          "wordHe": "מחק",
+          "symbol": "🧽"
+        },
+        {
+          "key": "ruler",
+          "word": "Ruler",
+          "wordHe": "סרגל",
+          "symbol": "📏"
+        },
+        {
+          "key": "desk",
+          "word": "Desk",
+          "wordHe": "שולחן",
+          "symbol": "🪑"
+        },
+        {
+          "key": "chair",
+          "word": "Chair",
+          "wordHe": "כיסא",
+          "symbol": "💺"
+        },
+        {
+          "key": "backpack",
+          "word": "Backpack",
+          "wordHe": "תיק",
+          "symbol": "🎒"
+        },
+        {
+          "key": "teacher",
+          "word": "Teacher",
+          "wordHe": "מורה",
+          "symbol": "👩‍🏫"
+        },
+        {
+          "key": "student",
+          "word": "Student",
+          "wordHe": "תלמיד",
+          "symbol": "🧑‍🎓"
+        },
+        {
+          "key": "bell",
+          "word": "Bell",
+          "wordHe": "פעמון",
+          "symbol": "🔔"
+        },
+        {
+          "key": "crayon",
+          "word": "Crayon",
+          "wordHe": "צבע",
+          "symbol": "🖍️"
+        },
+        {
+          "key": "notebook",
+          "word": "Notebook",
+          "wordHe": "מחברת",
+          "symbol": "📓"
+        }
+      ]
+    },
+    {
+      "id": "street",
+      "entries": [
+        {
+          "key": "road",
+          "word": "Road",
+          "wordHe": "כביש",
+          "symbol": "🛣️"
+        },
+        {
+          "key": "light",
+          "word": "Light",
+          "wordHe": "רמזור",
+          "symbol": "🚦"
+        },
+        {
+          "key": "sign",
+          "word": "Sign",
+          "wordHe": "שלט",
+          "symbol": "🪧"
+        },
+        {
+          "key": "sidewalk",
+          "word": "Sidewalk",
+          "wordHe": "מדרכה",
+          "symbol": "🚶"
+        },
+        {
+          "key": "bridge",
+          "word": "Bridge",
+          "wordHe": "גשר",
+          "symbol": "🌉"
+        },
+        {
+          "key": "park",
+          "word": "Park",
+          "wordHe": "פארק",
+          "symbol": "🌳"
+        },
+        {
+          "key": "bench",
+          "word": "Bench",
+          "wordHe": "ספסל",
+          "symbol": "🪑"
+        },
+        {
+          "key": "mailbox",
+          "word": "Mailbox",
+          "wordHe": "תיבת דואר",
+          "symbol": "📮"
+        },
+        {
+          "key": "trash",
+          "word": "Trash",
+          "wordHe": "פח",
+          "symbol": "🗑️"
+        },
+        {
+          "key": "crosswalk",
+          "word": "Crosswalk",
+          "wordHe": "מעבר חציה",
+          "symbol": "🚸"
+        },
+        {
+          "key": "fountain",
+          "word": "Fountain",
+          "wordHe": "מזרקה",
+          "symbol": "⛲"
+        },
+        {
+          "key": "statue",
+          "word": "Statue",
+          "wordHe": "פסל",
+          "symbol": "🗿"
+        }
+      ]
+    },
+    {
+      "id": "colors",
+      "entries": [
+        {
+          "key": "red",
+          "word": "Red",
+          "wordHe": "אדום",
+          "symbol": "🔴"
+        },
+        {
+          "key": "blue",
+          "word": "Blue",
+          "wordHe": "כחול",
+          "symbol": "🔵"
+        },
+        {
+          "key": "green",
+          "word": "Green",
+          "wordHe": "ירוק",
+          "symbol": "🟢"
+        },
+        {
+          "key": "yellow",
+          "word": "Yellow",
+          "wordHe": "צהוב",
+          "symbol": "🟡"
+        },
+        {
+          "key": "orange",
+          "word": "Orange",
+          "wordHe": "כתום",
+          "symbol": "🟠"
+        },
+        {
+          "key": "purple",
+          "word": "Purple",
+          "wordHe": "סגול",
+          "symbol": "🟣"
+        },
+        {
+          "key": "pink",
+          "word": "Pink",
+          "wordHe": "ורוד",
+          "symbol": "🩷"
+        },
+        {
+          "key": "brown",
+          "word": "Brown",
+          "wordHe": "חום",
+          "symbol": "🟤"
+        },
+        {
+          "key": "black",
+          "word": "Black",
+          "wordHe": "שחור",
+          "symbol": "⚫"
+        },
+        {
+          "key": "white",
+          "word": "White",
+          "wordHe": "לבן",
+          "symbol": "⚪"
+        },
+        {
+          "key": "gray",
+          "word": "Gray",
+          "wordHe": "אפור",
+          "symbol": "⬜"
+        },
+        {
+          "key": "gold",
+          "word": "Gold",
+          "wordHe": "זהב",
+          "symbol": "✨"
+        }
+      ]
+    },
+    {
+      "id": "fruit",
+      "entries": [
+        {
+          "key": "apple",
+          "word": "Apple",
+          "wordHe": "תפוח",
+          "symbol": "🍎"
+        },
+        {
+          "key": "banana",
+          "word": "Banana",
+          "wordHe": "בננה",
+          "symbol": "🍌"
+        },
+        {
+          "key": "orange",
+          "word": "Orange",
+          "wordHe": "תפוז",
+          "symbol": "🍊"
+        },
+        {
+          "key": "grape",
+          "word": "Grape",
+          "wordHe": "ענבים",
+          "symbol": "🍇"
+        },
+        {
+          "key": "strawberry",
+          "word": "Strawberry",
+          "wordHe": "תות",
+          "symbol": "🍓"
+        },
+        {
+          "key": "watermelon",
+          "word": "Watermelon",
+          "wordHe": "אבטיח",
+          "symbol": "🍉"
+        },
+        {
+          "key": "peach",
+          "word": "Peach",
+          "wordHe": "אפרסק",
+          "symbol": "🍑"
+        },
+        {
+          "key": "pear",
+          "word": "Pear",
+          "wordHe": "אגס",
+          "symbol": "🍐"
+        },
+        {
+          "key": "lemon",
+          "word": "Lemon",
+          "wordHe": "לימון",
+          "symbol": "🍋"
+        },
+        {
+          "key": "cherry",
+          "word": "Cherry",
+          "wordHe": "דובדבן",
+          "symbol": "🍒"
+        },
+        {
+          "key": "pineapple",
+          "word": "Pineapple",
+          "wordHe": "אננס",
+          "symbol": "🍍"
+        },
+        {
+          "key": "mango",
+          "word": "Mango",
+          "wordHe": "מנגו",
+          "symbol": "🥭"
+        }
+      ]
+    },
+    {
+      "id": "family",
+      "entries": [
+        {
+          "key": "mom",
+          "word": "Mom",
+          "wordHe": "אמא",
+          "symbol": "👩"
+        },
+        {
+          "key": "dad",
+          "word": "Dad",
+          "wordHe": "אבא",
+          "symbol": "👨"
+        },
+        {
+          "key": "sister",
+          "word": "Sister",
+          "wordHe": "אחות",
+          "symbol": "👧"
+        },
+        {
+          "key": "brother",
+          "word": "Brother",
+          "wordHe": "אח",
+          "symbol": "👦"
+        },
+        {
+          "key": "baby",
+          "word": "Baby",
+          "wordHe": "תינוק",
+          "symbol": "👶"
+        },
+        {
+          "key": "grandma",
+          "word": "Grandma",
+          "wordHe": "סבתא",
+          "symbol": "👵"
+        },
+        {
+          "key": "grandpa",
+          "word": "Grandpa",
+          "wordHe": "סבא",
+          "symbol": "👴"
+        },
+        {
+          "key": "aunt",
+          "word": "Aunt",
+          "wordHe": "דודה",
+          "symbol": "👩‍🦰"
+        },
+        {
+          "key": "uncle",
+          "word": "Uncle",
+          "wordHe": "דוד",
+          "symbol": "👨‍🦱"
+        },
+        {
+          "key": "cousin",
+          "word": "Cousin",
+          "wordHe": "בן דוד",
+          "symbol": "🧒"
+        },
+        {
+          "key": "parents",
+          "word": "Parents",
+          "wordHe": "הורים",
+          "symbol": "👨‍👩‍👧"
+        },
+        {
+          "key": "family",
+          "word": "Family",
+          "wordHe": "משפחה",
+          "symbol": "👪"
+        }
+      ]
+    },
+    {
+      "id": "body",
+      "entries": [
+        {
+          "key": "head",
+          "word": "Head",
+          "wordHe": "ראש",
+          "symbol": "🙂"
+        },
+        {
+          "key": "hand",
+          "word": "Hand",
+          "wordHe": "יד",
+          "symbol": "✋"
+        },
+        {
+          "key": "foot",
+          "word": "Foot",
+          "wordHe": "רגל",
+          "symbol": "🦶"
+        },
+        {
+          "key": "eye",
+          "word": "Eye",
+          "wordHe": "עין",
+          "symbol": "👁️"
+        },
+        {
+          "key": "ear",
+          "word": "Ear",
+          "wordHe": "אוזן",
+          "symbol": "👂"
+        },
+        {
+          "key": "nose",
+          "word": "Nose",
+          "wordHe": "אף",
+          "symbol": "👃"
+        },
+        {
+          "key": "mouth",
+          "word": "Mouth",
+          "wordHe": "פה",
+          "symbol": "👄"
+        },
+        {
+          "key": "teeth",
+          "word": "Teeth",
+          "wordHe": "שיניים",
+          "symbol": "🦷"
+        },
+        {
+          "key": "hair",
+          "word": "Hair",
+          "wordHe": "שיער",
+          "symbol": "💇"
+        },
+        {
+          "key": "arm",
+          "word": "Arm",
+          "wordHe": "זרוע",
+          "symbol": "💪"
+        },
+        {
+          "key": "leg",
+          "word": "Leg",
+          "wordHe": "רגל",
+          "symbol": "🦵"
+        },
+        {
+          "key": "heart",
+          "word": "Heart",
+          "wordHe": "לב",
+          "symbol": "❤️"
+        }
+      ]
+    },
+    {
+      "id": "weather",
+      "entries": [
+        {
+          "key": "sun",
+          "word": "Sun",
+          "wordHe": "שמש",
+          "symbol": "☀️"
+        },
+        {
+          "key": "rain",
+          "word": "Rain",
+          "wordHe": "גשם",
+          "symbol": "🌧️"
+        },
+        {
+          "key": "cloud",
+          "word": "Cloud",
+          "wordHe": "ענן",
+          "symbol": "☁️"
+        },
+        {
+          "key": "snow",
+          "word": "Snow",
+          "wordHe": "שלג",
+          "symbol": "❄️"
+        },
+        {
+          "key": "wind",
+          "word": "Wind",
+          "wordHe": "רוח",
+          "symbol": "💨"
+        },
+        {
+          "key": "storm",
+          "word": "Storm",
+          "wordHe": "סערה",
+          "symbol": "⛈️"
+        },
+        {
+          "key": "rainbow",
+          "word": "Rainbow",
+          "wordHe": "קשת",
+          "symbol": "🌈"
+        },
+        {
+          "key": "hot",
+          "word": "Hot",
+          "wordHe": "חם",
+          "symbol": "🥵"
+        },
+        {
+          "key": "cold",
+          "word": "Cold",
+          "wordHe": "קר",
+          "symbol": "🥶"
+        },
+        {
+          "key": "fog",
+          "word": "Fog",
+          "wordHe": "ערפל",
+          "symbol": "🌫️"
+        },
+        {
+          "key": "lightning",
+          "word": "Lightning",
+          "wordHe": "ברק",
+          "symbol": "⚡"
+        },
+        {
+          "key": "umbrella",
+          "word": "Umbrella",
+          "wordHe": "מטריה",
+          "symbol": "☂️"
+        }
+      ]
+    },
+    {
+      "id": "clothes",
+      "entries": [
+        {
+          "key": "shirt",
+          "word": "Shirt",
+          "wordHe": "חולצה",
+          "symbol": "👕"
+        },
+        {
+          "key": "pants",
+          "word": "Pants",
+          "wordHe": "מכנסיים",
+          "symbol": "👖"
+        },
+        {
+          "key": "shoes",
+          "word": "Shoes",
+          "wordHe": "נעליים",
+          "symbol": "👟"
+        },
+        {
+          "key": "socks",
+          "word": "Socks",
+          "wordHe": "גרביים",
+          "symbol": "🧦"
+        },
+        {
+          "key": "hat",
+          "word": "Hat",
+          "wordHe": "כובע",
+          "symbol": "🧢"
+        },
+        {
+          "key": "coat",
+          "word": "Coat",
+          "wordHe": "מעיל",
+          "symbol": "🧥"
+        },
+        {
+          "key": "dress",
+          "word": "Dress",
+          "wordHe": "שמלה",
+          "symbol": "👗"
+        },
+        {
+          "key": "skirt",
+          "word": "Skirt",
+          "wordHe": "חצאית",
+          "symbol": "👚"
+        },
+        {
+          "key": "gloves",
+          "word": "Gloves",
+          "wordHe": "כפפות",
+          "symbol": "🧤"
+        },
+        {
+          "key": "scarf",
+          "word": "Scarf",
+          "wordHe": "צעיף",
+          "symbol": "🧣"
+        },
+        {
+          "key": "jacket",
+          "word": "Jacket",
+          "wordHe": "ז׳קט",
+          "symbol": "🦺"
+        },
+        {
+          "key": "boots",
+          "word": "Boots",
+          "wordHe": "מגפיים",
+          "symbol": "👢"
+        }
+      ]
+    },
+    {
+      "id": "food",
+      "entries": [
+        {
+          "key": "bread",
+          "word": "Bread",
+          "wordHe": "לחם",
+          "symbol": "🍞"
+        },
+        {
+          "key": "milk",
+          "word": "Milk",
+          "wordHe": "חלב",
+          "symbol": "🥛"
+        },
+        {
+          "key": "egg",
+          "word": "Egg",
+          "wordHe": "ביצה",
+          "symbol": "🥚"
+        },
+        {
+          "key": "cheese",
+          "word": "Cheese",
+          "wordHe": "גבינה",
+          "symbol": "🧀"
+        },
+        {
+          "key": "rice",
+          "word": "Rice",
+          "wordHe": "אורז",
+          "symbol": "🍚"
+        },
+        {
+          "key": "soup",
+          "word": "Soup",
+          "wordHe": "מרק",
+          "symbol": "🍲"
+        },
+        {
+          "key": "pizza",
+          "word": "Pizza",
+          "wordHe": "פיצה",
+          "symbol": "🍕"
+        },
+        {
+          "key": "salad",
+          "word": "Salad",
+          "wordHe": "סלט",
+          "symbol": "🥗"
+        },
+        {
+          "key": "cookie",
+          "word": "Cookie",
+          "wordHe": "עוגיה",
+          "symbol": "🍪"
+        },
+        {
+          "key": "cake",
+          "word": "Cake",
+          "wordHe": "עוגה",
+          "symbol": "🎂"
+        },
+        {
+          "key": "honey",
+          "word": "Honey",
+          "wordHe": "דבש",
+          "symbol": "🍯"
+        },
+        {
+          "key": "butter",
+          "word": "Butter",
+          "wordHe": "חמאה",
+          "symbol": "🧈"
+        }
+      ]
+    },
+    {
+      "id": "sports",
+      "entries": [
+        {
+          "key": "ball",
+          "word": "Ball",
+          "wordHe": "כדור",
+          "symbol": "🏐"
+        },
+        {
+          "key": "soccer",
+          "word": "Soccer",
+          "wordHe": "כדורגל",
+          "symbol": "⚽"
+        },
+        {
+          "key": "basketball",
+          "word": "Basketball",
+          "wordHe": "כדורסל",
+          "symbol": "🏀"
+        },
+        {
+          "key": "tennis",
+          "word": "Tennis",
+          "wordHe": "טניס",
+          "symbol": "🎾"
+        },
+        {
+          "key": "swim",
+          "word": "Swim",
+          "wordHe": "שחייה",
+          "symbol": "🏊"
+        },
+        {
+          "key": "run",
+          "word": "Run",
+          "wordHe": "ריצה",
+          "symbol": "🏃"
+        },
+        {
+          "key": "jump",
+          "word": "Jump",
+          "wordHe": "קפיצה",
+          "symbol": "🤸"
+        },
+        {
+          "key": "skate",
+          "word": "Skate",
+          "wordHe": "החלקה",
+          "symbol": "⛸️"
+        },
+        {
+          "key": "golf",
+          "word": "Golf",
+          "wordHe": "גולף",
+          "symbol": "⛳"
+        },
+        {
+          "key": "yoga",
+          "word": "Yoga",
+          "wordHe": "יוגה",
+          "symbol": "🧘"
+        },
+        {
+          "key": "dance",
+          "word": "Dance",
+          "wordHe": "ריקוד",
+          "symbol": "💃"
+        },
+        {
+          "key": "baseball",
+          "word": "Baseball",
+          "wordHe": "בייסבול",
+          "symbol": "⚾"
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "entries": [
+        {
+          "key": "bed",
+          "word": "Bed",
+          "wordHe": "מיטה",
+          "symbol": "🛏️"
+        },
+        {
+          "key": "sofa",
+          "word": "Sofa",
+          "wordHe": "ספה",
+          "symbol": "🛋️"
+        },
+        {
+          "key": "table",
+          "word": "Table",
+          "wordHe": "שולחן",
+          "symbol": "🪑"
+        },
+        {
+          "key": "chair",
+          "word": "Chair",
+          "wordHe": "כיסא",
+          "symbol": "💺"
+        },
+        {
+          "key": "lamp",
+          "word": "Lamp",
+          "wordHe": "מנורה",
+          "symbol": "💡"
+        },
+        {
+          "key": "door",
+          "word": "Door",
+          "wordHe": "דלת",
+          "symbol": "🚪"
+        },
+        {
+          "key": "window",
+          "word": "Window",
+          "wordHe": "חלון",
+          "symbol": "🪟"
+        },
+        {
+          "key": "kitchen",
+          "word": "Kitchen",
+          "wordHe": "מטבח",
+          "symbol": "🍳"
+        },
+        {
+          "key": "bath",
+          "word": "Bath",
+          "wordHe": "אמבטיה",
+          "symbol": "🛁"
+        },
+        {
+          "key": "fridge",
+          "word": "Fridge",
+          "wordHe": "מקרר",
+          "symbol": "🧊"
+        },
+        {
+          "key": "clock",
+          "word": "Clock",
+          "wordHe": "שעון",
+          "symbol": "⏰"
+        },
+        {
+          "key": "mirror",
+          "word": "Mirror",
+          "wordHe": "מראה",
+          "symbol": "🪞"
+        }
+      ]
+    },
+    {
+      "id": "jobs",
+      "entries": [
+        {
+          "key": "doctor",
+          "word": "Doctor",
+          "wordHe": "רופא",
+          "symbol": "👨‍⚕️"
+        },
+        {
+          "key": "teacher",
+          "word": "Teacher",
+          "wordHe": "מורה",
+          "symbol": "👩‍🏫"
+        },
+        {
+          "key": "firefighter",
+          "word": "Firefighter",
+          "wordHe": "כבאי",
+          "symbol": "👨‍🚒"
+        },
+        {
+          "key": "police",
+          "word": "Police",
+          "wordHe": "שוטר",
+          "symbol": "👮"
+        },
+        {
+          "key": "chef",
+          "word": "Chef",
+          "wordHe": "טבח",
+          "symbol": "👨‍🍳"
+        },
+        {
+          "key": "farmer",
+          "word": "Farmer",
+          "wordHe": "חקלאי",
+          "symbol": "👨‍🌾"
+        },
+        {
+          "key": "pilot",
+          "word": "Pilot",
+          "wordHe": "טייס",
+          "symbol": "👨‍✈️"
+        },
+        {
+          "key": "artist",
+          "word": "Artist",
+          "wordHe": "אמן",
+          "symbol": "🎨"
+        },
+        {
+          "key": "nurse",
+          "word": "Nurse",
+          "wordHe": "אחות",
+          "symbol": "💉"
+        },
+        {
+          "key": "builder",
+          "word": "Builder",
+          "wordHe": "בנאי",
+          "symbol": "👷"
+        },
+        {
+          "key": "vet",
+          "word": "Vet",
+          "wordHe": "וטרינר",
+          "symbol": "🐾"
+        },
+        {
+          "key": "singer",
+          "word": "Singer",
+          "wordHe": "זמר",
+          "symbol": "🎤"
+        }
+      ]
+    },
+    {
+      "id": "nature",
+      "entries": [
+        {
+          "key": "tree",
+          "word": "Tree",
+          "wordHe": "עץ",
+          "symbol": "🌳"
+        },
+        {
+          "key": "flower",
+          "word": "Flower",
+          "wordHe": "פרח",
+          "symbol": "🌸"
+        },
+        {
+          "key": "grass",
+          "word": "Grass",
+          "wordHe": "דשא",
+          "symbol": "🌿"
+        },
+        {
+          "key": "mountain",
+          "word": "Mountain",
+          "wordHe": "הר",
+          "symbol": "⛰️"
+        },
+        {
+          "key": "river",
+          "word": "River",
+          "wordHe": "נהר",
+          "symbol": "🏞️"
+        },
+        {
+          "key": "lake",
+          "word": "Lake",
+          "wordHe": "אגם",
+          "symbol": "🌊"
+        },
+        {
+          "key": "forest",
+          "word": "Forest",
+          "wordHe": "יער",
+          "symbol": "🌲"
+        },
+        {
+          "key": "rock",
+          "word": "Rock",
+          "wordHe": "סלע",
+          "symbol": "🪨"
+        },
+        {
+          "key": "leaf",
+          "word": "Leaf",
+          "wordHe": "עלה",
+          "symbol": "🍃"
+        },
+        {
+          "key": "bee",
+          "word": "Bee",
+          "wordHe": "דבורה",
+          "symbol": "🐝"
+        },
+        {
+          "key": "butterfly",
+          "word": "Butterfly",
+          "wordHe": "פרפר",
+          "symbol": "🦋"
+        },
+        {
+          "key": "moon",
+          "word": "Moon",
+          "wordHe": "ירח",
+          "symbol": "🌙"
+        }
+      ]
+    },
+    {
+      "id": "feelings",
+      "entries": [
+        {
+          "key": "happy",
+          "word": "Happy",
+          "wordHe": "שמח",
+          "symbol": "😊"
+        },
+        {
+          "key": "sad",
+          "word": "Sad",
+          "wordHe": "עצוב",
+          "symbol": "😢"
+        },
+        {
+          "key": "angry",
+          "word": "Angry",
+          "wordHe": "כועס",
+          "symbol": "😠"
+        },
+        {
+          "key": "scared",
+          "word": "Scared",
+          "wordHe": "מפחד",
+          "symbol": "😨"
+        },
+        {
+          "key": "tired",
+          "word": "Tired",
+          "wordHe": "עייף",
+          "symbol": "😴"
+        },
+        {
+          "key": "excited",
+          "word": "Excited",
+          "wordHe": "נרגש",
+          "symbol": "🤩"
+        },
+        {
+          "key": "bored",
+          "word": "Bored",
+          "wordHe": "משועמם",
+          "symbol": "😑"
+        },
+        {
+          "key": "proud",
+          "word": "Proud",
+          "wordHe": "גאה",
+          "symbol": "🏅"
+        },
+        {
+          "key": "shy",
+          "word": "Shy",
+          "wordHe": "ביישן",
+          "symbol": "😳"
+        },
+        {
+          "key": "love",
+          "word": "Love",
+          "wordHe": "אהבה",
+          "symbol": "😍"
+        },
+        {
+          "key": "calm",
+          "word": "Calm",
+          "wordHe": "רגוע",
+          "symbol": "😌"
+        },
+        {
+          "key": "surprised",
+          "word": "Surprised",
+          "wordHe": "מופתע",
+          "symbol": "😲"
+        }
+      ]
+    },
+    {
+      "id": "numbers",
+      "entries": [
+        {
+          "key": "one",
+          "word": "One",
+          "wordHe": "אחת",
+          "symbol": "1️⃣"
+        },
+        {
+          "key": "two",
+          "word": "Two",
+          "wordHe": "שתיים",
+          "symbol": "2️⃣"
+        },
+        {
+          "key": "three",
+          "word": "Three",
+          "wordHe": "שלוש",
+          "symbol": "3️⃣"
+        },
+        {
+          "key": "four",
+          "word": "Four",
+          "wordHe": "ארבע",
+          "symbol": "4️⃣"
+        },
+        {
+          "key": "five",
+          "word": "Five",
+          "wordHe": "חמש",
+          "symbol": "5️⃣"
+        },
+        {
+          "key": "six",
+          "word": "Six",
+          "wordHe": "שש",
+          "symbol": "6️⃣"
+        },
+        {
+          "key": "seven",
+          "word": "Seven",
+          "wordHe": "שבע",
+          "symbol": "7️⃣"
+        },
+        {
+          "key": "eight",
+          "word": "Eight",
+          "wordHe": "שמונה",
+          "symbol": "8️⃣"
+        },
+        {
+          "key": "nine",
+          "word": "Nine",
+          "wordHe": "תשע",
+          "symbol": "9️⃣"
+        },
+        {
+          "key": "ten",
+          "word": "Ten",
+          "wordHe": "עשר",
+          "symbol": "🔟"
+        },
+        {
+          "key": "eleven",
+          "word": "Eleven",
+          "wordHe": "אחת עשרה",
+          "symbol": "🕚"
+        },
+        {
+          "key": "twelve",
+          "word": "Twelve",
+          "wordHe": "שתים עשרה",
+          "symbol": "🕛"
+        }
+      ]
+    },
+    {
+      "id": "shapes",
+      "entries": [
+        {
+          "key": "circle",
+          "word": "Circle",
+          "wordHe": "עיגול",
+          "symbol": "⭕"
+        },
+        {
+          "key": "square",
+          "word": "Square",
+          "wordHe": "ריבוע",
+          "symbol": "⬜"
+        },
+        {
+          "key": "triangle",
+          "word": "Triangle",
+          "wordHe": "משולש",
+          "symbol": "🔺"
+        },
+        {
+          "key": "star",
+          "word": "Star",
+          "wordHe": "כוכב",
+          "symbol": "⭐"
+        },
+        {
+          "key": "heart",
+          "word": "Heart",
+          "wordHe": "לב",
+          "symbol": "❤️"
+        },
+        {
+          "key": "oval",
+          "word": "Oval",
+          "wordHe": "אליפסה",
+          "symbol": "🥚"
+        },
+        {
+          "key": "rectangle",
+          "word": "Rectangle",
+          "wordHe": "מלבן",
+          "symbol": "▭"
+        },
+        {
+          "key": "diamond",
+          "word": "Diamond",
+          "wordHe": "יהלום",
+          "symbol": "💎"
+        },
+        {
+          "key": "line",
+          "word": "Line",
+          "wordHe": "קו",
+          "symbol": "➖"
+        },
+        {
+          "key": "cube",
+          "word": "Cube",
+          "wordHe": "קובייה",
+          "symbol": "🧊"
+        },
+        {
+          "key": "sphere",
+          "word": "Sphere",
+          "wordHe": "כדור",
+          "symbol": "⚽"
+        },
+        {
+          "key": "cone",
+          "word": "Cone",
+          "wordHe": "חרוט",
+          "symbol": "🍦"
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "entries": [
+        {
+          "key": "piano",
+          "word": "Piano",
+          "wordHe": "פסנתר",
+          "symbol": "🎹"
+        },
+        {
+          "key": "guitar",
+          "word": "Guitar",
+          "wordHe": "גיטרה",
+          "symbol": "🎸"
+        },
+        {
+          "key": "drum",
+          "word": "Drum",
+          "wordHe": "תוף",
+          "symbol": "🥁"
+        },
+        {
+          "key": "violin",
+          "word": "Violin",
+          "wordHe": "כינור",
+          "symbol": "🎻"
+        },
+        {
+          "key": "flute",
+          "word": "Flute",
+          "wordHe": "חליל",
+          "symbol": "🪈"
+        },
+        {
+          "key": "trumpet",
+          "word": "Trumpet",
+          "wordHe": "חצוצרה",
+          "symbol": "🎺"
+        },
+        {
+          "key": "microphone",
+          "word": "Microphone",
+          "wordHe": "מיקרופון",
+          "symbol": "🎙️"
+        },
+        {
+          "key": "song",
+          "word": "Song",
+          "wordHe": "שיר",
+          "symbol": "🎵"
+        },
+        {
+          "key": "dance",
+          "word": "Dance",
+          "wordHe": "ריקוד",
+          "symbol": "💃"
+        },
+        {
+          "key": "radio",
+          "word": "Radio",
+          "wordHe": "רדיו",
+          "symbol": "📻"
+        },
+        {
+          "key": "headphones",
+          "word": "Headphones",
+          "wordHe": "אוזניות",
+          "symbol": "🎧"
+        },
+        {
+          "key": "notes",
+          "word": "Notes",
+          "wordHe": "תווים",
+          "symbol": "🎶"
+        }
+      ]
+    },
+    {
+      "id": "places",
+      "entries": [
+        {
+          "key": "pyramid",
+          "word": "Pyramid",
+          "wordHe": "פירמידה",
+          "symbol": "🔺"
+        },
+        {
+          "key": "tower",
+          "word": "Tower",
+          "wordHe": "מגדל",
+          "symbol": "🗼"
+        },
+        {
+          "key": "beach",
+          "word": "Beach",
+          "wordHe": "חוף",
+          "symbol": "🏖️"
+        },
+        {
+          "key": "castle",
+          "word": "Castle",
+          "wordHe": "טירה",
+          "symbol": "🏰"
+        },
+        {
+          "key": "temple",
+          "word": "Temple",
+          "wordHe": "מקדש",
+          "symbol": "⛩️"
+        },
+        {
+          "key": "market",
+          "word": "Market",
+          "wordHe": "שוק",
+          "symbol": "🏪"
+        },
+        {
+          "key": "museum",
+          "word": "Museum",
+          "wordHe": "מוזיאון",
+          "symbol": "🏛️"
+        },
+        {
+          "key": "zoo",
+          "word": "Zoo",
+          "wordHe": "גן חיות",
+          "symbol": "🦁"
+        },
+        {
+          "key": "farm",
+          "word": "Farm",
+          "wordHe": "חווה",
+          "symbol": "🚜"
+        },
+        {
+          "key": "airport",
+          "word": "Airport",
+          "wordHe": "שדה תעופה",
+          "symbol": "✈️"
+        },
+        {
+          "key": "harbor",
+          "word": "Harbor",
+          "wordHe": "נמל",
+          "symbol": "⚓"
+        },
+        {
+          "key": "cave",
+          "word": "Cave",
+          "wordHe": "מערה",
+          "symbol": "🕳️"
+        }
+      ]
+    }
+  ]
+}

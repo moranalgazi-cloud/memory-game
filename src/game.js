@@ -15,6 +15,67 @@ export function factKey(a, b) {
 }
 
 /**
+ * Normalized uniform in [0, 1) from an RNG; falls back if the value is not finite.
+ * @param {() => number} [rng]
+ * @returns {number}
+ */
+export function rngUnit(rng = Math.random) {
+  const u = rng();
+  if (typeof u !== "number" || !Number.isFinite(u)) return Math.random();
+  let x = u % 1;
+  if (x < 0) x += 1;
+  if (x >= 1) x = 0;
+  return x;
+}
+
+/**
+ * How many distinct products exist for factors 1..tableMax (one pair per product).
+ * @param {number} tableMax
+ */
+export function uniqueProductCount(tableMax) {
+  const products = new Set();
+  for (let a = 1; a <= tableMax; a += 1) {
+    for (let b = a; b <= tableMax; b += 1) {
+      products.add(a * b);
+    }
+  }
+  return products.size;
+}
+
+/**
+ * Pick up to count items, at most one per unique value of getValue(item).
+ * @template T
+ * @param {T[]} pool
+ * @param {number} count
+ * @param {(item: T) => number} getValue
+ * @param {() => number} [rng]
+ * @returns {T[]}
+ */
+export function pickWithUniqueValues(pool, count, getValue, rng = Math.random) {
+  /** @type {Map<number, T[]>} */
+  const byValue = new Map();
+  for (const item of pool) {
+    const v = getValue(item);
+    let group = byValue.get(v);
+    if (!group) {
+      group = [];
+      byValue.set(v, group);
+    }
+    group.push(item);
+  }
+  const groups = [...byValue.values()];
+  const chosen = [];
+  const n = Math.min(count, groups.length);
+  while (chosen.length < n && groups.length) {
+    const i = Math.floor(rngUnit(rng) * groups.length);
+    const facts = groups.splice(i, 1)[0];
+    const j = Math.floor(rngUnit(rng) * facts.length);
+    chosen.push(facts[j]);
+  }
+  return chosen;
+}
+
+/**
  * @param {number} tableMax inclusive (e.g. 9 → factors 1..9)
  * @param {number} pairCount how many distinct facts
  * @param {() => number} [rng] returns 0 <= n < 1
@@ -32,13 +93,7 @@ export function pickFacts(tableMax, pairCount, rng = Math.random) {
       });
     }
   }
-  const bag = [...facts];
-  const chosen = [];
-  while (chosen.length < pairCount && bag.length) {
-    const i = Math.floor(rng() * bag.length);
-    chosen.push(bag.splice(i, 1)[0]);
-  }
-  return chosen;
+  return pickWithUniqueValues(facts, pairCount, (f) => f.product, rng);
 }
 
 /**
@@ -53,7 +108,7 @@ export function buildDeck(facts, rng = Math.random) {
   for (const f of facts) {
     let left = f.a;
     let right = f.b;
-    if (f.a !== f.b && rng() >= 0.5) {
+    if (f.a !== f.b && rngUnit(rng) >= 0.5) {
       left = f.b;
       right = f.a;
     }
@@ -83,7 +138,7 @@ export function buildDeck(facts, rng = Math.random) {
  */
 export function shuffle(arr, rng = Math.random) {
   for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(rng() * (i + 1));
+    const j = Math.floor(rngUnit(rng) * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;

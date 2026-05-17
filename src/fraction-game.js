@@ -1,3 +1,5 @@
+import { rngUnit } from "./game.js";
+
 /**
  * @typedef {{ key: string; n: number; d: number; label: string }} FractionEntry
  * @typedef {{ id: string; factKey: string; side: "fraction" | "diagram"; label: string; n?: number; d?: number; word?: string }} FractionCard
@@ -63,7 +65,7 @@ export function pickFractionEntries(pool, count, rng = Math.random) {
   const chosen = [];
   const n = Math.min(count, bag.length);
   while (chosen.length < n && bag.length) {
-    const i = Math.floor(rng() * bag.length);
+    const i = Math.floor(rngUnit(rng) * bag.length);
     chosen.push(bag.splice(i, 1)[0]);
   }
   return chosen;

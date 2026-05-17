@@ -1,86 +1,53 @@
 /**
- * Builds src/english-lexicon.json from GitHub's emoji CDN (object / action style icons).
+ * Validates src/english-vocabulary.json (curated topics for the English game).
  * Run: node scripts/build-english-lexicon.mjs
- *
- * The app uses `isKidFriendlyEnglishEntry` in english-game.js to keep the English
- * memory pool short and age-appropriate (flags, long phrases, etc. are dropped there).
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const outPath = path.join(__dirname, "..", "src", "english-lexicon.json");
+const vocabPath = path.join(__dirname, "..", "src", "english-vocabulary.json");
 
-const BLOCK = new Set(
-  [
-    "middle_finger",
-    "fu",
-    "gun",
-    "knife",
-    "bomb",
-    "syringe",
-    "cigarette",
-    "smoking",
-    "pirate_flag",
-  ].map((s) => s.toLowerCase()),
-);
+/** @type {{ topics: { id: string; entries: { key: string; word: string; symbol: string }[] }[] }} */
+const data = JSON.parse(fs.readFileSync(vocabPath, "utf8"));
 
-function isBlocked(key) {
-  const k = key.toLowerCase();
-  if (BLOCK.has(k)) return true;
-  if (/(porn|sex|nazi|hitler)/i.test(k)) return true;
-  return false;
+const ids = new Set();
+let errors = 0;
+
+for (const topic of data.topics) {
+  if (!topic.id || ids.has(topic.id)) {
+    console.error("Duplicate or missing topic id:", topic.id);
+    errors += 1;
+  }
+  ids.add(topic.id);
+  if (!Array.isArray(topic.entries) || topic.entries.length < 9) {
+    console.error(`Topic ${topic.id}: need at least 9 entries, got ${topic.entries?.length ?? 0}`);
+    errors += 1;
+  }
+  const keys = new Set();
+  const symbols = new Set();
+  for (const e of topic.entries ?? []) {
+    if (!e.key || !e.word || !e.wordHe || !e.symbol) {
+      console.error(`Topic ${topic.id}: invalid entry`, e);
+      errors += 1;
+    }
+    if (keys.has(e.key)) {
+      console.error(`Topic ${topic.id}: duplicate key ${e.key}`);
+      errors += 1;
+    }
+    keys.add(e.key);
+    if (symbols.has(e.symbol)) {
+      console.error(`Topic ${topic.id}: duplicate symbol ${e.symbol} (${e.key})`);
+      errors += 1;
+    }
+    symbols.add(e.symbol);
+  }
 }
 
-function isGoodKey(key) {
-  if (typeof key !== "string") return false;
-  if (key.length < 3 || key.length > 48) return false;
-  if (/^[0-9]+$/.test(key)) return false;
-  if (!/^[a-z0-9_+.-]+$/i.test(key)) return false;
-  if (/^[0-9]/.test(key) && !key.includes("_")) return false;
-  if (isBlocked(key)) return false;
-  return true;
-}
-
-function toDisplayName(key) {
-  return key
-    .replace(/_/g, " ")
-    .replace(/\+/g, " ")
-    .replace(/\./g, " ")
-    .split(" ")
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(" ");
-}
-
-const res = await fetch("https://api.github.com/emojis", {
-  headers: {
-    "User-Agent": "multiplication-memory-game-lexicon-builder",
-    Accept: "application/vnd.github+json",
-  },
-});
-
-if (!res.ok) {
-  console.error("Failed to fetch emojis:", res.status, await res.text());
+if (errors) {
+  console.error("Validation failed with", errors, "error(s)");
   process.exit(1);
 }
 
-/** @type {Record<string, string>} */
-const raw = await res.json();
-
-/** @type {{ key: string; word: string; image: string }[]} */
-const entries = [];
-for (const [key, url] of Object.entries(raw)) {
-  if (!isGoodKey(key) || typeof url !== "string" || !url.startsWith("http")) continue;
-  entries.push({ key, word: toDisplayName(key), image: url });
-}
-
-if (entries.length < 1000) {
-  console.error("Too few entries:", entries.length);
-  process.exit(1);
-}
-
-fs.mkdirSync(path.dirname(outPath), { recursive: true });
-fs.writeFileSync(outPath, JSON.stringify(entries), "utf8");
-console.log("Wrote", outPath, "entries:", entries.length);
+console.log("OK:", data.topics.length, "topics,", data.topics.reduce((n, t) => n + t.entries.length, 0), "words");

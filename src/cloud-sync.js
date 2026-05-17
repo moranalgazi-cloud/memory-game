@@ -4,14 +4,28 @@ import { loadRecordsForUser } from "./records.js";
 
 const DEVICE_KEY = "memory-app-device-id-v1";
 
+/** @type {string | null} */
+let ephemeralDeviceId = null;
+
 /** @returns {string} */
 export function getDeviceId() {
-  let id = localStorage.getItem(DEVICE_KEY);
-  if (!id) {
-    id = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `d-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-    localStorage.setItem(DEVICE_KEY, id);
+  try {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) {
+      id =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `d-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+      localStorage.setItem(DEVICE_KEY, id);
+    }
+    return id;
+  } catch (e) {
+    console.warn("[cloud-sync] device id storage:", e);
+    if (!ephemeralDeviceId) {
+      ephemeralDeviceId = `d-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    }
+    return ephemeralDeviceId;
   }
-  return id;
 }
 
 /** @type {import("@supabase/supabase-js").SupabaseClient | null} */
@@ -62,11 +76,35 @@ function modeFrom(raw) {
 /** @param {unknown} stats */
 export function statsFromCloudRow(stats) {
   const s = stats && typeof stats === "object" ? stats : {};
+  const testsRaw = s.tests && typeof s.tests === "object" ? s.tests : {};
+  /** @param {unknown} raw */
+  const testFrom = (raw) => {
+    const o = raw && typeof raw === "object" ? raw : {};
+    const best = o.bestScorePercent;
+    return {
+      bestScorePercent:
+        typeof best === "number" && Number.isFinite(best) && best >= 0 && best <= 100
+          ? best
+          : null,
+      testsPassed:
+        typeof o.testsPassed === "number" && Number.isFinite(o.testsPassed) ? o.testsPassed : 0,
+      testsTaken:
+        typeof o.testsTaken === "number" && Number.isFinite(o.testsTaken) ? o.testsTaken : 0,
+    };
+  };
   return {
     math: modeFrom(s.math),
     sums: modeFrom(s.sums),
-    english: modeFrom(s.english),
+    english1: modeFrom(s.english1 ?? s.english),
+    english2: modeFrom(s.english2),
     fractions: modeFrom(s.fractions),
+    tests: {
+      math: testFrom(testsRaw.math),
+      sums: testFrom(testsRaw.sums),
+      english1: testFrom(testsRaw.english1),
+      english2: testFrom(testsRaw.english2),
+      fractions: testFrom(testsRaw.fractions),
+    },
   };
 }
 

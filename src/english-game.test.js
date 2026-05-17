@@ -1,89 +1,95 @@
 import { describe, it, expect } from "vitest";
 import {
+  ENGLISH_TOPIC_IDS,
+  ENGLISH_TOPICS,
+  getEnglishPool,
+  pickEnglishTopicId,
   pickEnglishEntries,
   buildEnglishDeck,
-  isKidFriendlyEnglishEntry,
+  isValidEnglishEntry,
+  isValidBilingualEntry,
+  entryLabel,
 } from "./english-game.js";
 import { isPairMatch } from "./game.js";
 
-describe("isKidFriendlyEnglishEntry", () => {
-  it("rejects regional-flag image URLs", () => {
-    expect(
-      isKidFriendlyEnglishEntry({
-        key: "somewhere",
-        word: "Somewhere",
-        image:
-          "https://github.githubassets.com/images/icons/emoji/unicode/1f1e6-1f1e8.png?v8",
-      }),
-    ).toBe(false);
+describe("ENGLISH_TOPICS", () => {
+  it("has enough words per topic for hard level", () => {
+    for (const topic of ENGLISH_TOPICS) {
+      expect(topic.entries.length).toBeGreaterThanOrEqual(9);
+    }
   });
 
-  it("accepts short one- and two-word labels", () => {
-    expect(
-      isKidFriendlyEnglishEntry({
-        key: "soccer",
-        word: "Soccer",
-        image: "https://example.com/26bd.png",
-      }),
-    ).toBe(true);
-    expect(
-      isKidFriendlyEnglishEntry({
-        key: "t_rex",
-        word: "T Rex",
-        image: "https://example.com/trex.png",
-      }),
-    ).toBe(true);
+  it("includes all category groups", () => {
+    expect(ENGLISH_TOPIC_IDS.length).toBe(23);
   });
 
-  it("rejects more than two words", () => {
-    expect(
-      isKidFriendlyEnglishEntry({
-        key: "a_b_c",
-        word: "A B C",
-        image: "https://example.com/x.png",
-      }),
-    ).toBe(false);
-  });
-
-  it("rejects arrow_ keys", () => {
-    expect(
-      isKidFriendlyEnglishEntry({
-        key: "arrow_up",
-        word: "Arrow Up",
-        image: "https://example.com/x.png",
-      }),
-    ).toBe(false);
+  it("requires Hebrew labels", () => {
+    for (const topic of ENGLISH_TOPICS) {
+      for (const e of topic.entries) {
+        expect(isValidEnglishEntry(e, "he")).toBe(true);
+        expect(e.wordHe.length).toBeGreaterThan(0);
+      }
+    }
   });
 });
 
-describe("pickEnglishEntries", () => {
-  const pool = Array.from({ length: 20 }, (_, i) => ({
-    key: `k${i}`,
-    word: `W${i}`,
-    image: `https://example.com/${i}.png`,
-  }));
-
-  it("returns unique entries up to count", () => {
-    const rng = () => 0.25;
-    const picked = pickEnglishEntries(pool, 8, rng);
-    expect(picked).toHaveLength(8);
-    const keys = new Set(picked.map((p) => p.key));
-    expect(keys.size).toBe(8);
+describe("entryLabel", () => {
+  it("returns English or Hebrew by lang", () => {
+    const e = { key: "dog", word: "Dog", wordHe: "כלב", symbol: "🐕" };
+    expect(entryLabel(e, "en")).toBe("Dog");
+    expect(entryLabel(e, "he")).toBe("כלב");
   });
 });
 
 describe("buildEnglishDeck", () => {
-  it("pairs picture and word sides", () => {
-    const entries = [
-      { key: "ball", word: "Ball", image: "https://example.com/ball.png" },
-    ];
-    const deck = buildEnglishDeck(entries);
+  const entry = { key: "ball", word: "Ball", wordHe: "כדור", symbol: "⚽" };
+
+  it("english1: pairs icon with English word", () => {
+    const deck = buildEnglishDeck([entry], "english1");
     expect(deck).toHaveLength(2);
     const pic = deck.find((c) => c.side === "picture");
     const word = deck.find((c) => c.side === "word");
-    expect(pic?.imageUrl).toContain("ball.png");
+    expect(pic?.symbol).toBe("⚽");
     expect(word?.label).toBe("Ball");
     expect(isPairMatch(pic ?? null, word ?? null)).toBe(true);
-    expect(isPairMatch(pic ?? null, pic ?? null)).toBe(false);
+  });
+
+  it("english2: pairs Hebrew text with English text (no icon)", () => {
+    const deck = buildEnglishDeck([entry], "english2");
+    expect(deck).toHaveLength(2);
+    const he = deck.find((c) => c.side === "he");
+    const en = deck.find((c) => c.side === "en");
+    expect(he?.symbol).toBeUndefined();
+    expect(en?.symbol).toBeUndefined();
+    expect(he?.label).toBe("כדור");
+    expect(en?.label).toBe("Ball");
+    expect(isPairMatch(he ?? null, en ?? null)).toBe(true);
+    expect(isPairMatch(he ?? null, he ?? null)).toBe(false);
   });
 });
+
+describe("pickEnglishEntries", () => {
+  it("filters bilingual entries for english2", () => {
+    const pool = getEnglishPool("colors");
+    const picked = pickEnglishEntries(pool, 6, "english2", seeded(42));
+    expect(picked).toHaveLength(6);
+    expect(picked.every(isValidBilingualEntry)).toBe(true);
+  });
+});
+
+describe("pickEnglishTopicId", () => {
+  it("returns a known topic id", () => {
+    const id = pickEnglishTopicId(seeded(1));
+    expect(ENGLISH_TOPIC_IDS).toContain(id);
+  });
+});
+
+/** @param {number} seed */
+function seeded(seed) {
+  return function mulberry32() {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}

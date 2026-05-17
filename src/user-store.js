@@ -72,9 +72,15 @@ function readUsers() {
   }
 }
 
-/** @param {AppUser[]} users */
+/** @param {AppUser[]} users @returns {boolean} */
 function writeUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  try {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    return true;
+  } catch (e) {
+    console.warn("[user-store] Failed to save users list:", e);
+    return false;
+  }
 }
 
 function migrateLegacyStatsIfNeeded() {
@@ -85,7 +91,10 @@ function migrateLegacyStatsIfNeeded() {
   const name = "Player";
   const remoteId = allocateRemoteId();
   const users = [{ slug, name, createdAt: Date.now(), remoteId }];
-  writeUsers(users);
+  if (!writeUsers(users)) {
+    console.warn("[user-store] migrate: could not save users list");
+    return;
+  }
   localStorage.setItem(USER_STATS_PREFIX + slug, legacy);
   localStorage.setItem(CURRENT_SLUG_KEY, slug);
   scheduleSyncAllUsersToCloudIfEnabled();
@@ -138,14 +147,17 @@ export function ensureUserRemoteIds() {
     }
   }
   if (changed) {
-    writeUsers(users);
-    scheduleSyncAllUsersToCloudIfEnabled();
+    if (writeUsers(users)) {
+      scheduleSyncAllUsersToCloudIfEnabled();
+    } else {
+      console.warn("[user-store] ensureUserRemoteIds: could not save");
+    }
   }
 }
 
 /**
  * @param {string} displayName
- * @returns {{ ok: true, user: AppUser } | { ok: false, reason: "length" | "duplicate" }}
+ * @returns {{ ok: true, user: AppUser } | { ok: false, reason: "length" | "duplicate" | "storage" }}
  */
 export function addUser(displayName) {
   const name = displayName.trim();
@@ -163,13 +175,16 @@ export function addUser(displayName) {
   };
   const users = readUsers();
   users.push(user);
-  writeUsers(users);
+  if (!writeUsers(users)) {
+    users.pop();
+    return { ok: false, reason: "storage" };
+  }
   return { ok: true, user };
 }
 
 /**
  * @param {string} slug
- * @returns {{ ok: false, reason: "last" | "missing" } | { ok: true, slug: string, removed: AppUser }}
+ * @returns {{ ok: false, reason: "last" | "missing" | "storage" } | { ok: true, slug: string, removed: AppUser }}
  */
 export function removeUser(slug) {
   ensureUserRemoteIds();
@@ -180,7 +195,10 @@ export function removeUser(slug) {
   const removed = users[idx];
   const wasCurrent = getCurrentUserSlug() === slug;
   users.splice(idx, 1);
-  writeUsers(users);
+  if (!writeUsers(users)) {
+    users.splice(idx, 0, removed);
+    return { ok: false, reason: "storage" };
+  }
   try {
     localStorage.removeItem(USER_STATS_PREFIX + slug);
   } catch {
@@ -189,8 +207,12 @@ export function removeUser(slug) {
   if (wasCurrent) {
     const sorted = users.slice().sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
     const next = sorted[0];
-    if (next) localStorage.setItem(CURRENT_SLUG_KEY, next.slug);
-    else localStorage.removeItem(CURRENT_SLUG_KEY);
+    try {
+      if (next) localStorage.setItem(CURRENT_SLUG_KEY, next.slug);
+      else localStorage.removeItem(CURRENT_SLUG_KEY);
+    } catch (e) {
+      console.warn("[user-store] current slug after remove:", e);
+    }
   }
   return { ok: true, slug, removed };
 }
@@ -199,8 +221,13 @@ export function removeUser(slug) {
 export function setCurrentUserSlug(slug) {
   const users = readUsers();
   if (!users.some((u) => u.slug === slug)) return false;
-  localStorage.setItem(CURRENT_SLUG_KEY, slug);
-  return true;
+  try {
+    localStorage.setItem(CURRENT_SLUG_KEY, slug);
+    return true;
+  } catch (e) {
+    console.warn("[user-store] setCurrentUserSlug:", e);
+    return false;
+  }
 }
 
 /** @returns {string | null} */
@@ -230,6 +257,10 @@ export function touchUserPlayed(slug) {
   const users = readUsers();
   const u = users.find((x) => x.slug === slug);
   if (!u) return;
+  const prev = u.lastPlayedAt;
   u.lastPlayedAt = Date.now();
-  writeUsers(users);
+  if (!writeUsers(users)) {
+    u.lastPlayedAt = prev;
+    console.warn("[user-store] touchUserPlayed: save failed");
+  }
 }

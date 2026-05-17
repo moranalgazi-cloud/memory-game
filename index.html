@@ -52,7 +52,8 @@
           <label class="field">
             <span id="labelGameMode" class="field__label">Game</span>
             <select id="gameMode" aria-label="Game type">
-              <option value="english" selected>English</option>
+              <option value="english1" selected>English 1</option>
+              <option value="english2">English 2</option>
               <option value="sums">Plus &amp; minus</option>
               <option value="math">Multiplication</option>
               <option value="fractions">Fractions</option>
@@ -125,14 +126,18 @@
       </header>
       <main>
         <div id="board" class="board" role="grid" aria-label="Memory cards"></div>
-        <p id="winMessage" class="win-message" hidden></p>
+        <div id="winActions" class="win-actions" hidden>
+          <p id="winMessage" class="win-message"></p>
+          <button type="button" id="testMeBtn" class="btn btn--primary win-actions__btn">Test me</button>
+        </div>
       </main>
     </div>
 
     <dialog id="recordsDialog" class="records-dialog">
       <div class="records-dialog__inner">
         <h2 id="recordsTitle" class="records-dialog__title">Your records</h2>
-        <div class="records-grid">
+        <h3 id="recordsGamesHeading" class="records-section__title">Games</h3>
+        <div class="records-grid records-grid--games">
           <div class="records-col">
             <h3 id="recordsHeadingMath">Multiplication</h3>
             <dl class="records-list">
@@ -156,14 +161,25 @@
             </dl>
           </div>
           <div class="records-col">
-            <h3 id="recordsHeadingEnglish">English</h3>
+            <h3 id="recordsHeadingEnglish1">English 1</h3>
             <dl class="records-list">
-              <dt id="recEngBestLabel">Best time</dt>
-              <dd id="recEngBest">—</dd>
-              <dt id="recEngWonLabel">Games won</dt>
-              <dd id="recEngWon">0</dd>
-              <dt id="recEngPlayedLabel">Games played</dt>
-              <dd id="recEngPlayed">0</dd>
+              <dt id="recEng1BestLabel">Best time</dt>
+              <dd id="recEng1Best">—</dd>
+              <dt id="recEng1WonLabel">Games won</dt>
+              <dd id="recEng1Won">0</dd>
+              <dt id="recEng1PlayedLabel">Games played</dt>
+              <dd id="recEng1Played">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h3 id="recordsHeadingEnglish2">English 2</h3>
+            <dl class="records-list">
+              <dt id="recEng2BestLabel">Best time</dt>
+              <dd id="recEng2Best">—</dd>
+              <dt id="recEng2WonLabel">Games won</dt>
+              <dd id="recEng2Won">0</dd>
+              <dt id="recEng2PlayedLabel">Games played</dt>
+              <dd id="recEng2Played">0</dd>
             </dl>
           </div>
           <div class="records-col">
@@ -178,11 +194,83 @@
             </dl>
           </div>
         </div>
+        <h3 id="recordsTestsHeading" class="records-section__title">Tests</h3>
+        <div class="records-grid records-grid--tests">
+          <div class="records-col">
+            <h4 id="recordsTestHeadingMath" class="records-col__title">Multiplication</h4>
+            <dl class="records-list">
+              <dt id="recTestMathBestLabel">Best score</dt>
+              <dd id="recTestMathBest">—</dd>
+              <dt id="recTestMathPassedLabel">Tests passed</dt>
+              <dd id="recTestMathPassed">0</dd>
+              <dt id="recTestMathTakenLabel">Tests taken</dt>
+              <dd id="recTestMathTaken">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h4 id="recordsTestHeadingSums" class="records-col__title">Plus &amp; minus</h4>
+            <dl class="records-list">
+              <dt id="recTestSumsBestLabel">Best score</dt>
+              <dd id="recTestSumsBest">—</dd>
+              <dt id="recTestSumsPassedLabel">Tests passed</dt>
+              <dd id="recTestSumsPassed">0</dd>
+              <dt id="recTestSumsTakenLabel">Tests taken</dt>
+              <dd id="recTestSumsTaken">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h4 id="recordsTestHeadingEnglish1" class="records-col__title">English 1</h4>
+            <dl class="records-list">
+              <dt id="recTestEng1BestLabel">Best score</dt>
+              <dd id="recTestEng1Best">—</dd>
+              <dt id="recTestEng1PassedLabel">Tests passed</dt>
+              <dd id="recTestEng1Passed">0</dd>
+              <dt id="recTestEng1TakenLabel">Tests taken</dt>
+              <dd id="recTestEng1Taken">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h4 id="recordsTestHeadingEnglish2" class="records-col__title">English 2</h4>
+            <dl class="records-list">
+              <dt id="recTestEng2BestLabel">Best score</dt>
+              <dd id="recTestEng2Best">—</dd>
+              <dt id="recTestEng2PassedLabel">Tests passed</dt>
+              <dd id="recTestEng2Passed">0</dd>
+              <dt id="recTestEng2TakenLabel">Tests taken</dt>
+              <dd id="recTestEng2Taken">0</dd>
+            </dl>
+          </div>
+          <div class="records-col">
+            <h4 id="recordsTestHeadingFractions" class="records-col__title">Fractions</h4>
+            <dl class="records-list">
+              <dt id="recTestFracBestLabel">Best score</dt>
+              <dd id="recTestFracBest">—</dd>
+              <dt id="recTestFracPassedLabel">Tests passed</dt>
+              <dd id="recTestFracPassed">0</dd>
+              <dt id="recTestFracTakenLabel">Tests taken</dt>
+              <dd id="recTestFracTaken">0</dd>
+            </dl>
+          </div>
+        </div>
         <div class="records-dialog__actions">
           <button type="button" id="emailRecords" class="btn btn--ghost records-dialog__action">
             Show off
           </button>
           <button type="button" id="closeRecords" class="btn btn--primary records-dialog__action">Close</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="quizDialog" class="quiz-dialog">
+      <div class="quiz-dialog__inner">
+        <h2 id="quizTitle" class="quiz-dialog__title">Test me</h2>
+        <p id="quizProgress" class="quiz-progress"></p>
+        <p id="quizPrompt" class="quiz-prompt"></p>
+        <div id="quizChoices" class="quiz-choices" role="group"></div>
+        <p id="quizFeedback" class="quiz-feedback" hidden></p>
+        <p id="quizSummary" class="quiz-summary" hidden></p>
+        <div class="quiz-dialog__actions">
+          <button type="button" id="closeQuiz" class="btn btn--primary" hidden>Done</button>
         </div>
       </div>
     </dialog>

@@ -1,4 +1,4 @@
-/** @typedef {"math" | "sums" | "english" | "fractions"} GameMode */
+/** @typedef {"math" | "sums" | "english1" | "english2" | "fractions"} GameMode */
 
 import { getCurrentUserSlug, USER_STATS_PREFIX, touchUserPlayed } from "./user-store.js";
 
@@ -14,11 +14,40 @@ function scheduleCloudSync(slug) {
 
 /**
  * @typedef {{ bestTimeMs: number | null; gamesWon: number; gamesPlayed: number }} ModeStats
- * @typedef {{ math: ModeStats; sums: ModeStats; english: ModeStats; fractions: ModeStats }} AllStats
+ * @typedef {{ bestScorePercent: number | null; testsPassed: number; testsTaken: number }} TestModeStats
+ * @typedef {{
+ *   math: ModeStats;
+ *   sums: ModeStats;
+ *   english1: ModeStats;
+ *   english2: ModeStats;
+ *   fractions: ModeStats;
+ *   tests: {
+ *     math: TestModeStats;
+ *     sums: TestModeStats;
+ *     english1: TestModeStats;
+ *     english2: TestModeStats;
+ *     fractions: TestModeStats;
+ *   };
+ * }} AllStats
  */
 
 function defaultMode() {
   return { bestTimeMs: null, gamesWon: 0, gamesPlayed: 0 };
+}
+
+function defaultTestMode() {
+  return { bestScorePercent: null, testsPassed: 0, testsTaken: 0 };
+}
+
+/** @returns {AllStats["tests"]} */
+function emptyTests() {
+  return {
+    math: defaultTestMode(),
+    sums: defaultTestMode(),
+    english1: defaultTestMode(),
+    english2: defaultTestMode(),
+    fractions: defaultTestMode(),
+  };
 }
 
 /** @returns {AllStats} */
@@ -26,8 +55,77 @@ function emptyStats() {
   return {
     math: defaultMode(),
     sums: defaultMode(),
-    english: defaultMode(),
+    english1: defaultMode(),
+    english2: defaultMode(),
     fractions: defaultMode(),
+    tests: emptyTests(),
+  };
+}
+
+/** @param {unknown} raw */
+function modeFrom(raw) {
+  const o = raw && typeof raw === "object" ? raw : {};
+  const bestTimeMs = o.bestTimeMs;
+  return {
+    bestTimeMs:
+      typeof bestTimeMs === "number" && Number.isFinite(bestTimeMs) && bestTimeMs > 0
+        ? bestTimeMs
+        : null,
+    gamesWon: typeof o.gamesWon === "number" && Number.isFinite(o.gamesWon) ? o.gamesWon : 0,
+    gamesPlayed:
+      typeof o.gamesPlayed === "number" && Number.isFinite(o.gamesPlayed) ? o.gamesPlayed : 0,
+  };
+}
+
+/** @param {unknown} raw */
+function testModeFrom(raw) {
+  const o = raw && typeof raw === "object" ? raw : {};
+  const best = o.bestScorePercent;
+  return {
+    bestScorePercent:
+      typeof best === "number" && Number.isFinite(best) && best >= 0 && best <= 100
+        ? best
+        : null,
+    testsPassed:
+      typeof o.testsPassed === "number" && Number.isFinite(o.testsPassed) ? o.testsPassed : 0,
+    testsTaken:
+      typeof o.testsTaken === "number" && Number.isFinite(o.testsTaken) ? o.testsTaken : 0,
+  };
+}
+
+/** @param {unknown} raw */
+function testsFrom(raw) {
+  const o = raw && typeof raw === "object" ? raw : {};
+  const base = emptyTests();
+  return {
+    math: { ...base.math, ...testModeFrom(o.math) },
+    sums: { ...base.sums, ...testModeFrom(o.sums) },
+    english1: { ...base.english1, ...testModeFrom(o.english1) },
+    english2: { ...base.english2, ...testModeFrom(o.english2) },
+    fractions: { ...base.fractions, ...testModeFrom(o.fractions) },
+  };
+}
+
+/**
+ * Migrates legacy `english` stats into `english1`.
+ * @param {unknown} parsed
+ */
+function normalizeStoredStats(parsed) {
+  const base = parsed && typeof parsed === "object" ? parsed : {};
+  const legacyEnglish = base.english;
+  return {
+    ...emptyStats(),
+    ...base,
+    math: { ...defaultMode(), ...base.math },
+    sums: { ...defaultMode(), ...base.sums },
+    english1: {
+      ...defaultMode(),
+      ...base.english1,
+      ...(legacyEnglish && !base.english1 ? legacyEnglish : {}),
+    },
+    english2: { ...defaultMode(), ...base.english2 },
+    fractions: { ...defaultMode(), ...base.fractions },
+    tests: testsFrom(base.tests),
   };
 }
 
@@ -47,15 +145,7 @@ export function loadRecordsForUser(slug) {
   try {
     const raw = localStorage.getItem(key);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      return {
-        ...emptyStats(),
-        ...parsed,
-        math: { ...defaultMode(), ...parsed.math },
-        sums: { ...defaultMode(), ...parsed.sums },
-        english: { ...defaultMode(), ...parsed.english },
-        fractions: { ...defaultMode(), ...parsed.fractions },
-      };
+      return normalizeStoredStats(JSON.parse(raw));
     }
   } catch {
     /* fall through */
@@ -75,7 +165,11 @@ function saveRecords(data) {
   const slug = getCurrentUserSlug();
   const key = statsStorageKey(slug);
   if (!key) return;
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn("[records] Failed to save stats:", e);
+  }
 }
 
 /**
@@ -108,6 +202,36 @@ export function recordAbandoned(mode) {
   saveRecords(data);
   touchUserPlayed(slug);
   scheduleCloudSync(slug);
+}
+
+/**
+ * @param {GameMode} mode
+ * @param {number} correct
+ * @param {number} total
+ */
+export function recordTestResult(mode, correct, total) {
+  const slug = getCurrentUserSlug();
+  if (!slug || total <= 0) return;
+  const data = loadRecords();
+  const t = data.tests[mode];
+  t.testsTaken += 1;
+  const pct = Math.round((correct / total) * 100);
+  if (correct === total) t.testsPassed += 1;
+  if (t.bestScorePercent === null || pct > t.bestScorePercent) {
+    t.bestScorePercent = pct;
+  }
+  saveRecords(data);
+  touchUserPlayed(slug);
+  scheduleCloudSync(slug);
+}
+
+/**
+ * @param {number | null} pct
+ * @returns {string}
+ */
+export function formatScorePercent(pct) {
+  if (pct === null || typeof pct !== "number" || !Number.isFinite(pct)) return "—";
+  return `${pct}%`;
 }
 
 /**

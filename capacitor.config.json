@@ -1,0 +1,8 @@
+{
+  "appId": "com.memorygames.app",
+  "appName": "Memory games",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
