@@ -61,7 +61,6 @@ import {
 } from "./cloud-sync.js";
 import { armCelebrationAudio, celebrateWin } from "./celebrate.js";
 import { applySnapshotToState } from "./multiplayer/protocol.js";
-import { readMathOptionsFromDom } from "./multiplayer/math-online.js";
 import { leaveOnlineSession, getActiveOnlineSession } from "./multiplayer/online-session.js";
 import {
   initOnlinePlay,
@@ -2101,8 +2100,7 @@ initOnlinePlay({
   renderBoard,
   updateStats,
   getMode,
-  readMathOptions: () =>
-    readMathOptionsFromDom(tableMaxSelect?.value, pairCountSelect?.value),
+  readMathOptions: () => getMathLevelSettings(getMathLevel()),
   t,
   hideWinActions,
   showOnlineWin,
