@@ -52,9 +52,13 @@ export default defineConfig(({ mode }) => {
   const fromVite = loadEnv(mode, root, "VITE_");
   const supaUrl = (fromFile.VITE_SUPABASE_URL || fromVite.VITE_SUPABASE_URL || "").trim();
   const supaKey = (fromFile.VITE_SUPABASE_ANON_KEY || fromVite.VITE_SUPABASE_ANON_KEY || "").trim();
+  /** GitHub Pages: `/memory-game/` when `GITHUB_PAGES=true` (see `.github/workflows/deploy-pages.yml`). */
+  const pagesBase =
+    process.env.GITHUB_PAGES_BASE ||
+    (process.env.GITHUB_PAGES === "true" ? "/memory-game/" : "./");
   return {
-    /** Relative asset paths so the app works inside Capacitor’s WebView (`capacitor://localhost`). */
-    base: "./",
+    /** Relative `./` for Capacitor; absolute base for GitHub Pages. */
+    base: pagesBase,
     define: {
       __APP_SUPABASE_URL__: JSON.stringify(supaUrl),
       __APP_SUPABASE_KEY__: JSON.stringify(supaKey),
