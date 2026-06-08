@@ -18,6 +18,8 @@ import { getSupabaseClient } from "./cloud-sync.js";
 /** @type {SupabaseUser | null} */
 let currentUser = null;
 let initialized = false;
+/** @type {Promise<void> | null} */
+let initPromise = null;
 
 /** @type {Set<(user: SupabaseUser | null) => void>} */
 const listeners = new Set();
@@ -103,30 +105,53 @@ function redirectTarget() {
 }
 
 /**
- * Establish a session on boot. Safe to call multiple times.
+ * Establish a session on boot. Safe to call multiple times; concurrent callers
+ * share the same in-flight promise.
  * @returns {Promise<void>}
  */
-export async function initAuth() {
-  if (initialized) return;
-  const c = getSupabaseClient();
-  if (!c) return; // local-only mode
-  initialized = true;
+export function initAuth() {
+  if (!initPromise) {
+    initPromise = (async () => {
+      const c = getSupabaseClient();
+      if (!c) return; // local-only mode
+      if (initialized) return;
+      initialized = true;
 
-  c.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user ?? null;
-    notify();
-  });
+      c.auth.onAuthStateChange((_event, session) => {
+        currentUser = session?.user ?? null;
+        notify();
+      });
 
-  try {
-    const { data } = await c.auth.getSession();
-    currentUser = data.session?.user ?? null;
-    if (!currentUser) {
-      await ensureAnonymousSession(c);
-    }
-  } catch (e) {
-    console.warn("[auth] init failed:", e);
+      try {
+        const { data } = await c.auth.getSession();
+        currentUser = data.session?.user ?? null;
+        if (!currentUser) {
+          await ensureAnonymousSession(c);
+        }
+      } catch (e) {
+        console.warn("[auth] init failed:", e);
+      }
+      notify();
+    })();
   }
+  return initPromise;
+}
+
+/**
+ * Wait until a Supabase auth session exists (anonymous or Google).
+ * Cloud sync must call this before writing — otherwise RLS rejects rows with
+ * no owner_id / no JWT.
+ * @returns {Promise<string | null>} auth.uid() or null if sign-in failed
+ */
+export async function ensureAuthReady() {
+  const c = getSupabaseClient();
+  if (!c) return null;
+  await initAuth();
+  if (getAuthUserId()) return getAuthUserId();
+  // Init finished but session missing (e.g. anonymous sign-in disabled).
+  await ensureAnonymousSession(c);
   notify();
+  return getAuthUserId();
 }
 
 /** @param {import("@supabase/supabase-js").SupabaseClient} c */

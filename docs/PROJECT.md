@@ -92,7 +92,7 @@ flowchart TB
 
 - **Records** — best times and games won per mode (per local player).
 - **Test me** — short quiz after winning, based on the deck you just played.
-- **Admin** — password-gated overview when configured (local + cloud player list).
+- **Admin** — password-gated overview of **local players on this device** (no cross-user cloud list; see Phase 3 security).
 - **Finish** (admin only) — skip to end of game for testing; online host can force a win in P2P.
 
 ---
@@ -114,6 +114,26 @@ Then reference them in this file or the root README.
 ## Legal
 
 Use and distribution are subject to the project disclaimer: **[DISCLAIMER.md](./DISCLAIMER.md)** (no warranty; limitation of liability; not legal advice).
+
+---
+
+## Roadmap (phased improvements)
+
+| Phase | Status | Summary |
+|-------|--------|---------|
+| **1 — UI** | Done | Design tokens, theme toggle (Dark / Light / Fun), cleaner player picker |
+| **2 — Auth** | Done | Anonymous sessions + optional Google sign-in; `owner_id` on cloud rows |
+| **3 — Security** | Done (code) | Owner-scoped RLS (`supabase/03_security_rls.sql`); admin is local-only; cloud writes require `auth.uid()` |
+| **4 — Multiplayer** | **Tomorrow** | Fix lag/disconnects when many 1v1 matches run at once |
+
+### Phase 4 plan (resume here)
+
+1. **TURN server** — add credentials (e.g. Metered / Twilio) so mobile NAT/firewalls can relay WebRTC when STUN fails; document env vars and setup steps.
+2. **Signaling reliability** — reconnect/backoff, channel cleanup when rooms end, avoid duplicate ICE/offer storms.
+3. **Session hardening** — host/guest leave handling, timeout UX, debounce sync broadcasts.
+4. **Load testing** — several parallel 1v1 rooms (two phones + desktop) and verify stable play.
+
+Online play uses **WebRTC for game state** and **Supabase Realtime only for signaling** — Phase 4 does not change the `memory_players` table.
 
 ---
 

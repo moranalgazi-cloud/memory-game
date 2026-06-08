@@ -62,11 +62,9 @@ import {
 } from "./admin-auth.js";
 import {
   isCloudSyncEnabled,
-  fetchAllPlayersForAdmin,
   fetchPlayersForOwner,
   syncAllLocalUsersToCloud,
   commitPlayerListToCloud,
-  statsFromCloudRow,
 } from "./cloud-sync.js";
 import {
   initAuth,
@@ -560,7 +558,7 @@ function refreshChrome() {
   if (addUserBtn) addUserBtn.textContent = t("addUser");
   if (userDialogContinue) userDialogContinue.textContent = t("userContinue");
   if (adt) adt.textContent = t("adminDialogTitle");
-  if (adh) adh.textContent = t(isCloudSyncEnabled() ? "adminDialogHintCloud" : "adminDialogHint");
+  if (adh) adh.textContent = t("adminDialogHint");
   if (closeAdminBtn) closeAdminBtn.textContent = t("closeAdmin");
   const aut = document.querySelector("#adminUnlockTitle");
   const auh = document.querySelector("#adminUnlockHint");
@@ -2300,136 +2298,25 @@ function renderAdminTableLocal(cur) {
   }
 }
 
-/**
- * @param {{ id: string; device_id: string; display_name: string; stats: unknown; last_played_at: unknown }} row
- * @param {null | { remoteId?: string }} cur
- */
-function appendCloudPlayerRow(row, cur) {
-  if (!adminTableBody) return;
-  const st = statsFromCloudRow(row.stats);
-  const total =
-    st.math.gamesPlayed +
-    st.sums.gamesPlayed +
-    st.english1.gamesPlayed +
-    st.english2.gamesPlayed +
-    st.fractions.gamesPlayed;
-  const rawLast = row.last_played_at;
-  const lastNum =
-    typeof rawLast === "number"
-      ? rawLast
-      : rawLast != null && String(rawLast).length
-        ? Number(rawLast)
-        : NaN;
-  const name = row.display_name + (cur?.remoteId === row.id ? " *" : "");
-  const did = row.device_id || "";
-  const devShort = did.length > 8 ? `${did.slice(0, 8)}…` : did;
-  const cells = [
-    name,
-    devShort,
-    formatLastPlayed(Number.isFinite(lastNum) ? lastNum : null),
-    String(total),
-    formatDuration(st.math.bestTimeMs),
-    formatDuration(st.sums.bestTimeMs),
-    formatDuration(st.english1.bestTimeMs),
-    formatDuration(st.english2.bestTimeMs),
-    formatDuration(st.fractions.bestTimeMs),
-  ];
-  const tr = document.createElement("tr");
-  for (const text of cells) {
-    const td = document.createElement("td");
-    td.textContent = text;
-    tr.append(td);
-  }
-  adminTableBody.append(tr);
-}
-
 async function openAdminOverview() {
   closeSettingsMenu();
   refreshChrome();
   if (!adminTableHead || !adminTableBody || !adminDialog) return;
 
-  const cloud = isCloudSyncEnabled();
-  const keys = cloud
-    ? [
-        "adminColUser",
-        "adminColDevice",
-        "adminColLast",
-        "adminColGames",
-        "adminColMath",
-        "adminColSums",
-        "adminColEng1",
-        "adminColEng2",
-        "adminColFrac",
-      ]
-    : [
-        "adminColUser",
-        "adminColLast",
-        "adminColGames",
-        "adminColMath",
-        "adminColSums",
-        "adminColEng1",
-        "adminColEng2",
-        "adminColFrac",
-      ];
+  const keys = [
+    "adminColUser",
+    "adminColLast",
+    "adminColGames",
+    "adminColMath",
+    "adminColSums",
+    "adminColEng1",
+    "adminColEng2",
+    "adminColFrac",
+  ];
 
   buildAdminTableHeader(keys);
-  adminTableBody.replaceChildren();
   adminDialog.showModal();
-
-  const cur = getCurrentUser();
-
-  if (cloud) {
-    const loadingTr = document.createElement("tr");
-    const loadingTd = document.createElement("td");
-    loadingTd.colSpan = keys.length;
-    loadingTd.textContent = t("adminLoadingCloud");
-    loadingTr.append(loadingTd);
-    adminTableBody.append(loadingTr);
-
-    try {
-      ensureUserRemoteIds();
-      const syncResult = await syncAllLocalUsersToCloud();
-      if (!syncResult.ok) {
-        console.warn("[cloud-sync] admin pre-fetch sync:", syncResult.failures.join(" | "));
-      }
-      const rows = await fetchAllPlayersForAdmin();
-      adminTableBody.replaceChildren();
-      if (!rows.length) {
-        const er = document.createElement("tr");
-        const ec = document.createElement("td");
-        ec.colSpan = keys.length;
-        ec.textContent = t("adminCloudEmpty");
-        er.append(ec);
-        adminTableBody.append(er);
-      } else {
-        for (const row of rows) {
-          appendCloudPlayerRow(row, cur);
-        }
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      buildAdminTableHeader([
-        "adminColUser",
-        "adminColLast",
-        "adminColGames",
-        "adminColMath",
-        "adminColSums",
-        "adminColEng1",
-        "adminColEng2",
-        "adminColFrac",
-      ]);
-      adminTableBody.replaceChildren();
-      const er = document.createElement("tr");
-      const ec = document.createElement("td");
-      ec.colSpan = 9;
-      ec.textContent = t("adminCloudError", { message: msg });
-      er.append(ec);
-      adminTableBody.append(er);
-      renderAdminTableLocal(cur);
-    }
-  } else {
-    renderAdminTableLocal(cur);
-  }
+  renderAdminTableLocal(getCurrentUser());
 }
 
 initLocale();

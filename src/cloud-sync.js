@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { listUsers, ensureUserRemoteIds } from "./user-store.js";
 import { loadRecordsForUser } from "./records.js";
-import { getAuthUserId } from "./auth.js";
+import { ensureAuthReady, getAuthUserId } from "./auth.js";
 
 const DEVICE_KEY = "memory-app-device-id-v1";
 
@@ -68,6 +68,23 @@ export function isCloudSyncEnabled() {
   return getSupabaseClient() !== null;
 }
 
+/** True when cloud is configured and the client has an auth session (anon or Google). */
+export function isCloudAuthReady() {
+  return isCloudSyncEnabled() && Boolean(getAuthUserId());
+}
+
+/**
+ * Whether this local player profile may be synced under the current auth session.
+ * @param {{ authOwner?: string }} user
+ */
+function playerOwnedByCurrentAuth(user) {
+  const uid = getAuthUserId();
+  if (!uid) return false;
+  // Legacy/local players without authOwner belong to whoever is signed in here.
+  if (!user.authOwner) return true;
+  return user.authOwner === uid;
+}
+
 /** @param {unknown} raw */
 function modeFrom(raw) {
   const o = raw && typeof raw === "object" ? raw : {};
@@ -121,41 +138,34 @@ export function statsFromCloudRow(stats) {
 export async function syncUserBySlug(slug) {
   const c = getSupabaseClient();
   if (!c) return { ok: false, error: "no_client" };
+  const ownerId = await ensureAuthReady();
+  if (!ownerId) return { ok: false, error: "no_auth" };
   ensureUserRemoteIds();
   const user = listUsers().find((u) => u.slug === slug);
   if (!user?.remoteId) return { ok: false, error: "no_remote_id" };
+  if (!playerOwnedByCurrentAuth(user)) return { ok: false, error: "not_owner" };
 
   const stats = loadRecordsForUser(slug);
   const lastPlayedAt =
     typeof user.lastPlayedAt === "number" && Number.isFinite(user.lastPlayedAt) ? user.lastPlayedAt : null;
 
-  const ownerId = getAuthUserId();
   /** @type {Record<string, unknown>} */
   const row = {
     id: user.remoteId,
+    owner_id: ownerId,
     device_id: getDeviceId(),
     display_name: user.name,
     stats,
     last_played_at: lastPlayedAt,
     updated_at: new Date().toISOString(),
   };
-  if (ownerId) row.owner_id = ownerId;
 
-  let { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
-
-  // Resilience: if the owner_id column hasn't been migrated yet, retry without it.
-  if (error && row.owner_id && /owner_id|column .* does not exist|schema cache/i.test(String(error.message))) {
-    console.warn(
-      "[cloud-sync] owner_id column missing — run supabase/02_auth_owner.sql. Retrying without owner_id.",
-    );
-    const { owner_id, ...rowNoOwner } = row;
-    ({ error } = await c.from("memory_players").upsert(rowNoOwner, { onConflict: "id" }));
-  }
+  const { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
 
   if (error) {
     const hint =
-      /jwt|api key|401|permission denied|not authorized/i.test(String(error.message))
-        ? " If you use a publishable key (sb_publishable_…) and still see this, open Supabase → Project Settings → API Keys → “Legacy anon” and paste the anon public (eyJ…) value into VITE_SUPABASE_ANON_KEY."
+      /jwt|api key|401|permission denied|not authorized|policy|42501/i.test(String(error.message))
+        ? " Run supabase/03_security_rls.sql if you have not yet. If you use a publishable key (sb_publishable_…) and still see this, open Supabase → Project Settings → API Keys → “Legacy anon” and paste the anon public (eyJ…) value into VITE_SUPABASE_ANON_KEY."
         : "";
     console.warn("[cloud-sync] upsert failed:", error.message, "| player:", row.display_name, hint);
     if (/jwt|invalid/i.test(String(error.message))) {
@@ -196,15 +206,22 @@ export function scheduleCloudSyncForSlug(slug) {
 
 export async function syncAllLocalUsersToCloud() {
   if (!isCloudSyncEnabled()) return { ok: true, failures: [] };
+  const uid = await ensureAuthReady();
+  if (!uid) {
+    const msg =
+      "No auth session — enable Anonymous sign-ins in Supabase (Authentication → Providers).";
+    console.warn("[cloud-sync]", msg);
+    return { ok: false, failures: [msg] };
+  }
   ensureUserRemoteIds();
-  const users = listUsers();
+  const users = listUsers().filter((u) => playerOwnedByCurrentAuth(u));
   let ok = 0;
   /** @type {string[]} */
   const failures = [];
   for (const u of users) {
     const r = await syncUserBySlug(u.slug);
     if (r.ok) ok += 1;
-    else failures.push(`${u.name}: ${r.error ?? "unknown"}`);
+    else if (r.error !== "not_owner") failures.push(`${u.name}: ${r.error ?? "unknown"}`);
   }
   if (failures.length) {
     console.warn("[cloud-sync] Sync had failures:", failures.join(" | "));
@@ -238,20 +255,6 @@ export async function fetchPlayersForOwner(ownerId) {
 }
 
 /**
- * @returns {Promise<{ id: string; device_id: string; display_name: string; stats: unknown; last_played_at: number | null }[]>}
- */
-export async function fetchAllPlayersForAdmin() {
-  const c = getSupabaseClient();
-  if (!c) return [];
-  const { data, error } = await c
-    .from("memory_players")
-    .select("id, device_id, display_name, stats, last_played_at")
-    .order("display_name", { ascending: true });
-  if (error) throw new Error(error.message);
-  return Array.isArray(data) ? data : [];
-}
-
-/**
  * Remove one cloud row (used when a player is deleted locally).
  * Tries `id` first, then this device's `display_name` (covers missing `remoteId` or id mismatch).
  * @param {{ remoteId?: string | null; displayName: string }} player
@@ -262,6 +265,8 @@ export async function deletePlayerFromCloud(player) {
   const displayName = String(player.displayName ?? "").trim();
   const c = getSupabaseClient();
   if (!c) return { ok: false, error: "no_client" };
+  const ownerId = await ensureAuthReady();
+  if (!ownerId) return { ok: false, error: "no_auth" };
   const deviceId = getDeviceId();
 
   if (remoteId) {
@@ -283,7 +288,7 @@ export async function deletePlayerFromCloud(player) {
     );
     const hint =
       /policy|permission denied|42501/i.test(String(error.message))
-        ? " Run supabase/memory_players_delete_policy.sql (or re-run memory_players.sql) so anon can DELETE."
+        ? " Run supabase/03_security_rls.sql so DELETE is allowed for rows you own (owner_id = auth.uid())."
         : "";
     return { ok: false, error: error.message + hint };
   }

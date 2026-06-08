@@ -16,6 +16,9 @@ create index if not exists memory_players_owner_id_idx
 -- 2) Best-effort backfill: nothing to do here yet (anonymous users get an
 --    owner_id on their next sync). Phase 3 handles any remaining null rows.
 
+-- Next: run supabase/03_security_rls.sql (Phase 3) to replace open policies with
+-- owner-scoped RLS before production use.
+--
 -- NOTE: Dashboard setup still required for sign-in to work:
 --   Authentication -> Sign In / Providers:
 --     * Enable "Anonymous sign-ins"

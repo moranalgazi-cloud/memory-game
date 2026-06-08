@@ -49,7 +49,13 @@ If you cloned from a different path or folder name, `cd` into that directory ins
 
 2. **Local-only:** leave `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` empty in `.env`. Solo play and local records still work; **Play online** and cloud sync are disabled.
 
-3. **With Supabase:** create a project at [supabase.com](https://supabase.com), then in the Supabase SQL editor run the scripts in `supabase/` (start with `memory_players.sql`; use `memory_players_delete_policy.sql` if your workflow needs that policy). Fill in the URL and anon (or publishable) key from **Project Settings → API** — never put the **service_role** secret in the frontend. Details are in `.env.example`.
+3. **With Supabase:** create a project at [supabase.com](https://supabase.com), then in the Supabase SQL editor run these scripts **in order**:
+   - `supabase/memory_players.sql` — table + initial policies
+   - `supabase/02_auth_owner.sql` — `owner_id` column (Phase 2 auth)
+   - `supabase/03_security_rls.sql` — owner-scoped RLS (Phase 3 security; **required** for cloud sync after Phase 3)
+   - `supabase/memory_players_delete_policy.sql` — only if you created the table before DELETE policy existed
+
+   Fill in the URL and anon (or publishable) key from **Project Settings → API** — never put the **service_role** secret in the frontend. Enable **Anonymous sign-ins** and optionally **Google** under Authentication → Providers. Details are in `.env.example`.
 
 4. **Online multiplayer:** enable Realtime on the project and follow [supabase/online-realtime.md](supabase/online-realtime.md). Deployments (e.g. GitHub Pages) need the same `VITE_*` secrets in CI.
 
