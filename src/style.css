@@ -1860,6 +1860,25 @@ select:focus-visible {
   width: 100%;
 }
 
+.user-dialog__privacy {
+  display: block;
+  margin-top: var(--space-3);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.user-dialog__privacy:hover {
+  color: var(--accent-alt);
+}
+
+/* Public footer link sits under the modal backdrop; hide it while the picker is open. */
+body:has(#userDialog[open]) .public-meta .site-footer {
+  visibility: hidden;
+}
+
 .admin-password-field {
   display: flex;
   align-items: stretch;

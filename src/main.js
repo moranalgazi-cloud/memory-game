@@ -184,6 +184,8 @@ const newUserNameInput = document.querySelector("#newUserName");
 const userAddError = document.querySelector("#userAddError");
 const addUserBtn = document.querySelector("#addUserBtn");
 const userDialogContinue = document.querySelector("#userDialogContinue");
+const userDialogPrivacyLink = document.querySelector("#userDialogPrivacyLink");
+const privacyPolicyLink = document.querySelector("#privacyPolicyLink");
 const adminUnlockDialog = document.querySelector("#adminUnlockDialog");
 const adminUnlockForm = document.querySelector("#adminUnlockForm");
 const adminPasswordInput = document.querySelector("#adminPasswordInput");
@@ -561,6 +563,8 @@ function refreshChrome() {
   if (lnu) lnu.textContent = t("labelNewUser");
   if (addUserBtn) addUserBtn.textContent = t("addUser");
   if (userDialogContinue) userDialogContinue.textContent = t("userContinue");
+  if (userDialogPrivacyLink) userDialogPrivacyLink.textContent = t("privacyPolicyLink");
+  if (privacyPolicyLink) privacyPolicyLink.textContent = t("privacyPolicyLink");
   if (adt) adt.textContent = t("adminDialogTitle");
   if (adh) adh.textContent = t("adminDialogHint");
   if (closeAdminBtn) closeAdminBtn.textContent = t("closeAdmin");
