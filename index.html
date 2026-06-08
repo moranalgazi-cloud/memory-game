@@ -34,8 +34,20 @@
       <header class="header">
         <div class="header__top">
           <div class="header__brand">
-            <h1 id="gameTitle">Memory games</h1>
-            <p id="gameTagline" class="tagline"></p>
+            <div class="header__brand-row">
+              <img
+                id="appLogo"
+                class="header__logo"
+                width="48"
+                height="48"
+                decoding="async"
+                alt=""
+              />
+              <div class="header__titles">
+                <h1 id="gameTitle">Memory games</h1>
+                <p id="gameTagline" class="tagline"></p>
+              </div>
+            </div>
           </div>
           <button
             type="button"
@@ -557,6 +569,16 @@
 
     <dialog id="aboutDialog" class="about-dialog info-dialog">
       <div class="about-dialog__inner info-dialog__inner">
+        <div class="about-dialog__hero">
+          <img
+            id="aboutLogo"
+            class="about-dialog__logo"
+            width="72"
+            height="72"
+            decoding="async"
+            alt=""
+          />
+        </div>
         <h2 id="aboutDialogTitle" class="about-dialog__title info-dialog__title">About</h2>
         <div id="aboutBody" class="about-dialog__body info-dialog__body" tabindex="0"></div>
         <button type="button" id="aboutCloseBtn" class="btn btn--primary info-dialog__close">

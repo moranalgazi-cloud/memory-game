@@ -1,4 +1,5 @@
 import "./style.css";
+import { applyAppBranding } from "./branding.js";
 import {
   pickFacts,
   buildDeck,
@@ -463,6 +464,7 @@ function getFractionLevelSettings(level) {
 }
 
 function refreshChrome() {
+  applyAppBranding(t);
   const mode = getMode();
   setPageTitleForMode(mode);
   if (gameTitle) {
@@ -2320,6 +2322,7 @@ async function openAdminOverview() {
 }
 
 initLocale();
+applyAppBranding(t);
 initDisclaimerUi({
   t,
   onAccepted: () => syncUserAddDisclaimerGate(),
