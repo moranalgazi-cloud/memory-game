@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy policy — Memory games</title>
+    <meta
+      name="description"
+      content="Privacy policy for Memory games — how player names, scores, and optional cloud sync are handled."
+    />
+    <link
+      rel="canonical"
+      href="https://moranalgazi-cloud.github.io/memory-game/privacy.html"
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --text: #1a2850;
+        --muted: #4a5f8a;
+        --bg: #f3f6ff;
+        --link: #6c4dff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #f3f6ff;
+          --muted: #aeb9e6;
+          --bg: #161f47;
+          --link: #9aaeff;
+        }
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        line-height: 1.55;
+        color: var(--text);
+        background: var(--bg);
+        padding: 1.5rem 1rem 2.5rem;
+      }
+      main {
+        max-width: 42rem;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 0.5rem;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+        margin: 1.5rem 0 0.5rem;
+      }
+      p,
+      ul {
+        margin: 0.5rem 0;
+      }
+      a {
+        color: var(--link);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Privacy policy</h1>
+      <p class="meta">
+        Last updated: May 2026 ·
+        <a href="https://moranalgazi-cloud.github.io/memory-game/">Back to Memory games</a>
+      </p>
+
+      <p>
+        This privacy policy applies to <strong>Memory games</strong>, an educational browser
+        application for children to practice English, math, and fractions through memory-style
+        matching games. The app is operated at
+        <a href="https://moranalgazi-cloud.github.io/memory-game/">moranalgazi-cloud.github.io/memory-game</a>.
+      </p>
+
+      <h2>Information we collect</h2>
+      <ul>
+        <li>
+          <strong>Player names:</strong> names you enter locally on a device to separate scores
+          between players.
+        </li>
+        <li>
+          <strong>Game statistics:</strong> best times, games played, and optional quiz scores,
+          stored on your device.
+        </li>
+        <li>
+          <strong>Preferences:</strong> language, theme, and similar settings in browser storage.
+        </li>
+        <li>
+          <strong>Account identifier (optional):</strong> if you choose Google sign-in or cloud
+          sync, an anonymous or Google-linked user id from our auth provider (Supabase) is used to
+          associate saved progress with your account.
+        </li>
+        <li>
+          <strong>Online play:</strong> multiplayer uses peer-to-peer connections between browsers.
+          We do not store game moves in our database. Room codes are exchanged between players only.
+        </li>
+      </ul>
+
+      <h2>How we use information</h2>
+      <p>
+        Data is used only to run the app: show your records, resume progress, and optionally sync
+        across devices when you sign in. We do not sell personal information or use it for
+        advertising.
+      </p>
+
+      <h2>Where data is stored</h2>
+      <ul>
+        <li><strong>On your device</strong> — browser local storage.</li>
+        <li>
+          <strong>In the cloud (optional)</strong> — Supabase database when cloud sync or Google
+          sign-in is enabled.
+        </li>
+      </ul>
+
+      <h2>Third-party services</h2>
+      <p>We use the following third-party services:</p>
+      <ul>
+        <li><strong>Supabase</strong> — optional authentication and cloud storage of player stats.</li>
+        <li><strong>Google Sign-In</strong> — optional account linking (only if you choose it).</li>
+        <li><strong>Google Fonts</strong> — web fonts for the user interface.</li>
+      </ul>
+      <p>Each provider has its own privacy policy and terms.</p>
+
+      <h2>Children</h2>
+      <p>
+        The app is intended for supervised use by children. Parents, guardians, and teachers should
+        choose player names and decide whether to enable Google sign-in or cloud sync.
+      </p>
+
+      <h2>Your choices</h2>
+      <ul>
+        <li>Play without signing in — local players only, no Google account required.</li>
+        <li>Clear browser site data to remove local player names and scores.</li>
+        <li>Sign out from Google in the player dialog to end a linked session.</li>
+      </ul>
+
+      <h2>Data retention and security</h2>
+      <p>
+        Local data remains until you clear browser storage. Cloud data is retained while your account
+        or anonymous session exists and may be removed when you delete players or sign out, subject
+        to our database provider’s policies. Cloud access is protected by row-level security so each
+        user can only access their own records.
+      </p>
+
+      <h2>Disclaimer</h2>
+      <p>
+        The software is provided “as is” without warranty. See the in-app disclaimer (Settings →
+        Disclaimer) for limitation of liability and terms of use.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        We may update this privacy policy. The “Last updated” date at the top will change when we
+        do. Continued use of the app after changes means you accept the updated policy.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions about this privacy policy: open an issue on the project repository or contact the
+        maintainer listed in the
+        <a href="https://moranalgazi-cloud.github.io/memory-game/">Memory games</a> README.
+      </p>
+    </main>
+  </body>
+</html>

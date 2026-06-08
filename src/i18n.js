@@ -25,6 +25,8 @@ const messages = {
     taglineEnglish1Generic: "Match each icon to its English word.",
     taglineEnglish2Generic: "Match each Hebrew word to its English word.",
     taglineFractions: "Match each fraction to its pie picture.",
+    appPurpose:
+      "Memory games helps kids practice English, math, and fractions by matching pairs of cards. Play solo on this device or challenge a friend online.",
     pairs: "Pairs",
     englishLevel: "English level",
     englishLevelEasy: "Easy — voice on all cards",
@@ -330,6 +332,8 @@ const messages = {
     taglineEnglish1Generic: "התאימו כל סמל למילה באנגלית.",
     taglineEnglish2Generic: "התאימו כל מילה בעברית למילה באנגלית.",
     taglineFractions: "התאימו כל שבר לתמונת העוגה שלו.",
+    appPurpose:
+      "משחקי הזיכרון עוזרים לילדים לתרגל אנגלית, חשבון ושברים בהתאמת זוגות קלפים. משחקים לבד במכשיר הזה או מאתגרים חבר ברשת.",
     pairs: "זוגות",
     englishLevel: "רמת אנגלית",
     englishLevelEasy: "קל — קול בכל הכרטיסים",

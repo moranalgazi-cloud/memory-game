@@ -156,6 +156,24 @@ body {
   padding: 1.25rem 1rem 2rem;
 }
 
+.site-footer {
+  margin-top: var(--space-5);
+  padding-top: var(--space-3);
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer__link {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.site-footer__link:hover {
+  color: var(--accent-alt);
+}
+
 .header {
   text-align: center;
   margin-bottom: 1.25rem;
@@ -469,6 +487,17 @@ h1 {
   font-size: 1.02rem;
   font-weight: 600;
   white-space: pre-line;
+}
+
+.app-purpose {
+  margin: 0.35rem 0 1rem;
+  max-width: 36rem;
+  margin-inline: auto;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.45;
+  text-wrap: balance;
 }
 
 .toolbar {

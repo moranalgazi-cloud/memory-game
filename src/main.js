@@ -154,6 +154,7 @@ const closeRecordsBtn = document.querySelector("#closeRecords");
 const emailRecordsBtn = document.querySelector("#emailRecords");
 const gameTitle = document.querySelector("#gameTitle");
 const gameTagline = document.querySelector("#gameTagline");
+const appPurposeEl = document.querySelector("#appPurpose");
 const labelGameMode = document.querySelector("#labelGameMode");
 const labelPairs = document.querySelector("#labelPairs");
 const labelEnglishLevel = document.querySelector("#labelEnglishLevel");
@@ -474,6 +475,7 @@ function refreshChrome() {
     else if (mode === "sums") gameTitle.textContent = t("titleSums");
     else gameTitle.textContent = t("titleMath");
   }
+  if (appPurposeEl) appPurposeEl.textContent = t("appPurpose");
   if (gameTagline) {
     if (
       state &&
