@@ -10,6 +10,24 @@
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Rubik:wght@600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Apply the effective theme before first paint to avoid a flash.
+      // Theming is fully attribute-driven: data-theme is always set to
+      // "light", "dark", or "fun" (saved choice wins, else the OS preference).
+      (function () {
+        var theme = null;
+        try {
+          theme = localStorage.getItem("memory-theme-v1");
+        } catch (e) {}
+        if (theme !== "light" && theme !== "dark" && theme !== "fun") {
+          var prefersLight =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches;
+          theme = prefersLight ? "light" : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
   </head>
   <body>
     <div id="appRoot" class="app">
@@ -19,6 +37,15 @@
             <h1 id="gameTitle">Memory games</h1>
             <p id="gameTagline" class="tagline"></p>
           </div>
+          <button
+            type="button"
+            id="accountBadge"
+            class="account-badge is-hidden"
+            aria-label="Account"
+            title="Account"
+          >
+            <span id="accountBadgeInitial" class="account-badge__initial" aria-hidden="true"></span>
+          </button>
           <div class="settings-dropdown">
             <button
               type="button"
@@ -45,6 +72,9 @@
                   <option value="he">עברית</option>
                 </select>
               </label>
+              <button type="button" id="themeToggle" class="btn btn--ghost settings-menu__btn">
+                <span id="themeToggleLabel">Dark mode</span>
+              </button>
               <button type="button" id="openPlayOnline" class="btn btn--ghost settings-menu__btn">
                 Play online
               </button>
@@ -198,117 +228,207 @@
         <h2 id="recordsTitle" class="records-dialog__title">Your records</h2>
         <h3 id="recordsGamesHeading" class="records-section__title">Games</h3>
         <div class="records-grid records-grid--games">
-          <div class="records-col">
-            <h3 id="recordsHeadingMath">Multiplication</h3>
-            <dl class="records-list">
-              <dt id="recMathBestLabel">Best time</dt>
-              <dd id="recMathBest">—</dd>
-              <dt id="recMathWonLabel">Games won</dt>
-              <dd id="recMathWon">0</dd>
-              <dt id="recMathPlayedLabel">Games played</dt>
-              <dd id="recMathPlayed">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">✖️</span>
+              <h3 id="recordsHeadingMath" class="records-card__title">Multiplication</h3>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recMathBestLabel">Best time</dt>
+                <dd id="recMathBest">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recMathWonLabel">Games won</dt>
+                <dd id="recMathWon">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recMathPlayedLabel">Games played</dt>
+                <dd id="recMathPlayed">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h3 id="recordsHeadingSums">Plus &amp; minus</h3>
-            <dl class="records-list">
-              <dt id="recSumsBestLabel">Best time</dt>
-              <dd id="recSumsBest">—</dd>
-              <dt id="recSumsWonLabel">Games won</dt>
-              <dd id="recSumsWon">0</dd>
-              <dt id="recSumsPlayedLabel">Games played</dt>
-              <dd id="recSumsPlayed">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">➕</span>
+              <h3 id="recordsHeadingSums" class="records-card__title">Plus &amp; minus</h3>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recSumsBestLabel">Best time</dt>
+                <dd id="recSumsBest">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recSumsWonLabel">Games won</dt>
+                <dd id="recSumsWon">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recSumsPlayedLabel">Games played</dt>
+                <dd id="recSumsPlayed">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h3 id="recordsHeadingEnglish1">English 1</h3>
-            <dl class="records-list">
-              <dt id="recEng1BestLabel">Best time</dt>
-              <dd id="recEng1Best">—</dd>
-              <dt id="recEng1WonLabel">Games won</dt>
-              <dd id="recEng1Won">0</dd>
-              <dt id="recEng1PlayedLabel">Games played</dt>
-              <dd id="recEng1Played">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">🔤</span>
+              <h3 id="recordsHeadingEnglish1" class="records-card__title">English 1</h3>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recEng1BestLabel">Best time</dt>
+                <dd id="recEng1Best">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recEng1WonLabel">Games won</dt>
+                <dd id="recEng1Won">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recEng1PlayedLabel">Games played</dt>
+                <dd id="recEng1Played">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h3 id="recordsHeadingEnglish2">English 2</h3>
-            <dl class="records-list">
-              <dt id="recEng2BestLabel">Best time</dt>
-              <dd id="recEng2Best">—</dd>
-              <dt id="recEng2WonLabel">Games won</dt>
-              <dd id="recEng2Won">0</dd>
-              <dt id="recEng2PlayedLabel">Games played</dt>
-              <dd id="recEng2Played">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">📚</span>
+              <h3 id="recordsHeadingEnglish2" class="records-card__title">English 2</h3>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recEng2BestLabel">Best time</dt>
+                <dd id="recEng2Best">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recEng2WonLabel">Games won</dt>
+                <dd id="recEng2Won">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recEng2PlayedLabel">Games played</dt>
+                <dd id="recEng2Played">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h3 id="recordsHeadingFractions">Fractions</h3>
-            <dl class="records-list">
-              <dt id="recFracBestLabel">Best time</dt>
-              <dd id="recFracBest">—</dd>
-              <dt id="recFracWonLabel">Games won</dt>
-              <dd id="recFracWon">0</dd>
-              <dt id="recFracPlayedLabel">Games played</dt>
-              <dd id="recFracPlayed">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">½</span>
+              <h3 id="recordsHeadingFractions" class="records-card__title">Fractions</h3>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recFracBestLabel">Best time</dt>
+                <dd id="recFracBest">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recFracWonLabel">Games won</dt>
+                <dd id="recFracWon">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recFracPlayedLabel">Games played</dt>
+                <dd id="recFracPlayed">0</dd>
+              </div>
             </dl>
           </div>
         </div>
         <h3 id="recordsTestsHeading" class="records-section__title">Tests</h3>
         <div class="records-grid records-grid--tests">
-          <div class="records-col">
-            <h4 id="recordsTestHeadingMath" class="records-col__title">Multiplication</h4>
-            <dl class="records-list">
-              <dt id="recTestMathBestLabel">Best score</dt>
-              <dd id="recTestMathBest">—</dd>
-              <dt id="recTestMathPassedLabel">Tests passed</dt>
-              <dd id="recTestMathPassed">0</dd>
-              <dt id="recTestMathTakenLabel">Tests taken</dt>
-              <dd id="recTestMathTaken">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">✖️</span>
+              <h4 id="recordsTestHeadingMath" class="records-card__title">Multiplication</h4>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recTestMathBestLabel">Best score</dt>
+                <dd id="recTestMathBest">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestMathPassedLabel">Tests passed</dt>
+                <dd id="recTestMathPassed">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestMathTakenLabel">Tests taken</dt>
+                <dd id="recTestMathTaken">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h4 id="recordsTestHeadingSums" class="records-col__title">Plus &amp; minus</h4>
-            <dl class="records-list">
-              <dt id="recTestSumsBestLabel">Best score</dt>
-              <dd id="recTestSumsBest">—</dd>
-              <dt id="recTestSumsPassedLabel">Tests passed</dt>
-              <dd id="recTestSumsPassed">0</dd>
-              <dt id="recTestSumsTakenLabel">Tests taken</dt>
-              <dd id="recTestSumsTaken">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">➕</span>
+              <h4 id="recordsTestHeadingSums" class="records-card__title">Plus &amp; minus</h4>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recTestSumsBestLabel">Best score</dt>
+                <dd id="recTestSumsBest">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestSumsPassedLabel">Tests passed</dt>
+                <dd id="recTestSumsPassed">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestSumsTakenLabel">Tests taken</dt>
+                <dd id="recTestSumsTaken">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h4 id="recordsTestHeadingEnglish1" class="records-col__title">English 1</h4>
-            <dl class="records-list">
-              <dt id="recTestEng1BestLabel">Best score</dt>
-              <dd id="recTestEng1Best">—</dd>
-              <dt id="recTestEng1PassedLabel">Tests passed</dt>
-              <dd id="recTestEng1Passed">0</dd>
-              <dt id="recTestEng1TakenLabel">Tests taken</dt>
-              <dd id="recTestEng1Taken">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">🔤</span>
+              <h4 id="recordsTestHeadingEnglish1" class="records-card__title">English 1</h4>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recTestEng1BestLabel">Best score</dt>
+                <dd id="recTestEng1Best">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestEng1PassedLabel">Tests passed</dt>
+                <dd id="recTestEng1Passed">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestEng1TakenLabel">Tests taken</dt>
+                <dd id="recTestEng1Taken">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h4 id="recordsTestHeadingEnglish2" class="records-col__title">English 2</h4>
-            <dl class="records-list">
-              <dt id="recTestEng2BestLabel">Best score</dt>
-              <dd id="recTestEng2Best">—</dd>
-              <dt id="recTestEng2PassedLabel">Tests passed</dt>
-              <dd id="recTestEng2Passed">0</dd>
-              <dt id="recTestEng2TakenLabel">Tests taken</dt>
-              <dd id="recTestEng2Taken">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">📚</span>
+              <h4 id="recordsTestHeadingEnglish2" class="records-card__title">English 2</h4>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recTestEng2BestLabel">Best score</dt>
+                <dd id="recTestEng2Best">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestEng2PassedLabel">Tests passed</dt>
+                <dd id="recTestEng2Passed">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestEng2TakenLabel">Tests taken</dt>
+                <dd id="recTestEng2Taken">0</dd>
+              </div>
             </dl>
           </div>
-          <div class="records-col">
-            <h4 id="recordsTestHeadingFractions" class="records-col__title">Fractions</h4>
-            <dl class="records-list">
-              <dt id="recTestFracBestLabel">Best score</dt>
-              <dd id="recTestFracBest">—</dd>
-              <dt id="recTestFracPassedLabel">Tests passed</dt>
-              <dd id="recTestFracPassed">0</dd>
-              <dt id="recTestFracTakenLabel">Tests taken</dt>
-              <dd id="recTestFracTaken">0</dd>
+          <div class="records-card">
+            <div class="records-card__head">
+              <span class="records-card__icon" aria-hidden="true">½</span>
+              <h4 id="recordsTestHeadingFractions" class="records-card__title">Fractions</h4>
+            </div>
+            <dl class="records-stats">
+              <div class="records-stat records-stat--primary">
+                <dt id="recTestFracBestLabel">Best score</dt>
+                <dd id="recTestFracBest">—</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestFracPassedLabel">Tests passed</dt>
+                <dd id="recTestFracPassed">0</dd>
+              </div>
+              <div class="records-stat">
+                <dt id="recTestFracTakenLabel">Tests taken</dt>
+                <dd id="recTestFracTaken">0</dd>
+              </div>
             </dl>
           </div>
         </div>
@@ -477,14 +597,23 @@
           </label>
         </div>
 
-        <div class="user-dialog__section">
-          <h3 id="userStepPickTitle" class="user-dialog__step-title">1. Pick a player</h3>
+        <div id="userGoogleSection" class="user-dialog__section user-dialog__google is-hidden">
+          <p id="userGoogleHint" class="user-dialog__step-hint"></p>
+          <button type="button" id="userGoogleBtn" class="btn btn--primary user-google-btn">
+            Sign in with Google
+          </button>
+          <p id="userGoogleStatus" class="user-google-status is-hidden"></p>
+          <div class="user-dialog__divider"><span id="userGoogleOr">or</span></div>
+        </div>
+
+        <div id="userPickSection" class="user-dialog__section">
+          <h3 id="userStepPickTitle" class="user-dialog__step-title">Pick a player</h3>
           <p id="userStepPickHint" class="user-dialog__step-hint"></p>
           <div id="userListMount" class="user-list-mount" role="list"></div>
         </div>
 
-        <div class="user-dialog__section">
-          <h3 id="userStepAddTitle" class="user-dialog__step-title">2. Or add someone new</h3>
+        <div id="userAddSection" class="user-dialog__section">
+          <h3 id="userStepAddTitle" class="user-dialog__step-title">Add someone new</h3>
           <p id="userStepAddHint" class="user-dialog__step-hint"></p>
           <div id="disclaimerGate" class="disclaimer-gate">
             <p id="disclaimerRequiredHint" class="disclaimer-gate__hint is-hidden"></p>
@@ -499,8 +628,11 @@
           <p id="userAddError" class="user-add-error is-hidden" role="alert"></p>
           <div class="user-dialog__actions">
             <button type="button" id="addUserBtn" class="btn btn--ghost">Add player</button>
-            <button type="button" id="userDialogContinue" class="btn btn--primary" disabled>Continue</button>
           </div>
+        </div>
+
+        <div class="user-dialog__footer">
+          <button type="button" id="userDialogContinue" class="btn btn--primary" disabled>Continue</button>
         </div>
       </div>
     </dialog>

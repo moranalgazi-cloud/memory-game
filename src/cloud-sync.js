@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { listUsers, ensureUserRemoteIds } from "./user-store.js";
 import { loadRecordsForUser } from "./records.js";
+import { getAuthUserId } from "./auth.js";
 
 const DEVICE_KEY = "memory-app-device-id-v1";
 
@@ -46,7 +47,12 @@ export function getSupabaseClient() {
     return null;
   }
   _client = createClient(url.trim(), key.trim(), {
-    auth: { persistSession: false, autoRefreshToken: false },
+    auth: {
+      // Phase 2: real auth sessions (anonymous by default, optional Google).
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
     global: {
       fetch: (input, init) =>
         fetch(input, {
@@ -123,6 +129,8 @@ export async function syncUserBySlug(slug) {
   const lastPlayedAt =
     typeof user.lastPlayedAt === "number" && Number.isFinite(user.lastPlayedAt) ? user.lastPlayedAt : null;
 
+  const ownerId = getAuthUserId();
+  /** @type {Record<string, unknown>} */
   const row = {
     id: user.remoteId,
     device_id: getDeviceId(),
@@ -131,8 +139,19 @@ export async function syncUserBySlug(slug) {
     last_played_at: lastPlayedAt,
     updated_at: new Date().toISOString(),
   };
+  if (ownerId) row.owner_id = ownerId;
 
-  const { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
+  let { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
+
+  // Resilience: if the owner_id column hasn't been migrated yet, retry without it.
+  if (error && row.owner_id && /owner_id|column .* does not exist|schema cache/i.test(String(error.message))) {
+    console.warn(
+      "[cloud-sync] owner_id column missing — run supabase/02_auth_owner.sql. Retrying without owner_id.",
+    );
+    const { owner_id, ...rowNoOwner } = row;
+    ({ error } = await c.from("memory_players").upsert(rowNoOwner, { onConflict: "id" }));
+  }
+
   if (error) {
     const hint =
       /jwt|api key|401|permission denied|not authorized/i.test(String(error.message))
@@ -193,6 +212,29 @@ export async function syncAllLocalUsersToCloud() {
     console.info("[cloud-sync] Synced", ok, "player(s) to Supabase (table memory_players).");
   }
   return { ok: failures.length === 0, failures };
+}
+
+/**
+ * Fetch the players owned by a given auth user (for cross-device sync on sign-in).
+ * @param {string} ownerId
+ * @returns {Promise<{ id: string; display_name: string; stats: unknown; last_played_at: number | null }[]>}
+ */
+export async function fetchPlayersForOwner(ownerId) {
+  const c = getSupabaseClient();
+  if (!c || !ownerId) return [];
+  const { data, error } = await c
+    .from("memory_players")
+    .select("id, display_name, stats, last_played_at")
+    .eq("owner_id", ownerId);
+  if (error) {
+    // owner_id column may not be migrated yet — treat as "no cloud players".
+    if (/owner_id|column .* does not exist|schema cache/i.test(String(error.message))) {
+      console.warn("[cloud-sync] fetchPlayersForOwner: owner_id missing — run supabase/02_auth_owner.sql");
+      return [];
+    }
+    throw new Error(error.message);
+  }
+  return Array.isArray(data) ? data : [];
 }
 
 /**

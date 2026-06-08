@@ -53,6 +53,7 @@ import {
   getCurrentUser,
   isAdminUser,
   ensureUserRemoteIds,
+  ensureAccountPlayer,
 } from "./user-store.js";
 import {
   isAdminSessionUnlocked,
@@ -62,10 +63,22 @@ import {
 import {
   isCloudSyncEnabled,
   fetchAllPlayersForAdmin,
+  fetchPlayersForOwner,
   syncAllLocalUsersToCloud,
   commitPlayerListToCloud,
   statsFromCloudRow,
 } from "./cloud-sync.js";
+import {
+  initAuth,
+  onAuthChange,
+  isSignedIn,
+  getAuthUserId,
+  getAuthEmail,
+  getAuthDisplayName,
+  getAuthAvatarUrl,
+  signInWithGoogle,
+  signOutAuth,
+} from "./auth.js";
 import { armCelebrationAudio, celebrateWin } from "./celebrate.js";
 import { applySnapshotToState } from "./multiplayer/protocol.js";
 import { buildOnlineHostConfig } from "./multiplayer/online-deck.js";
@@ -83,6 +96,13 @@ import {
   quitOnlineGame,
   playOnlineAgain,
 } from "./online-ui.js";
+
+// Theme constants live up top: refreshChrome() runs during module init and
+// reads these via nextTheme(), so they must be initialized before that point
+// (avoids a temporal-dead-zone ReferenceError on boot).
+const THEME_KEY = "memory-theme-v1";
+/** Cycle order for the theme toggle. Dark is the default. */
+const THEME_ORDER = /** @type {const} */ (["dark", "light", "fun"]);
 
 const board = document.querySelector("#board");
 const movesEl = document.querySelector("#moves");
@@ -146,6 +166,18 @@ const labelTime = document.querySelector("#labelTime");
 const appRoot = document.querySelector("#appRoot");
 const openUserMenuBtn = document.querySelector("#openUserMenu");
 const openAdminBtn = document.querySelector("#openAdmin");
+const themeToggleBtn = document.querySelector("#themeToggle");
+const themeToggleLabel = document.querySelector("#themeToggleLabel");
+const accountBadge = document.querySelector("#accountBadge");
+const accountBadgeInitial = document.querySelector("#accountBadgeInitial");
+const userGoogleSection = document.querySelector("#userGoogleSection");
+const userGoogleBtn = document.querySelector("#userGoogleBtn");
+const userGoogleStatus = document.querySelector("#userGoogleStatus");
+const userGoogleHint = document.querySelector("#userGoogleHint");
+const userGoogleOr = document.querySelector("#userGoogleOr");
+const userPickSection = document.querySelector("#userPickSection");
+const userAddSection = document.querySelector("#userAddSection");
+const userStepPickTitle = document.querySelector("#userStepPickTitle");
 const userDialog = document.querySelector("#userDialog");
 const userListMount = document.querySelector("#userListMount");
 const newUserNameInput = document.querySelector("#newUserName");
@@ -465,6 +497,8 @@ function refreshChrome() {
       mode === "fractions" ? t("tablesAsDenominator") : t("tables");
   }
   if (labelLanguage) labelLanguage.textContent = t("language");
+  updateThemeToggleLabel();
+  refreshAuthUI();
   if (labelMoves) labelMoves.textContent = t("moves");
   if (labelMatches) labelMatches.textContent = t("matches");
   if (labelTime) labelTime.textContent = t("time");
@@ -521,6 +555,7 @@ function refreshChrome() {
   if (ush1) ush1.textContent = t("userStepPickHint");
   if (ust2) ust2.textContent = t("userStepAddTitle");
   if (ush2) ush2.textContent = t("userStepAddHint");
+  syncUserDialogAccountMode();
   if (lnu) lnu.textContent = t("labelNewUser");
   if (addUserBtn) addUserBtn.textContent = t("addUser");
   if (userDialogContinue) userDialogContinue.textContent = t("userContinue");
@@ -1845,23 +1880,125 @@ function showUserAddError(message) {
   userAddError.classList.remove("is-hidden");
 }
 
+/** Kid-friendly avatars: pick a stable emoji + hue from the player's name so
+ *  each player is visually recognizable without having to read. */
+const AVATAR_EMOJIS = [
+  "\u{1F436}", // dog
+  "\u{1F431}", // cat
+  "\u{1F98A}", // fox
+  "\u{1F438}", // frog
+  "\u{1F435}", // monkey
+  "\u{1F981}", // lion
+  "\u{1F43C}", // panda
+  "\u{1F430}", // rabbit
+  "\u{1F427}", // penguin
+  "\u{1F984}", // unicorn
+  "\u{1F422}", // turtle
+  "\u{1F41D}", // bee
+  "\u{1F419}", // octopus
+  "\u{1F995}", // dino
+  "\u{1F981}", // lion
+  "\u{1F428}", // koala
+];
+
+/** @param {string} name @returns {number} */
+function hashString(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) {
+    h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+
+/** @param {string} name */
+function avatarForName(name) {
+  const h = hashString((name || "?").trim().toLowerCase());
+  return {
+    emoji: AVATAR_EMOJIS[h % AVATAR_EMOJIS.length],
+    hue: h % 360,
+  };
+}
+
+/** The players shown in the picker list (filtered to the account when signed in). */
+function getDisplayedPickerUsers() {
+  const uid = getAuthUserId();
+  let users = listUsers();
+  if (isAccountMode() && uid) {
+    // Signed in with Google: the account is the only identity shown.
+    users = users.filter((u) => u.authOwner === uid);
+  }
+  return users;
+}
+
+/**
+ * Keep the dialog sections in sync with state:
+ * - account mode hides the "add someone new" flow,
+ * - the pick step (step 1) only appears when there is at least one player to pick.
+ */
+function syncUserDialogAccountMode() {
+  const accountMode = isAccountMode();
+  const hasPickable = getDisplayedPickerUsers().length > 0;
+  if (userAddSection) userAddSection.classList.toggle("is-hidden", accountMode);
+  if (userPickSection) userPickSection.classList.toggle("is-hidden", !hasPickable);
+  if (userStepPickTitle) {
+    userStepPickTitle.textContent = accountMode ? t("userAccountPlayer") : t("userStepPickTitle");
+  }
+  const addTitle = document.querySelector("#userStepAddTitle");
+  if (addTitle) {
+    // Without an existing list there is no "step 1", so the add flow stands alone.
+    addTitle.textContent = hasPickable ? t("userStepAddTitle") : t("userStepAddTitleSolo");
+  }
+}
+
 function renderUserPickerList() {
   if (!userListMount) return;
   userListMount.replaceChildren();
-  const users = listUsers();
+  const accountMode = isAccountMode();
+  const uid = getAuthUserId();
+  const users = getDisplayedPickerUsers();
   const curSlug = pendingUserSlug ?? getCurrentUser()?.slug ?? null;
-  const canDelete = users.length > 1;
+  const canDelete = !accountMode && users.length > 1;
   for (const u of users) {
-    const row = document.createElement("div");
-    row.className = "user-pick-row";
-    row.setAttribute("role", "listitem");
+    const isAccountTile = accountMode && Boolean(uid) && u.authOwner === uid;
+    const cell = document.createElement("div");
+    cell.className = "user-pick-cell";
+    cell.setAttribute("role", "listitem");
 
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "user-pick";
-    btn.textContent = u.name;
     btn.dataset.slug = u.slug;
     if (u.slug === curSlug) btn.classList.add("is-selected");
+
+    const avatar = document.createElement("span");
+    avatar.className = "user-pick__avatar";
+    avatar.setAttribute("aria-hidden", "true");
+    if (isAccountTile) {
+      // Google account: use the real profile photo (or a neutral initial),
+      // never a random emoji avatar — those are for local players only.
+      avatar.classList.add("user-pick__avatar--account");
+      const photo = getAuthAvatarUrl();
+      if (photo) {
+        const img = document.createElement("img");
+        img.src = photo;
+        img.alt = "";
+        img.referrerPolicy = "no-referrer";
+        img.className = "user-pick__photo";
+        avatar.append(img);
+      } else {
+        avatar.textContent = (u.name.trim()[0] || "?").toUpperCase();
+      }
+    } else {
+      const { emoji, hue } = avatarForName(u.name);
+      avatar.style.setProperty("--avatar-hue", String(hue));
+      avatar.textContent = emoji;
+    }
+
+    const label = document.createElement("span");
+    label.className = "user-pick__name";
+    label.textContent = u.name;
+
+    btn.append(avatar, label);
     btn.addEventListener("click", () => {
       pendingUserSlug = u.slug;
       if (newUserNameInput) newUserNameInput.value = "";
@@ -1869,12 +2006,12 @@ function renderUserPickerList() {
       renderUserPickerList();
       if (userDialogContinue) userDialogContinue.disabled = false;
     });
-    row.append(btn);
+    cell.append(btn);
 
     if (canDelete) {
       const del = document.createElement("button");
       del.type = "button";
-      del.className = "btn user-pick-delete";
+      del.className = "user-pick-delete";
       del.setAttribute("aria-label", t("ariaDeletePlayer", { name: u.name }));
       del.textContent = "\u00d7";
       del.addEventListener("click", (e) => {
@@ -1882,14 +2019,15 @@ function renderUserPickerList() {
         e.stopPropagation();
         removeUserFromPicker(u.slug);
       });
-      row.append(del);
+      cell.append(del);
     }
 
-    userListMount.append(row);
+    userListMount.append(cell);
   }
   if (userDialogContinue) {
     userDialogContinue.disabled = !pendingUserSlug;
   }
+  syncUserDialogAccountMode();
   syncUserDialogButtonEmphasis();
 }
 
@@ -1948,7 +2086,11 @@ function syncUserAddDisclaimerGate() {
   }
   if (hint) hint.classList.toggle("is-hidden", accepted);
   const gate = document.querySelector("#disclaimerGate");
-  if (gate) gate.classList.toggle("disclaimer-gate--locked", !accepted);
+  if (gate) {
+    // Once accepted, the agreement prompt has no reason to stay in this dialog.
+    gate.classList.toggle("is-hidden", accepted);
+    gate.classList.toggle("disclaimer-gate--locked", !accepted);
+  }
 }
 
 function openUserPickerDialog() {
@@ -2327,20 +2469,37 @@ initOnlinePlay({
 });
 ensureUserRemoteIds();
 
+// Phase 2: keep the account UI in sync with auth-state changes (sign in, sign
+// out, or returning from a Google OAuth redirect), and apply/relax the
+// account-as-player identity.
+onAuthChange(() => {
+  refreshAuthUI();
+  syncUserDialogAccountMode();
+  if (userDialog?.open) renderUserPickerList();
+  void applyGoogleIdentityIfSignedIn();
+});
+
 if (getCurrentUser()) {
   refreshChrome();
   startGame("init");
-  if (isCloudSyncEnabled()) {
-    queueMicrotask(() => {
-      void syncAllLocalUsersToCloud().then((r) => {
-        if (!r.ok) console.warn("[cloud-sync] boot sync:", r.failures.join(" | "));
-      });
-    });
-  }
 } else {
   appRoot?.classList.add("is-hidden");
   refreshChrome();
   queueMicrotask(() => openUserPickerDialog());
+}
+
+// Establish an auth session (anonymous by default). When signed in with Google,
+// the account becomes the active player. No-op in local-only mode.
+if (isCloudSyncEnabled()) {
+  queueMicrotask(() => {
+    void initAuth().then(async () => {
+      refreshAuthUI();
+      await applyGoogleIdentityIfSignedIn();
+      void syncAllLocalUsersToCloud().then((r) => {
+        if (!r.ok) console.warn("[cloud-sync] boot sync:", r.failures.join(" | "));
+      });
+    });
+  });
 }
 
 userDialog?.addEventListener("cancel", (e) => {
@@ -2360,7 +2519,11 @@ settingsMenuBtn?.addEventListener("click", (e) => {
 settingsMenu?.addEventListener("click", (e) => {
   const el = e.target;
   if (!(el instanceof Element)) return;
-  if (el.closest("button")) closeSettingsMenu();
+  const btn = el.closest("button");
+  if (!btn) return;
+  // Theme toggle stays in-menu so the user can preview and switch back.
+  if (btn.id === "themeToggle") return;
+  closeSettingsMenu();
 });
 
 document.addEventListener("click", (e) => {
@@ -2458,6 +2621,173 @@ fractionLevelSelect?.addEventListener("change", () => startGame("options"));
 tableMaxSelect?.addEventListener("change", () => startGame("options"));
 gameModeSelect?.addEventListener("change", () => startGame("options"));
 
+/** @typedef {"light" | "dark" | "fun"} ThemeName */
+
+/** @returns {ThemeName} The currently effective theme. */
+function getEffectiveTheme() {
+  const explicit = document.documentElement.dataset.theme;
+  if (explicit === "light" || explicit === "dark" || explicit === "fun") return explicit;
+  const prefersLight =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: light)").matches;
+  return prefersLight ? "light" : "dark";
+}
+
+/** @param {ThemeName} theme @returns {ThemeName} The next theme in the cycle. */
+function nextTheme(theme) {
+  const idx = THEME_ORDER.indexOf(theme);
+  return THEME_ORDER[(idx + 1) % THEME_ORDER.length];
+}
+
+/** Follow OS theme changes only while the user hasn't made an explicit choice. */
+if (typeof window.matchMedia === "function") {
+  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
+    let saved = null;
+    try {
+      saved = localStorage.getItem(THEME_KEY);
+    } catch {
+      /* ignore */
+    }
+    if (saved === "light" || saved === "dark" || saved === "fun") return;
+    document.documentElement.dataset.theme = e.matches ? "light" : "dark";
+    updateThemeToggleLabel();
+  });
+}
+
+/** @param {ThemeName} theme @returns {string} */
+function themeLabel(theme) {
+  if (theme === "light") return t("themeToLight");
+  if (theme === "fun") return t("themeToFun");
+  return t("themeToDark");
+}
+
+function updateThemeToggleLabel() {
+  if (!themeToggleLabel) return;
+  // Show the action: clicking switches to the NEXT theme in the cycle.
+  themeToggleLabel.textContent = themeLabel(nextTheme(getEffectiveTheme()));
+}
+
+function toggleTheme() {
+  const next = nextTheme(getEffectiveTheme());
+  document.documentElement.dataset.theme = next;
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch {
+    /* ignore storage failures */
+  }
+  updateThemeToggleLabel();
+}
+
+/** Show/update the optional Google sign-in control based on auth + cloud state. */
+function refreshAuthUI() {
+  const signedIn = isCloudSyncEnabled() && isSignedIn();
+  const email = signedIn ? getAuthEmail() : null;
+
+  // Header account badge: visible only when signed in with a real account.
+  appRoot?.classList.toggle("has-account-badge", Boolean(signedIn));
+  if (accountBadge) {
+    accountBadge.classList.toggle("is-hidden", !signedIn);
+    if (signedIn) {
+      const initial = (email || "?").trim().charAt(0).toUpperCase() || "?";
+      if (accountBadgeInitial) accountBadgeInitial.textContent = initial;
+      const label = email ? t("authSavedAs", { email }) : t("authSavedGeneric");
+      accountBadge.setAttribute("aria-label", label);
+      accountBadge.setAttribute("title", label);
+    }
+  }
+
+  // Google option inside the "Who's playing?" dialog.
+  if (userGoogleSection && userGoogleBtn) {
+    if (!isCloudSyncEnabled()) {
+      userGoogleSection.classList.add("is-hidden");
+    } else {
+      userGoogleSection.classList.remove("is-hidden");
+      if (userGoogleOr) userGoogleOr.textContent = t("authOr");
+      if (userGoogleHint) userGoogleHint.textContent = t("userGoogleHint");
+      if (signedIn) {
+        userGoogleBtn.textContent = t("authSignOut");
+        if (userGoogleStatus) {
+          userGoogleStatus.textContent = email
+            ? t("authSavedAs", { email })
+            : t("authSavedGeneric");
+          userGoogleStatus.classList.remove("is-hidden");
+        }
+      } else {
+        userGoogleBtn.textContent = t("authSignInGoogle");
+        if (userGoogleStatus) {
+          userGoogleStatus.textContent = "";
+          userGoogleStatus.classList.add("is-hidden");
+        }
+      }
+    }
+  }
+}
+
+async function handleAuthButton() {
+  if (!isCloudSyncEnabled()) return;
+  userGoogleBtn?.setAttribute("disabled", "true");
+  try {
+    if (isSignedIn()) {
+      await signOutAuth();
+      refreshAuthUI();
+      // Re-sync local players under the new (anonymous) session.
+      if (isCloudSyncEnabled()) void syncAllLocalUsersToCloud();
+    } else {
+      // Triggers a full-page redirect to Google; nothing runs after on success.
+      const res = await signInWithGoogle();
+      if (!res.ok) {
+        console.warn("[app] Google sign-in:", res.error);
+      }
+    }
+  } finally {
+    userGoogleBtn?.removeAttribute("disabled");
+  }
+}
+
+let accountIdentityInFlight = false;
+
+/** @returns {boolean} True when signed in with a real Google account + cloud on. */
+function isAccountMode() {
+  return isCloudSyncEnabled() && isSignedIn();
+}
+
+/**
+ * When signed in with Google, make the account itself the active player:
+ * ensure a single account-linked profile (adopting cloud stats if present),
+ * select it, and hide local-only players.
+ */
+async function applyGoogleIdentityIfSignedIn() {
+  if (!isAccountMode() || accountIdentityInFlight) return;
+  const uid = getAuthUserId();
+  if (!uid) return;
+  accountIdentityInFlight = true;
+  try {
+    /** @type {{ id: string; display_name?: string; stats?: unknown; last_played_at?: number | null }[]} */
+    let rows = [];
+    try {
+      rows = await fetchPlayersForOwner(uid);
+    } catch (e) {
+      console.warn("[cloud-sync] fetch account players:", e);
+    }
+    const name = getAuthDisplayName() || getAuthEmail() || "Player";
+    const prevSlug = getCurrentUser()?.slug ?? null;
+    const acct = ensureAccountPlayer(uid, name, rows);
+    if (!acct) return;
+    ensureUserRemoteIds();
+    refreshChrome();
+    if (userDialog?.open) renderUserPickerList();
+    syncUserDialogAccountMode();
+    // Switch the board to the account player if we changed who is active.
+    if (booted && prevSlug !== acct.slug && !isOnlineBoardActive()) {
+      cancelEnglishSpeech();
+      startGame("switch-user");
+    }
+    void syncAllLocalUsersToCloud();
+  } finally {
+    accountIdentityInFlight = false;
+  }
+}
+
 /** @param {HTMLSelectElement | null} source */
 function applyGameLocaleFromSelect(source) {
   const v = source?.value;
@@ -2473,6 +2803,20 @@ localeSelect?.addEventListener("change", () => {
   closeSettingsMenu();
 });
 userDialogLocale?.addEventListener("change", () => applyGameLocaleFromSelect(userDialogLocale));
+
+themeToggleBtn?.addEventListener("click", () => {
+  toggleTheme();
+});
+
+accountBadge?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  closeSettingsMenu();
+  openUserPickerDialog();
+});
+
+userGoogleBtn?.addEventListener("click", () => {
+  void handleAuthButton();
+});
 
 openRecordsBtn?.addEventListener("click", openRecords);
 closeRecordsBtn?.addEventListener("click", closeRecords);

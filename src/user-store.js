@@ -57,7 +57,7 @@ function allocateRemoteId() {
 }
 
 /**
- * @typedef {{ slug: string; name: string; createdAt: number; lastPlayedAt?: number; remoteId?: string }} AppUser
+ * @typedef {{ slug: string; name: string; createdAt: number; lastPlayedAt?: number; remoteId?: string; authOwner?: string }} AppUser
  */
 
 /** @returns {AppUser[]} */
@@ -250,6 +250,114 @@ export function isAdminUser(user) {
     if (String(a).trim().toLowerCase() === n) return true;
   }
   return false;
+}
+
+/**
+ * Merge players fetched from the cloud (owned by the signed-in account) into the
+ * local list. Only ADDS players missing locally (matched by remoteId or name) so
+ * local progress is never clobbered. Imports each new player's stats too.
+ * @param {{ id: string; display_name: string; stats?: unknown; last_played_at?: number | null }[]} rows
+ * @returns {{ imported: number }}
+ */
+export function importCloudPlayers(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return { imported: 0 };
+  const users = readUsers();
+  let imported = 0;
+  for (const row of rows) {
+    const remoteId = typeof row?.id === "string" ? row.id.trim() : "";
+    const name = typeof row?.display_name === "string" ? row.display_name.trim() : "";
+    if (!isValidRemoteUuid(remoteId) || name.length < 1) continue;
+    const exists = users.some(
+      (u) =>
+        u.remoteId === remoteId ||
+        u.name.trim().toLowerCase() === name.toLowerCase(),
+    );
+    if (exists) continue;
+    const slug = uniqueSlug(slugify(name));
+    const lastPlayedAt =
+      typeof row.last_played_at === "number" && Number.isFinite(row.last_played_at)
+        ? row.last_played_at
+        : undefined;
+    users.push({ slug, name, createdAt: Date.now(), lastPlayedAt, remoteId });
+    if (row.stats && typeof row.stats === "object") {
+      try {
+        localStorage.setItem(USER_STATS_PREFIX + slug, JSON.stringify(row.stats));
+      } catch {
+        /* stats are best-effort */
+      }
+    }
+    imported += 1;
+  }
+  if (imported > 0) writeUsers(users);
+  return { imported };
+}
+
+/**
+ * Players linked to a given Google account (auth uid).
+ * @param {string} uid
+ * @returns {AppUser[]}
+ */
+export function listAccountPlayers(uid) {
+  return readUsers()
+    .filter((u) => u.authOwner === uid)
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+}
+
+/**
+ * Ensure a single player linked to the signed-in Google account exists and is
+ * the current player. Adopts a matching cloud row (to keep stats across
+ * devices) when possible, otherwise creates a fresh profile.
+ * @param {string} uid
+ * @param {string} displayName
+ * @param {{ id: string; display_name?: string; stats?: unknown; last_played_at?: number | null }[]} [cloudRows]
+ * @returns {AppUser | null}
+ */
+export function ensureAccountPlayer(uid, displayName, cloudRows = []) {
+  if (!uid) return null;
+  const name = (displayName || "Player").trim().slice(0, 32) || "Player";
+  const users = readUsers();
+  let acct = users.find((u) => u.authOwner === uid);
+
+  if (!acct) {
+    const rows = Array.isArray(cloudRows) ? cloudRows : [];
+    // Only adopt a cloud row that is genuinely this account's own player
+    // (matched by the Google display name). Never fall back to an arbitrary
+    // row — that would hijack a local/kid player's record instead of creating
+    // a fresh one for the account.
+    const match =
+      rows.find(
+        (r) =>
+          typeof r.display_name === "string" &&
+          r.display_name.trim().toLowerCase() === name.toLowerCase(),
+      ) || null;
+    const remoteId =
+      match && isValidRemoteUuid(match.id) ? match.id : allocateRemoteId();
+    const slug = uniqueSlug(slugify(name));
+    const lastPlayedAt =
+      match && typeof match.last_played_at === "number" && Number.isFinite(match.last_played_at)
+        ? match.last_played_at
+        : undefined;
+    acct = { slug, name, createdAt: Date.now(), lastPlayedAt, remoteId, authOwner: uid };
+    users.push(acct);
+    if (match && match.stats && typeof match.stats === "object") {
+      try {
+        localStorage.setItem(USER_STATS_PREFIX + slug, JSON.stringify(match.stats));
+      } catch {
+        /* stats best-effort */
+      }
+    }
+    writeUsers(users);
+  } else if (acct.name !== name) {
+    acct.name = name;
+    writeUsers(users);
+  }
+
+  try {
+    localStorage.setItem(CURRENT_SLUG_KEY, acct.slug);
+  } catch (e) {
+    console.warn("[user-store] ensureAccountPlayer current slug:", e);
+  }
+  return acct;
 }
 
 /** @param {string} slug */
