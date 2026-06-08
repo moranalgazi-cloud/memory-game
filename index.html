@@ -38,6 +38,21 @@
     </script>
   </head>
   <body>
+    <!-- Always outside #appRoot so Google/crawlers see it even when the app shell is hidden. -->
+    <section id="publicMeta" class="public-meta">
+      <p id="appPurpose" class="app-purpose">
+        Memory games helps kids practice English, math, and fractions by matching pairs of
+        cards. Play solo on this device or challenge a friend online.
+      </p>
+      <footer class="site-footer">
+        <a
+          href="https://moranalgazi-cloud.github.io/memory-game/privacy.html"
+          id="privacyPolicyLink"
+          class="site-footer__link"
+        >Privacy policy</a>
+      </footer>
+    </section>
+
     <div id="appRoot" class="app">
       <header class="header">
         <div class="header__top">
@@ -56,10 +71,6 @@
                 <p id="gameTagline" class="tagline"></p>
               </div>
             </div>
-            <p id="appPurpose" class="app-purpose">
-              Memory games helps kids practice English, math, and fractions by matching pairs of
-              cards. Play solo on this device or challenge a friend online.
-            </p>
           </div>
           <button
             type="button"
@@ -246,13 +257,6 @@
         </div>
       </main>
 
-      <footer class="site-footer">
-        <a
-          href="https://moranalgazi-cloud.github.io/memory-game/privacy.html"
-          id="privacyPolicyLink"
-          class="site-footer__link"
-        >Privacy policy</a>
-      </footer>
     </div>
 
     <dialog id="recordsDialog" class="records-dialog">

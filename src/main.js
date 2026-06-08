@@ -2188,6 +2188,7 @@ async function confirmUserChoiceAsync() {
       return;
     }
     userDialog?.close();
+    document.body.classList.add("has-active-player");
     appRoot?.classList.remove("is-hidden");
     if (!booted) {
       refreshChrome();
@@ -2372,9 +2373,11 @@ onAuthChange(() => {
 });
 
 if (getCurrentUser()) {
+  document.body.classList.add("has-active-player");
   refreshChrome();
   startGame("init");
 } else {
+  document.body.classList.remove("has-active-player");
   appRoot?.classList.add("is-hidden");
   refreshChrome();
   queueMicrotask(() => openUserPickerDialog());
