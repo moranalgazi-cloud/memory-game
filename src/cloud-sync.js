@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { listUsers, ensureUserRemoteIds } from "./user-store.js";
+import { listUsers, ensureUserRemoteIds, reassignRemoteId, stampAuthOwner } from "./user-store.js";
 import { loadRecordsForUser } from "./records.js";
 import { ensureAuthReady, getAuthUserId } from "./auth.js";
 
@@ -85,6 +85,11 @@ function playerOwnedByCurrentAuth(user) {
   return user.authOwner === uid;
 }
 
+/** @param {unknown} message */
+function isRlsPolicyError(message) {
+  return /row-level security|violates.*policy|42501/i.test(String(message));
+}
+
 /** @param {unknown} raw */
 function modeFrom(raw) {
   const o = raw && typeof raw === "object" ? raw : {};
@@ -160,7 +165,21 @@ export async function syncUserBySlug(slug) {
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
+  let { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
+
+  // Old cloud rows (null owner_id or a previous auth session) block upsert under RLS.
+  if (error && isRlsPolicyError(error.message)) {
+    const newId = reassignRemoteId(slug);
+    if (newId) {
+      row.id = newId;
+      const retry = await c.from("memory_players").insert(row);
+      error = retry.error;
+      if (!error) {
+        stampAuthOwner(slug, ownerId);
+        return { ok: true };
+      }
+    }
+  }
 
   if (error) {
     const hint =
@@ -173,6 +192,7 @@ export async function syncUserBySlug(slug) {
     }
     return { ok: false, error: error.message };
   }
+  stampAuthOwner(slug, ownerId);
   return { ok: true };
 }
 

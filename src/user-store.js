@@ -136,6 +136,36 @@ export function userNameTaken(name) {
   return readUsers().some((u) => u.name.trim().toLowerCase() === n);
 }
 
+/**
+ * Replace a player's cloud row id when the old id points at a row this auth
+ * session cannot update (pre-RLS rows or a previous anonymous session).
+ * @param {string} slug
+ * @returns {string | null} the new remote id, or null if the player is missing
+ */
+export function reassignRemoteId(slug) {
+  const users = readUsers();
+  const u = users.find((x) => x.slug === slug);
+  if (!u) return null;
+  u.remoteId = allocateRemoteId();
+  if (!writeUsers(users)) {
+    console.warn("[user-store] reassignRemoteId: could not save");
+    return null;
+  }
+  return u.remoteId;
+}
+
+/** Bind a local player profile to the current Supabase auth session. @param {string} slug @param {string} uid */
+export function stampAuthOwner(slug, uid) {
+  if (!uid) return;
+  const users = readUsers();
+  const u = users.find((x) => x.slug === slug);
+  if (!u || u.authOwner === uid) return;
+  u.authOwner = uid;
+  if (!writeUsers(users)) {
+    console.warn("[user-store] stampAuthOwner: could not save");
+  }
+}
+
 /** Ensures every stored user has a stable `remoteId` for cloud sync. */
 export function ensureUserRemoteIds() {
   const users = readUsers();
