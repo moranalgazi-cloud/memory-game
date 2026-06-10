@@ -1,5 +1,4 @@
-/** @type {RTCIceServer[]} */
-const DEFAULT_ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
+import { FALLBACK_ICE_SERVERS } from "./ice-servers.js";
 
 /**
  * @typedef {{
@@ -13,9 +12,10 @@ const DEFAULT_ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 /**
  * @param {boolean} isHost
  * @param {DataChannelHandlers} handlers
+ * @param {RTCIceServer[]} [iceServers]
  */
-export function createGameConnection(isHost, handlers) {
-  const pc = new RTCPeerConnection({ iceServers: DEFAULT_ICE_SERVERS });
+export function createGameConnection(isHost, handlers, iceServers = FALLBACK_ICE_SERVERS) {
+  const pc = new RTCPeerConnection({ iceServers });
   /** @type {RTCDataChannel | null} */
   let dc = null;
 

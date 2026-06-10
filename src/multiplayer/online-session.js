@@ -1,5 +1,6 @@
 import { createSignalingChannel } from "./signaling.js";
 import { createGameConnection } from "./connection.js";
+import { resolveIceServers } from "./ice-servers.js";
 import { generateRoomCode } from "./room-code.js";
 import { buildOnlineDeckFromSeed, inferOnlineModeFromCards } from "./online-deck.js";
 import {
@@ -16,6 +17,8 @@ import { isCloudSyncEnabled } from "../cloud-sync.js";
 
 const MATCH_PAUSE_MS = 400;
 const MISMATCH_PAUSE_MS = 1000;
+const CONNECT_TIMEOUT_MS = 45_000;
+const ICE_SEND_DEBOUNCE_MS = 50;
 
 /** @typedef {'idle' | 'waiting' | 'connecting' | 'playing' | 'ended'} OnlinePhase */
 
@@ -59,6 +62,14 @@ export class OnlineSession {
     /** @type {ReturnType<typeof setTimeout> | null} */
     this.resolveTimer = null;
     this.guestJoined = false;
+    this.offerSent = false;
+    /** @type {ReturnType<typeof setTimeout> | null} */
+    this.connectTimeout = null;
+    /** @type {ReturnType<typeof setTimeout> | null} */
+    this.iceFlushTimer = null;
+    /** @type {RTCIceCandidateInit[]} */
+    this.pendingIce = [];
+    this.left = false;
   }
 
   /** @param {string} text */
@@ -70,6 +81,7 @@ export class OnlineSession {
     if (!isCloudSyncEnabled()) {
       throw new Error("online-requires-supabase");
     }
+    const iceServers = await resolveIceServers();
     this.signaling = createSignalingChannel(this.roomId, this.playerId, {
       onSignal: (payload) => this.handleSignal(payload),
       onStatus: (status) => {
@@ -79,30 +91,71 @@ export class OnlineSession {
         if (status === "SUBSCRIBED" && this.role === "host") {
           this.phase = "waiting";
           this.setStatus("online-status-waiting");
+          this.armConnectTimeout();
+        }
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          if (!this.left && this.phase !== "ended") {
+            this.callbacks.onError("online-error-connection");
+            void this.leave();
+          }
         }
       },
     });
 
-    this.conn = createGameConnection(this.role === "host", {
-      onOpen: () => this.onDataChannelOpen(),
-      onClose: () => this.onDisconnected(),
-      onMessage: (text) => this.onDataMessage(text),
-      onError: () => this.callbacks.onError("online-error-connection"),
-    });
+    this.conn = createGameConnection(
+      this.role === "host",
+      {
+        onOpen: () => this.onDataChannelOpen(),
+        onClose: () => this.onDisconnected(),
+        onMessage: (text) => this.onDataMessage(text),
+        onError: () => this.callbacks.onError("online-error-connection"),
+      },
+      iceServers,
+    );
 
     this.wireIce();
 
     if (this.role === "guest") {
       this.phase = "connecting";
       this.setStatus("online-status-connecting");
+      this.armConnectTimeout();
+    }
+  }
+
+  armConnectTimeout() {
+    this.clearConnectTimeout();
+    this.connectTimeout = setTimeout(() => {
+      this.connectTimeout = null;
+      if (this.phase === "connecting" || this.phase === "waiting") {
+        this.callbacks.onError("online-error-timeout");
+        void this.leave();
+      }
+    }, CONNECT_TIMEOUT_MS);
+  }
+
+  clearConnectTimeout() {
+    if (this.connectTimeout) {
+      clearTimeout(this.connectTimeout);
+      this.connectTimeout = null;
+    }
+  }
+
+  flushIceCandidates() {
+    this.iceFlushTimer = null;
+    if (!this.signaling || this.pendingIce.length === 0) return;
+    const batch = this.pendingIce.splice(0);
+    for (const candidate of batch) {
+      this.signaling.send("ice", candidate);
     }
   }
 
   wireIce() {
     if (!this.conn || !this.signaling) return;
     this.conn.pc.onicecandidate = (ev) => {
-      if (ev.candidate) {
-        this.signaling?.send("ice", ev.candidate.toJSON());
+      if (!ev.candidate) return;
+      this.pendingIce.push(ev.candidate.toJSON());
+      if (!this.iceFlushTimer) {
+        this.iceFlushTimer = setTimeout(() => this.flushIceCandidates(), ICE_SEND_DEBOUNCE_MS);
       }
     };
   }
@@ -112,12 +165,23 @@ export class OnlineSession {
    */
   async handleSignal(payload) {
     if (!this.conn) return;
+    if (payload.type === "leave") {
+      if (!this.left && this.phase !== "ended") {
+        this.callbacks.onError("online-error-peer-left");
+        void this.leave();
+      }
+      return;
+    }
     if (payload.type === "join" && this.role === "host" && !this.guestJoined) {
       this.guestJoined = true;
       this.phase = "connecting";
       this.setStatus("online-status-connecting");
-      const offer = await this.conn.createOffer();
-      this.signaling?.send("offer", offer);
+      this.armConnectTimeout();
+      if (!this.offerSent) {
+        this.offerSent = true;
+        const offer = await this.conn.createOffer();
+        this.signaling?.send("offer", offer);
+      }
     }
     if (payload.type === "offer" && this.role === "guest") {
       const offer = /** @type {RTCSessionDescriptionInit} */ (payload.data);
@@ -133,6 +197,7 @@ export class OnlineSession {
   }
 
   onDataChannelOpen() {
+    this.clearConnectTimeout();
     if (this.role === "host") {
       this.startHostGame();
     } else {
@@ -339,9 +404,22 @@ export class OnlineSession {
   }
 
   async leave() {
+    if (this.left) return;
+    this.left = true;
+    this.clearConnectTimeout();
+    if (this.iceFlushTimer) {
+      clearTimeout(this.iceFlushTimer);
+      this.iceFlushTimer = null;
+    }
+    this.pendingIce = [];
     if (this.resolveTimer) {
       clearTimeout(this.resolveTimer);
       this.resolveTimer = null;
+    }
+    try {
+      this.signaling?.send("leave", { roomId: this.roomId });
+    } catch {
+      /* ignore */
     }
     this.conn?.close();
     await this.signaling?.close();

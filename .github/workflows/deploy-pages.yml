@@ -39,6 +39,7 @@ jobs:
           GITHUB_PAGES_BASE: /
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_TURN_CREDENTIALS_URL: https://www.playmemorygames.win/api/turn-credentials
 
       - uses: actions/upload-pages-artifact@v3
         with:

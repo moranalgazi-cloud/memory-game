@@ -1,0 +1,17 @@
+name = "memory-games-turn"
+main = "src/index.js"
+compatibility_date = "2024-06-01"
+
+# Set secrets (never commit):
+#   npx wrangler secret put TURN_KEY_API_TOKEN
+# Optional var in dashboard or here:
+#   TURN_KEY_ID = "your-turn-token-id"
+
+[vars]
+ALLOWED_ORIGINS = "https://www.playmemorygames.win,http://localhost:5173"
+TURN_TTL_SECONDS = "3600"
+
+# After deploy, attach route in Cloudflare dashboard OR uncomment:
+# [[routes]]
+# pattern = "www.playmemorygames.win/api/turn-credentials"
+# zone_name = "playmemorygames.win"

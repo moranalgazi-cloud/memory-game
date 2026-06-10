@@ -15,7 +15,10 @@ Peer-to-peer play uses **Supabase Realtime broadcast** only for WebRTC signaling
 3. **Settings → Play online** → host creates a game; guest joins with link or code.
 4. Host picks any supported mode (English 1/2, sums, math, fractions) and level; the same seeded deck is sent to the guest.
 
+## TURN (mobile / strict networks)
+
+See **[docs/TURN.md](../docs/TURN.md)** — Cloudflare Worker at `/api/turn-credentials` supplies short-lived ICE servers to the browser.
+
 ## Later
 
-- TURN server if connections fail on mobile cellular networks.
 - Additional game modes and public lobby.

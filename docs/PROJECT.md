@@ -124,14 +124,14 @@ Use and distribution are subject to the project disclaimer: **[DISCLAIMER.md](./
 | **1 — UI** | Done | Design tokens, theme toggle (Dark / Light / Fun), cleaner player picker |
 | **2 — Auth** | Done | Anonymous sessions + optional Google sign-in; `owner_id` on cloud rows |
 | **3 — Security** | Done (code) | Owner-scoped RLS (`supabase/03_security_rls.sql`); admin is local-only; cloud writes require `auth.uid()` |
-| **4 — Multiplayer** | **Tomorrow** | Fix lag/disconnects when many 1v1 matches run at once |
+| **4 — Multiplayer** | In progress | Cloudflare TURN worker + ICE fetch; signaling timeout/leave; see [TURN.md](./TURN.md) |
 
-### Phase 4 plan (resume here)
+### Phase 4 plan
 
-1. **TURN server** — add credentials (e.g. Metered / Twilio) so mobile NAT/firewalls can relay WebRTC when STUN fails; document env vars and setup steps.
-2. **Signaling reliability** — reconnect/backoff, channel cleanup when rooms end, avoid duplicate ICE/offer storms.
-3. **Session hardening** — host/guest leave handling, timeout UX, debounce sync broadcasts.
-4. **Load testing** — several parallel 1v1 rooms (two phones + desktop) and verify stable play.
+1. **TURN server** — Cloudflare Worker (`workers/turn-credentials`) + `VITE_TURN_CREDENTIALS_URL`; deploy steps in [TURN.md](./TURN.md).
+2. **Signaling reliability** — ICE debounce, single offer per guest, channel error handling.
+3. **Session hardening** — connect timeout, peer-leave signal, cleanup on exit.
+4. **Load testing** — you: several parallel 1v1 rooms (two phones + desktop).
 
 Online play uses **WebRTC for game state** and **Supabase Realtime only for signaling** — Phase 4 does not change the `memory_players` table.
 

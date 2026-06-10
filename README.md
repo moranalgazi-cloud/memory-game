@@ -57,7 +57,7 @@ If you cloned from a different path or folder name, `cd` into that directory ins
 
    Fill in the URL and anon (or publishable) key from **Project Settings → API** — never put the **service_role** secret in the frontend. Enable **Anonymous sign-ins** and optionally **Google** under Authentication → Providers. Details are in `.env.example`.
 
-4. **Online multiplayer:** enable Realtime on the project and follow [supabase/online-realtime.md](supabase/online-realtime.md). Deployments (e.g. GitHub Pages) need the same `VITE_*` secrets in CI.
+4. **Online multiplayer:** enable Realtime on the project and follow [supabase/online-realtime.md](supabase/online-realtime.md). For mobile/cellular play, deploy the Cloudflare TURN worker ([docs/TURN.md](docs/TURN.md)). Deployments need `VITE_*` secrets in CI.
 
 ## Run (development)
 
