@@ -727,6 +727,57 @@ select:focus-visible {
     border: 3px solid color-mix(in srgb, var(--accent-alt) 35%, transparent);
     box-shadow: 0 8px 28px var(--shadow);
   }
+
+  /* Controls stay top-right; brand gets the full width below (no side squeeze). */
+  .header__top {
+    padding-top: 3.15rem;
+  }
+
+  .header__brand {
+    padding-inline: 0.25rem;
+  }
+
+  .has-account-badge .header__brand {
+    padding-inline: 0.25rem;
+  }
+
+  .header__brand-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    column-gap: 0;
+  }
+
+  .header__logo {
+    grid-column: unset;
+    grid-row: unset;
+    justify-self: unset;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .header__titles {
+    grid-column: unset;
+    grid-row: unset;
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .header__brand h1 {
+    font-size: clamp(1.35rem, 6.5vw, 1.75rem);
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+    overflow-wrap: break-word;
+  }
+
+  .header__brand .tagline {
+    font-size: clamp(0.82rem, 3.4vw, 0.98rem);
+    line-height: 1.35;
+    margin-bottom: 0;
+  }
 }
 
 @media (max-width: 640px) {
