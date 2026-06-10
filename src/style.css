@@ -2236,7 +2236,71 @@ body:has(#userDialog[open]) .public-meta .public-meta__privacy {
   margin-top: 1rem;
 }
 
+.online-turn-banner {
+  margin: 0 auto 1rem;
+  max-width: 28rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border: 3px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.online-turn-banner__text {
+  display: block;
+}
+
+.online-turn-banner--yours {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  animation: online-turn-pulse 1.6s ease-in-out infinite;
+}
+
+.online-turn-banner--theirs {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--muted) 35%, transparent);
+}
+
+.online-rematch-status {
+  margin: 0 0 0.75rem;
+  max-width: 20rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+@keyframes online-turn-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+}
+
+#board.board--your-turn {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 6px;
+  border-radius: var(--radius-md);
+}
+
 #board.board--waiting-turn .card:not(.is-flipped):not(.is-matched) {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
+  filter: grayscale(0.25);
+}
+
+#board.board--waiting-turn .card.is-flipped:not(.is-matched),
+#board.board--waiting-turn .card.is-matched {
+  opacity: 1;
+  filter: none;
 }

@@ -6,7 +6,7 @@ import {
   getActiveOnlineSession,
   isOnlinePlaying,
   forfeitOnlineGame,
-  rematchOnlineGame,
+  requestRematchOnlineGame,
 } from "./multiplayer/online-session.js";
 import {
   buildInviteUrl,
@@ -53,6 +53,8 @@ const onlineGameMode = document.querySelector("#onlineGameMode");
 const onlineLevel = document.querySelector("#onlineLevel");
 const openPlayOnlineBtn = document.querySelector("#openPlayOnline");
 const gameToolbar = document.querySelector(".toolbar--game");
+const onlineRematchStatus = document.querySelector("#onlineRematchStatus");
+const onlinePlayAgainBtn = document.querySelector("#onlinePlayAgain");
 
 /** @type {OnlineMode} */
 let onlineMode = null;
@@ -248,6 +250,55 @@ function setOnlineStatus(key) {
   onlineStatus.textContent = key ? deps.t(key) : "";
 }
 
+function resetRematchUi() {
+  if (onlineRematchStatus) {
+    onlineRematchStatus.textContent = "";
+    onlineRematchStatus.classList.add("is-hidden");
+  }
+  if (onlinePlayAgainBtn instanceof HTMLButtonElement) {
+    onlinePlayAgainBtn.disabled = false;
+    onlinePlayAgainBtn.textContent = deps?.t("onlinePlayAgain") ?? "Play again with friend";
+  }
+}
+
+/**
+ * @param {{ selfReady?: boolean; peerReady?: boolean; waitingForPeer?: boolean; bothReady?: boolean; peerLeft?: boolean }} status
+ */
+function refreshRematchUi(status) {
+  if (!deps) return;
+  const t = deps.t;
+  if (status.peerLeft) {
+    if (onlineRematchStatus) {
+      onlineRematchStatus.textContent = t("onlineRematchPeerLeft");
+      onlineRematchStatus.classList.remove("is-hidden");
+    }
+    if (onlinePlayAgainBtn instanceof HTMLButtonElement) {
+      onlinePlayAgainBtn.disabled = false;
+      onlinePlayAgainBtn.textContent = t("onlinePlayAgain");
+    }
+    return;
+  }
+  if (status.bothReady) {
+    if (onlineRematchStatus) {
+      onlineRematchStatus.textContent = t("onlineRematchStarting");
+      onlineRematchStatus.classList.remove("is-hidden");
+    }
+    return;
+  }
+  if (status.waitingForPeer) {
+    if (onlineRematchStatus) {
+      onlineRematchStatus.textContent = t("onlineWaitingRematch");
+      onlineRematchStatus.classList.remove("is-hidden");
+    }
+    if (onlinePlayAgainBtn instanceof HTMLButtonElement) {
+      onlinePlayAgainBtn.disabled = true;
+      onlinePlayAgainBtn.textContent = t("onlinePlayAgainWaiting");
+    }
+    return;
+  }
+  resetRematchUi();
+}
+
 function refreshOnlineLevelOptions() {
   if (!onlineLevel || !onlineGameMode || !deps) return;
   const t = deps.t;
@@ -418,7 +469,10 @@ function sessionCallbacks() {
     onStatus: setOnlineStatus,
     onSync: (snap, cards) => {
       setBusy(false);
-      if (!snap.winHandled) onlineWinShown = false;
+      if (!snap.winHandled) {
+        onlineWinShown = false;
+        resetRematchUi();
+      }
       deps?.applyOnlineSnapshot(snap, cards);
       setMainToolbarLocked(false);
       onlineDialog?.close();
@@ -445,7 +499,11 @@ function sessionCallbacks() {
         (winner === "host" && role === "host") ||
         (winner === "guest" && role === "guest");
       if (won || winner === null) celebrateWin();
+      resetRematchUi();
       deps?.showOnlineWin(message, hostScore, guestScore);
+    },
+    onRematchStatus: (status) => {
+      refreshRematchUi(status);
     },
     onError: (key) => {
       setBusy(false);
@@ -526,17 +584,9 @@ export async function quitOnlineGame() {
   }
 }
 
-export async function playOnlineAgain() {
-  onlineWinShown = false;
-  deps?.hideWinActions();
+export function playOnlineAgain() {
   const session = getActiveOnlineSession();
-  if (session?.role === "host" && rematchOnlineGame()) {
-    return;
-  }
-  if (session?.role === "guest" && session.phase === "ended") {
-    setOnlineStatus("onlineWaitingRematch");
-    return;
-  }
-  await leaveOnline({ resetBoard: false });
-  openOnlineDialog();
+  if (!session || session.phase !== "ended") return;
+  if (onlinePlayAgainBtn instanceof HTMLButtonElement && onlinePlayAgainBtn.disabled) return;
+  requestRematchOnlineGame();
 }

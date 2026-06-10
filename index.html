@@ -252,9 +252,18 @@
         </dl>
       </header>
       <main>
+        <div
+          id="onlineTurnBanner"
+          class="online-turn-banner is-hidden"
+          role="status"
+          aria-live="polite"
+        >
+          <span id="onlineTurnBannerText" class="online-turn-banner__text"></span>
+        </div>
         <div id="board" class="board" role="grid" aria-label="Memory cards"></div>
         <div id="winActions" class="win-actions" hidden>
           <p id="winMessage" class="win-message"></p>
+          <p id="onlineRematchStatus" class="online-rematch-status is-hidden" role="status" aria-live="polite"></p>
           <div class="win-actions__icons" role="group" id="winGameActions" aria-label="Play again">
             <button type="button" id="winNewGame" class="btn btn--icon btn--primary game-actions__btn">
               <span class="mem-icon mem-icon--new" aria-hidden="true">

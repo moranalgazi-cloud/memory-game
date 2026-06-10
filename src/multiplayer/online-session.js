@@ -27,6 +27,7 @@ const ICE_SEND_DEBOUNCE_MS = 50;
  * @property {(status: string) => void} onStatus
  * @property {(snap: ReturnType<exportSnapshot>, cards: unknown[]) => void} onSync
  * @property {(info: { winner: 'host' | 'guest' | null; hostScore: number; guestScore: number }) => void} onGameEnd
+ * @property {(status: { selfReady: boolean; peerReady: boolean; waitingForPeer: boolean; bothReady?: boolean; peerLeft?: boolean }) => void} [onRematchStatus]
  * @property {(message: string) => void} onError
  */
 
@@ -70,6 +71,8 @@ export class OnlineSession {
     /** @type {RTCIceCandidateInit[]} */
     this.pendingIce = [];
     this.left = false;
+    this.hostRematchReady = false;
+    this.guestRematchReady = false;
   }
 
   /** @param {string} text */
@@ -166,10 +169,13 @@ export class OnlineSession {
   async handleSignal(payload) {
     if (!this.conn) return;
     if (payload.type === "leave") {
-      if (!this.left && this.phase !== "ended") {
-        this.callbacks.onError("online-error-peer-left");
-        void this.leave();
+      if (this.left) return;
+      if (this.phase === "ended") {
+        this.callbacks.onRematchStatus?.({ selfReady: false, peerReady: false, waitingForPeer: false, peerLeft: true });
+        return;
       }
+      this.callbacks.onError("online-error-peer-left");
+      void this.leave();
       return;
     }
     if (payload.type === "join" && this.role === "host" && !this.guestJoined) {
@@ -207,6 +213,8 @@ export class OnlineSession {
   }
 
   startHostGame() {
+    this.hostRematchReady = false;
+    this.guestRematchReady = false;
     const seed = Math.floor(Math.random() * 1_000_000_000);
     const hostConfig = buildOnlineHostConfig(this.hostOptions.mode, this.hostOptions.level);
     const { cards, config } = buildOnlineDeckFromSeed(hostConfig, seed);
@@ -266,6 +274,14 @@ export class OnlineSession {
       const player = msg.player === "guest" ? "guest" : "host";
       applyForfeit(this.playState, player);
       this.broadcastSync();
+    }
+
+    if (msg.type === "rematch-ready") {
+      const player = msg.player === "host" ? "host" : "guest";
+      if (player === "host") this.hostRematchReady = true;
+      else this.guestRematchReady = true;
+      this.emitRematchStatus();
+      this.tryStartRematch();
     }
   }
 
@@ -387,13 +403,33 @@ export class OnlineSession {
     }
   }
 
-  rematch() {
-    if (this.role !== "host" || !this.guestJoined || this.phase === "idle") return false;
+  emitRematchStatus() {
+    const selfReady = this.role === "host" ? this.hostRematchReady : this.guestRematchReady;
+    const peerReady = this.role === "host" ? this.guestRematchReady : this.hostRematchReady;
+    this.callbacks.onRematchStatus?.({
+      selfReady,
+      peerReady,
+      waitingForPeer: selfReady && !peerReady,
+      bothReady: selfReady && peerReady,
+    });
+  }
+
+  tryStartRematch() {
+    if (this.role !== "host" || !this.hostRematchReady || !this.guestRematchReady) return;
     if (this.resolveTimer) {
       clearTimeout(this.resolveTimer);
       this.resolveTimer = null;
     }
     this.startHostGame();
+  }
+
+  requestRematch() {
+    if (this.phase !== "ended") return false;
+    if (this.role === "host") this.hostRematchReady = true;
+    else this.guestRematchReady = true;
+    this.sendData({ type: "rematch-ready", player: this.role });
+    this.emitRematchStatus();
+    this.tryStartRematch();
     return true;
   }
 
@@ -489,6 +525,6 @@ export function forfeitOnlineGame() {
   activeSession?.forfeit();
 }
 
-export function rematchOnlineGame() {
-  return activeSession?.rematch() ?? false;
+export function requestRematchOnlineGame() {
+  return activeSession?.requestRematch() ?? false;
 }
