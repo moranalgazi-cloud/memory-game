@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Grandpa">
+  <rect width="80" height="80" rx="12" fill="#f8fafc"/>
+  <circle cx="40" cy="24" r="12" fill="#e0b48c"/>
+  <path d="M28 22c1-5 8-8 12-8s11 3 12 8" fill="#e5e7eb"/>
+  <circle cx="35" cy="24" r="1.5" fill="#2d1b12"/>
+  <circle cx="45" cy="24" r="1.5" fill="#2d1b12"/>
+  <path d="M33 30h14v4H33z" fill="#d1d5db"/>
+  <path d="M36 29q4 1 8 0" fill="none" stroke="#8b5a3c" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M24 38h32l-2 28H26L24 38z" fill="#64748b"/>
+  <path d="M26 40h6v18h-6z" fill="#475569"/>
+  <path d="M48 40h6v18h-6z" fill="#475569"/>
+  <path d="M30 66h20v6H30z" fill="#334155"/>
+  <path d="M58 48v18" stroke="#8b5a3c" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="58" cy="66" r="3" fill="#8b5a3c"/>
+</svg>

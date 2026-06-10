@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Sister">
+  <rect width="80" height="80" rx="12" fill="#fff0f8"/>
+  <circle cx="40" cy="30" r="12" fill="#f7c9a8"/>
+  <path d="M30 28c1-7 6-10 10-10s9 3 10 10" fill="#d97706"/>
+  <circle cx="27" cy="24" r="4" fill="#f59e0b"/>
+  <circle cx="53" cy="24" r="4" fill="#f59e0b"/>
+  <path d="M28 24c3-5 8-7 12-7s9 2 12 7" fill="#d97706"/>
+  <circle cx="36" cy="30" r="1.5" fill="#2d1b12"/>
+  <circle cx="44" cy="30" r="1.5" fill="#2d1b12"/>
+  <path d="M37 35q3 2 6 0" fill="none" stroke="#e11d48" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M28 42h24c0 0 2 14 2 22H26c0-8 2-22 2-22z" fill="#fb7185"/>
+  <path d="M34 64h12v6H34z" fill="#f7c9a8"/>
+  <circle cx="40" cy="18" r="4" fill="#ec4899"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Aunt">
+  <rect width="80" height="80" rx="12" fill="#fff7ed"/>
+  <circle cx="40" cy="24" r="12" fill="#f2b98f"/>
+  <path d="M27 22c3-7 10-10 13-10s10 3 13 10" fill="#dc2626"/>
+  <path d="M27 20c4 4 8 6 13 6s9-2 13-6" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="35" cy="24" r="1.5" fill="#2d1b12"/>
+  <circle cx="45" cy="24" r="1.5" fill="#2d1b12"/>
+  <path d="M36 29q4 2 8 0" fill="none" stroke="#c2410c" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M24 38h32l-2 28H26L24 38z" fill="#f97316"/>
+  <circle cx="32" cy="34" r="2" fill="#fbbf24"/>
+  <circle cx="48" cy="34" r="2" fill="#fbbf24"/>
+  <path d="M30 66h20v6H30z" fill="#7c3aed"/>
+  <path d="M56 34c4 2 6 6 6 10" fill="none" stroke="#f2b98f" stroke-width="4" stroke-linecap="round"/>
+</svg>

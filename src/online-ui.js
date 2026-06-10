@@ -15,6 +15,7 @@ import {
   clearRoomFromLocation,
 } from "./multiplayer/room-code.js";
 import { celebrateWin } from "./celebrate.js";
+import { MODE_LABEL_KEYS } from "./mode-icons.js";
 
 let onlineWinShown = false;
 
@@ -51,7 +52,8 @@ const onlineCreateRoom = document.querySelector("#onlineCreateRoom");
 const onlineChangeGame = document.querySelector("#onlineChangeGame");
 const onlineGameMode = document.querySelector("#onlineGameMode");
 const onlineLevel = document.querySelector("#onlineLevel");
-const openPlayOnlineBtn = document.querySelector("#openPlayOnline");
+const onlineGameModePicker = document.querySelector("#onlineGameModePicker");
+const onlineLevelPicker = document.querySelector("#onlineLevelPicker");
 const gameToolbar = document.querySelector(".toolbar--game");
 const onlineRematchStatus = document.querySelector("#onlineRematchStatus");
 const onlinePlayAgainBtn = document.querySelector("#onlinePlayAgain");
@@ -74,7 +76,6 @@ let rematchPeerLeft = false;
 export function initOnlinePlay(d) {
   deps = d;
 
-  openPlayOnlineBtn?.addEventListener("click", () => openOnlineDialog());
   onlineModeStart?.addEventListener("click", () => void selectStartMode());
   onlineModeJoin?.addEventListener("click", () => void selectJoinMode());
   onlineCreateRoom?.addEventListener("click", () => void createHostRoom());
@@ -82,6 +83,31 @@ export function initOnlinePlay(d) {
   onlineShareCode?.addEventListener("click", () => void shareRoomCode());
   onlineJoinBtn?.addEventListener("click", () => void joinOnline());
   document.querySelector("#dismissOnline")?.addEventListener("click", () => void closeOnlineDialog());
+
+  onlineGameModePicker?.addEventListener("click", (e) => {
+    const btn = e.target instanceof Element ? e.target.closest(".game-mode-btn") : null;
+    if (!btn || btn.classList.contains("is-selected") || btn.disabled) return;
+    const mode = btn.getAttribute("data-mode");
+    if (
+      mode === "english1" ||
+      mode === "english2" ||
+      mode === "sums" ||
+      mode === "math" ||
+      mode === "fractions"
+    ) {
+      setOnlineGameMode(mode);
+      refreshOnlineLevelOptions();
+    }
+  });
+
+  onlineLevelPicker?.addEventListener("click", (e) => {
+    const btn = e.target instanceof Element ? e.target.closest(".online-level-btn") : null;
+    if (!btn || btn.classList.contains("is-selected") || btn.disabled) return;
+    const level = btn.getAttribute("data-level");
+    if (level === "easy" || level === "medium" || level === "hard") {
+      setOnlineLevel(level);
+    }
+  });
 
   onlineRoomInput?.addEventListener("input", () => {
     if (onlineRoomInput instanceof HTMLInputElement) {
@@ -132,16 +158,12 @@ function syncOnlineControls() {
 
   if (onlineModeStart instanceof HTMLButtonElement) {
     onlineModeStart.disabled = busy;
-    onlineModeStart.classList.toggle("btn--primary", isStart);
-    onlineModeStart.classList.toggle("btn--ghost", !isStart);
     onlineModeStart.classList.toggle("is-active", isStart);
     onlineModeStart.setAttribute("aria-pressed", String(isStart));
   }
 
   if (onlineModeJoin instanceof HTMLButtonElement) {
     onlineModeJoin.disabled = busy;
-    onlineModeJoin.classList.toggle("btn--primary", isJoin);
-    onlineModeJoin.classList.toggle("btn--ghost", !isJoin);
     onlineModeJoin.classList.toggle("is-active", isJoin);
     onlineModeJoin.setAttribute("aria-pressed", String(isJoin));
   }
@@ -151,11 +173,22 @@ function syncOnlineControls() {
 
   syncHostPanels();
 
+  const hostLocked = !isStart || busy || Boolean(hostRoomId);
   if (onlineGameMode instanceof HTMLSelectElement) {
-    onlineGameMode.disabled = !isStart || busy || Boolean(hostRoomId);
+    onlineGameMode.disabled = hostLocked;
   }
   if (onlineLevel instanceof HTMLSelectElement) {
-    onlineLevel.disabled = !isStart || busy || Boolean(hostRoomId);
+    onlineLevel.disabled = hostLocked;
+  }
+  if (onlineGameModePicker) {
+    for (const btn of onlineGameModePicker.querySelectorAll(".game-mode-btn")) {
+      if (btn instanceof HTMLButtonElement) btn.disabled = hostLocked;
+    }
+  }
+  if (onlineLevelPicker) {
+    for (const btn of onlineLevelPicker.querySelectorAll(".online-level-btn")) {
+      if (btn instanceof HTMLButtonElement) btn.disabled = hostLocked;
+    }
   }
   if (onlineCreateRoom instanceof HTMLButtonElement) {
     onlineCreateRoom.disabled = !isStart || busy || Boolean(hostRoomId);
@@ -212,11 +245,6 @@ export function refreshOnlineLabels() {
   if (joinHint) joinHint.textContent = t("onlineJoinHint");
   if (onlineJoinBtn) onlineJoinBtn.textContent = t("onlineJoinGo");
   if (dismiss) dismiss.setAttribute("aria-label", t("ariaCloseOnline"));
-  if (openPlayOnlineBtn) {
-    openPlayOnlineBtn.textContent = t("onlinePlay");
-    openPlayOnlineBtn.classList.toggle("is-hidden", !isCloudSyncEnabled());
-  }
-
   if (onlineGameMode) {
     for (const opt of onlineGameMode.options) {
       switch (opt.value) {
@@ -241,7 +269,44 @@ export function refreshOnlineLabels() {
     }
   }
 
+  refreshOnlineGameModePicker();
   refreshOnlineLevelOptions();
+}
+
+/** @param {import("./records.js").GameMode} mode */
+function setOnlineGameMode(mode) {
+  if (onlineGameMode instanceof HTMLSelectElement) onlineGameMode.value = mode;
+  if (!onlineGameModePicker) return;
+  for (const btn of onlineGameModePicker.querySelectorAll(".game-mode-btn")) {
+    const on = btn.getAttribute("data-mode") === mode;
+    btn.classList.toggle("is-selected", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+}
+
+/** @param {"easy" | "medium" | "hard"} level */
+function setOnlineLevel(level) {
+  if (onlineLevel instanceof HTMLSelectElement) onlineLevel.value = level;
+  if (!onlineLevelPicker) return;
+  for (const btn of onlineLevelPicker.querySelectorAll(".online-level-btn")) {
+    const on = btn.getAttribute("data-level") === level;
+    btn.classList.toggle("is-selected", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+}
+
+function refreshOnlineGameModePicker() {
+  if (!onlineGameModePicker || !deps) return;
+  const t = deps.t;
+  for (const btn of onlineGameModePicker.querySelectorAll(".game-mode-btn")) {
+    const mode = btn.getAttribute("data-mode");
+    const labelKey = mode && MODE_LABEL_KEYS[/** @type {import("./records.js").GameMode} */ (mode)];
+    const label = labelKey ? t(labelKey) : "";
+    const text = btn.querySelector(".game-mode-btn__label");
+    if (text) text.textContent = label;
+    btn.title = label;
+    btn.setAttribute("aria-label", label);
+  }
 }
 
 /**
@@ -313,22 +378,25 @@ function refreshOnlineLevelOptions() {
   const t = deps.t;
   const mode = onlineGameMode.value;
   const lvl = onlineLevel.querySelectorAll("option");
+  /** @type {[string, string, string]} */
+  let labels = [t("fractionLevelEasy"), t("fractionLevelMedium"), t("fractionLevelHard")];
   if (mode === "math") {
-    if (lvl[0]) lvl[0].textContent = t("mathLevelEasy");
-    if (lvl[1]) lvl[1].textContent = t("mathLevelMedium");
-    if (lvl[2]) lvl[2].textContent = t("mathLevelHard");
+    labels = [t("mathLevelEasy"), t("mathLevelMedium"), t("mathLevelHard")];
   } else if (mode === "sums") {
-    if (lvl[0]) lvl[0].textContent = t("sumsLevelEasy");
-    if (lvl[1]) lvl[1].textContent = t("sumsLevelMedium");
-    if (lvl[2]) lvl[2].textContent = t("sumsLevelHard");
+    labels = [t("sumsLevelEasy"), t("sumsLevelMedium"), t("sumsLevelHard")];
   } else if (mode === "english1" || mode === "english2") {
-    if (lvl[0]) lvl[0].textContent = t("englishLevelEasy");
-    if (lvl[1]) lvl[1].textContent = t("englishLevelMedium");
-    if (lvl[2]) lvl[2].textContent = t("englishLevelHard");
-  } else {
-    if (lvl[0]) lvl[0].textContent = t("fractionLevelEasy");
-    if (lvl[1]) lvl[1].textContent = t("fractionLevelMedium");
-    if (lvl[2]) lvl[2].textContent = t("fractionLevelHard");
+    labels = [t("englishLevelEasy"), t("englishLevelMedium"), t("englishLevelHard")];
+  }
+  if (lvl[0]) lvl[0].textContent = labels[0];
+  if (lvl[1]) lvl[1].textContent = labels[1];
+  if (lvl[2]) lvl[2].textContent = labels[2];
+
+  if (onlineLevelPicker) {
+    const btns = onlineLevelPicker.querySelectorAll(".online-level-btn");
+    btns.forEach((btn, i) => {
+      if (labels[i]) btn.textContent = labels[i];
+      btn.setAttribute("aria-label", labels[i] ?? btn.getAttribute("data-level") ?? "");
+    });
   }
 }
 

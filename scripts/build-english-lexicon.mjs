@@ -28,7 +28,10 @@ for (const topic of data.topics) {
   const keys = new Set();
   const symbols = new Set();
   for (const e of topic.entries ?? []) {
-    if (!e.key || !e.word || !e.wordHe || !e.symbol) {
+    const hasPicture =
+      (typeof e.symbol === "string" && e.symbol.trim()) ||
+      (typeof e.imageUrl === "string" && e.imageUrl.trim());
+    if (!e.key || !e.word || !e.wordHe || !hasPicture) {
       console.error(`Topic ${topic.id}: invalid entry`, e);
       errors += 1;
     }
@@ -37,11 +40,13 @@ for (const topic of data.topics) {
       errors += 1;
     }
     keys.add(e.key);
-    if (symbols.has(e.symbol)) {
-      console.error(`Topic ${topic.id}: duplicate symbol ${e.symbol} (${e.key})`);
-      errors += 1;
+    if (e.symbol) {
+      if (symbols.has(e.symbol)) {
+        console.error(`Topic ${topic.id}: duplicate symbol ${e.symbol} (${e.key})`);
+        errors += 1;
+      }
+      symbols.add(e.symbol);
     }
-    symbols.add(e.symbol);
   }
 }
 

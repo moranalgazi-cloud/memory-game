@@ -4,8 +4,8 @@ import { rngUnit, shuffle } from "./game.js";
 
 /**
  * @typedef {{ n: number; d: number; key: string }} QuizPieChoice
- * @typedef {{ id: string; prompt: string; choices: string[]; correctIndex: number; pieChoices?: QuizPieChoice[] }} QuizQuestion
- * @typedef {{ key: string; prompt: string; answer: string; pieN?: number; pieD?: number; symbol?: string; hebrew?: string; english?: string }} QuizFact
+ * @typedef {{ id: string; prompt: string; choices: string[]; correctIndex: number; imageUrl?: string; pieChoices?: QuizPieChoice[] }} QuizQuestion
+ * @typedef {{ key: string; prompt: string; answer: string; pieN?: number; pieD?: number; symbol?: string; imageUrl?: string; hebrew?: string; english?: string }} QuizFact
  */
 
 /**
@@ -79,13 +79,15 @@ export function extractQuizFacts(mode, cards) {
       const pic = group.find((c) => /** @type {{ side?: string }} */ (c).side === "picture");
       const word = group.find((c) => /** @type {{ side?: string }} */ (c).side === "word");
       const symbol = pic?.symbol;
+      const imageUrl = pic?.imageUrl;
       const english = word?.word ?? word?.label;
-      if (symbol && english) {
+      if ((symbol || imageUrl) && english) {
         facts.push({
           key,
-          prompt: symbol,
+          prompt: symbol ? String(symbol) : "",
           answer: String(english),
-          symbol: String(symbol),
+          symbol: symbol ? String(symbol) : undefined,
+          imageUrl: imageUrl ? String(imageUrl) : undefined,
           english: String(english),
         });
       }
@@ -200,6 +202,7 @@ export function factToQuestion(fact, allFacts, rng = Math.random) {
   return {
     id: fact.key,
     prompt: fact.prompt,
+    imageUrl: fact.imageUrl,
     choices,
     correctIndex: correctIndex >= 0 ? correctIndex : 0,
   };

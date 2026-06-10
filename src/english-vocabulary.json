@@ -304,7 +304,7 @@
           "key": "seahorse",
           "word": "Seahorse",
           "wordHe": "סוס ים",
-          "symbol": "🐚"
+          "symbol": "🐡"
         }
       ]
     },
@@ -381,7 +381,7 @@
           "key": "hummingbird",
           "word": "Hummingbird",
           "wordHe": "יונק דבש",
-          "symbol": "🪺"
+          "symbol": "🐥"
         }
       ]
     },
@@ -700,73 +700,85 @@
           "key": "mom",
           "word": "Mom",
           "wordHe": "אמא",
-          "symbol": "👩"
+          "symbol": "👩",
+          "imageUrl": "/english/family/mom.svg"
         },
         {
           "key": "dad",
           "word": "Dad",
           "wordHe": "אבא",
-          "symbol": "👨"
+          "symbol": "👨",
+          "imageUrl": "/english/family/dad.svg"
         },
         {
           "key": "sister",
           "word": "Sister",
           "wordHe": "אחות",
-          "symbol": "👧"
+          "symbol": "👧",
+          "imageUrl": "/english/family/sister.svg"
         },
         {
           "key": "brother",
           "word": "Brother",
           "wordHe": "אח",
-          "symbol": "👦"
+          "symbol": "👦",
+          "imageUrl": "/english/family/brother.svg"
         },
         {
           "key": "baby",
           "word": "Baby",
           "wordHe": "תינוק",
-          "symbol": "👶"
+          "symbol": "👶",
+          "imageUrl": "/english/family/baby.svg"
         },
         {
           "key": "grandma",
           "word": "Grandma",
           "wordHe": "סבתא",
-          "symbol": "👵"
+          "symbol": "👵",
+          "imageUrl": "/english/family/grandma.svg"
         },
         {
           "key": "grandpa",
           "word": "Grandpa",
           "wordHe": "סבא",
-          "symbol": "👴"
+          "symbol": "👴",
+          "imageUrl": "/english/family/grandpa.svg"
         },
         {
           "key": "aunt",
           "word": "Aunt",
           "wordHe": "דודה",
-          "symbol": "👩‍🦰"
+          "symbol": "👩‍🦰",
+          "imageUrl": "/english/family/aunt.svg"
         },
         {
           "key": "uncle",
           "word": "Uncle",
           "wordHe": "דוד",
-          "symbol": "👨‍🦱"
+          "symbol": "👨‍🦱",
+          "imageUrl": "/english/family/uncle.svg"
         },
         {
           "key": "cousin",
           "word": "Cousin",
           "wordHe": "בן דוד",
-          "symbol": "🧒"
+          "symbol": "🧒",
+          "imageUrl": "/english/family/cousin.svg"
         },
         {
           "key": "parents",
           "word": "Parents",
           "wordHe": "הורים",
-          "symbol": "👨‍👩‍👧"
+          "symbol": "👨‍👩‍👧",
+          "imageUrl": "/english/family/parents.svg"
         },
         {
           "key": "family",
           "word": "Family",
           "wordHe": "משפחה",
-          "symbol": "👪"
+          "symbol": "👪",
+          "imageUrl": "/english/family/family.svg"
         }
       ]
     },
@@ -777,7 +789,7 @@
           "key": "head",
           "word": "Head",
           "wordHe": "ראש",
-          "symbol": "🙂"
+          "symbol": "👤"
         },
         {
           "key": "hand",
@@ -1174,7 +1186,7 @@
           "key": "table",
           "word": "Table",
           "wordHe": "שולחן",
-          "symbol": "🪑"
+          "symbol": "🍽️"
         },
         {
           "key": "chair",
@@ -1287,7 +1299,7 @@
           "key": "nurse",
           "word": "Nurse",
           "wordHe": "אחות",
-          "symbol": "💉"
+          "symbol": "👩‍⚕️"
         },
         {
           "key": "builder",

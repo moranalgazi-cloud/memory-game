@@ -29,6 +29,17 @@ describe("extractQuizFacts", () => {
     expect(facts[0].pieD).toBe(2);
   });
 
+  it("builds english1 facts from illustration cards", () => {
+    const cards = [
+      { factKey: "dad", side: "picture", imageUrl: "/english/family/dad.svg", word: "Dad" },
+      { factKey: "dad", side: "word", label: "Dad", word: "Dad" },
+    ];
+    const facts = extractQuizFacts("english1", cards);
+    expect(facts).toHaveLength(1);
+    expect(facts[0].imageUrl).toBe("/english/family/dad.svg");
+    expect(facts[0].answer).toBe("Dad");
+  });
+
   it("builds english2 bilingual facts", () => {
     const cards = [
       { factKey: "dog", side: "he", label: "כלב", word: "כלב" },

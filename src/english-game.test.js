@@ -54,6 +54,20 @@ describe("buildEnglishDeck", () => {
     expect(isPairMatch(pic ?? null, word ?? null)).toBe(true);
   });
 
+  it("english1: uses illustration image when provided", () => {
+    const familyEntry = {
+      key: "dad",
+      word: "Dad",
+      wordHe: "אבא",
+      symbol: "👨",
+      imageUrl: "/english/family/dad.svg",
+    };
+    const deck = buildEnglishDeck([familyEntry], "english1");
+    const pic = deck.find((c) => c.side === "picture");
+    expect(pic?.imageUrl).toBe("/english/family/dad.svg");
+    expect(pic?.symbol).toBeUndefined();
+  });
+
   it("english2: pairs Hebrew text with English text (no icon)", () => {
     const deck = buildEnglishDeck([entry], "english2");
     expect(deck).toHaveLength(2);

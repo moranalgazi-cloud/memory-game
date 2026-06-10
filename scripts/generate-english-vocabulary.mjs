@@ -5,7 +5,13 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outPath = path.join(__dirname, "..", "src", "english-vocabulary.json");
 
-const e = (key, word, wordHe, symbol) => ({ key, word, wordHe, symbol });
+const e = (key, word, wordHe, symbol, imageUrl) => {
+  const entry = { key, word, wordHe, symbol };
+  if (imageUrl) entry.imageUrl = imageUrl;
+  return entry;
+};
+
+const familyImg = (key) => `/english/family/${key}.svg`;
 
 const topics = [
 
@@ -74,7 +80,7 @@ const topics = [
       e("seal", "Seal", "כלב ים", "🦭"),
       e("starfish", "Starfish", "כוכב ים", "⭐"),
       e("lobster", "Lobster", "לובסטר", "🦞"),
-      e("seahorse", "Seahorse", "סוס ים", "🐚"),
+      e("seahorse", "Seahorse", "סוס ים", "🐡"),
     ],
   },
   {
@@ -91,7 +97,7 @@ const topics = [
       e("peacock", "Peacock", "טווס", "🦚"),
       e("swan", "Swan", "ברבור", "🦢"),
       e("crow", "Crow", "עורב", "🐦‍⬛"),
-      e("hummingbird", "Hummingbird", "יונק דבש", "🪺"),
+      e("hummingbird", "Hummingbird", "יונק דבש", "🐥"),
     ],
   },
   {
@@ -165,24 +171,24 @@ const topics = [
   {
     id: "family",
     entries: [
-      e("mom", "Mom", "אמא", "👩"),
-      e("dad", "Dad", "אבא", "👨"),
-      e("sister", "Sister", "אחות", "👧"),
-      e("brother", "Brother", "אח", "👦"),
-      e("baby", "Baby", "תינוק", "👶"),
-      e("grandma", "Grandma", "סבתא", "👵"),
-      e("grandpa", "Grandpa", "סבא", "👴"),
-      e("aunt", "Aunt", "דודה", "👩‍🦰"),
-      e("uncle", "Uncle", "דוד", "👨‍🦱"),
-      e("cousin", "Cousin", "בן דוד", "🧒"),
-      e("parents", "Parents", "הורים", "👨‍👩‍👧"),
-      e("family", "Family", "משפחה", "👪"),
+      e("mom", "Mom", "אמא", "👩", familyImg("mom")),
+      e("dad", "Dad", "אבא", "👨", familyImg("dad")),
+      e("sister", "Sister", "אחות", "👧", familyImg("sister")),
+      e("brother", "Brother", "אח", "👦", familyImg("brother")),
+      e("baby", "Baby", "תינוק", "👶", familyImg("baby")),
+      e("grandma", "Grandma", "סבתא", "👵", familyImg("grandma")),
+      e("grandpa", "Grandpa", "סבא", "👴", familyImg("grandpa")),
+      e("aunt", "Aunt", "דודה", "👩‍🦰", familyImg("aunt")),
+      e("uncle", "Uncle", "דוד", "👨‍🦱", familyImg("uncle")),
+      e("cousin", "Cousin", "בן דוד", "🧒", familyImg("cousin")),
+      e("parents", "Parents", "הורים", "👨‍👩‍👧", familyImg("parents")),
+      e("family", "Family", "משפחה", "👪", familyImg("family")),
     ],
   },
   {
     id: "body",
     entries: [
-      e("head", "Head", "ראש", "🙂"),
+      e("head", "Head", "ראש", "👤"),
       e("hand", "Hand", "יד", "✋"),
       e("foot", "Foot", "רגל", "🦶"),
       e("eye", "Eye", "עין", "👁️"),
@@ -269,7 +275,7 @@ const topics = [
     entries: [
       e("bed", "Bed", "מיטה", "🛏️"),
       e("sofa", "Sofa", "ספה", "🛋️"),
-      e("table", "Table", "שולחן", "🪑"),
+      e("table", "Table", "שולחן", "🍽️"),
       e("chair", "Chair", "כיסא", "💺"),
       e("lamp", "Lamp", "מנורה", "💡"),
       e("door", "Door", "דלת", "🚪"),
@@ -292,7 +298,7 @@ const topics = [
       e("farmer", "Farmer", "חקלאי", "👨‍🌾"),
       e("pilot", "Pilot", "טייס", "👨‍✈️"),
       e("artist", "Artist", "אמן", "🎨"),
-      e("nurse", "Nurse", "אחות", "💉"),
+      e("nurse", "Nurse", "אחות", "👩‍⚕️"),
       e("builder", "Builder", "בנאי", "👷"),
       e("vet", "Vet", "וטרינר", "🐾"),
       e("singer", "Singer", "זמר", "🎤"),

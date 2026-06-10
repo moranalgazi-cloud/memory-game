@@ -1,6 +1,7 @@
 import gameBoardImg from "../docs/images/game-board.svg?url";
 import gameModesImg from "../docs/images/game-modes.svg?url";
 import onlinePlayImg from "../docs/images/online-play.svg?url";
+import { getModeIconUrl } from "./mode-icons.js";
 
 /**
  * @typedef {Object} AboutUiDeps
@@ -89,7 +90,7 @@ function appendBulletList(container, items) {
 
 /**
  * @param {HTMLElement} container
- * @param {[string, string][]} rows
+ * @param {[import("./records.js").GameMode, string, string][]} rows
  */
 function appendModesTable(container, rows) {
   const table = document.createElement("table");
@@ -105,10 +106,24 @@ function appendModesTable(container, rows) {
   thead.append(headRow);
   table.append(thead);
   const tbody = document.createElement("tbody");
-  for (const [game, match] of rows) {
+  for (const [mode, game, match] of rows) {
     const tr = document.createElement("tr");
     const tdGame = document.createElement("td");
-    tdGame.textContent = game;
+    tdGame.className = "about-dialog__mode-cell";
+    const iconUrl = getModeIconUrl(mode);
+    if (iconUrl) {
+      const img = document.createElement("img");
+      img.className = "about-dialog__mode-icon";
+      img.src = iconUrl;
+      img.width = 28;
+      img.height = 28;
+      img.decoding = "async";
+      img.alt = "";
+      tdGame.append(img);
+    }
+    const name = document.createElement("span");
+    name.textContent = game;
+    tdGame.append(name);
     const tdMatch = document.createElement("td");
     tdMatch.textContent = match;
     tr.append(tdGame, tdMatch);
@@ -136,11 +151,11 @@ function renderAboutBody() {
 
   appendHeading(aboutBody, t("aboutModesTitle"));
   appendModesTable(aboutBody, [
-    [t("modeEnglish1"), t("aboutModeEnglish1")],
-    [t("modeEnglish2"), t("aboutModeEnglish2")],
-    [t("modeSums"), t("aboutModeSums")],
-    [t("modeMath"), t("aboutModeMath")],
-    [t("modeFractions"), t("aboutModeFractions")],
+    ["english1", t("modeEnglish1"), t("aboutModeEnglish1")],
+    ["english2", t("modeEnglish2"), t("aboutModeEnglish2")],
+    ["sums", t("modeSums"), t("aboutModeSums")],
+    ["math", t("modeMath"), t("aboutModeMath")],
+    ["fractions", t("modeFractions"), t("aboutModeFractions")],
   ]);
   appendAboutImage(aboutBody, gameModesImg, t("aboutImgModesAlt"));
   appendParagraph(aboutBody, t("aboutEnglishNote"));

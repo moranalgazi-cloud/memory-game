@@ -44,6 +44,14 @@ export function isSignedIn() {
   return Boolean(currentUser) && !currentUser?.is_anonymous;
 }
 
+const DEV_TESTER_EMAIL = "moranalgazi@gmail.com";
+
+/** True only when signed in with the designated dev/test Google account. */
+export function isDevTesterSession() {
+  const email = getAuthEmail();
+  return email?.trim().toLowerCase() === DEV_TESTER_EMAIL;
+}
+
 /** @returns {string | null} */
 export function getAuthEmail() {
   if (!currentUser) return null;

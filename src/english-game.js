@@ -2,11 +2,11 @@ import vocabulary from "./english-vocabulary.json";
 import { rngUnit } from "./game.js";
 
 /**
- * @typedef {{ key: string; word: string; wordHe: string; symbol: string }} EnglishLexEntry
+ * @typedef {{ key: string; word: string; wordHe: string; symbol: string; imageUrl?: string }} EnglishLexEntry
  * @typedef {{ id: string; entries: EnglishLexEntry[] }} EnglishTopic
  * @typedef {"en" | "he"} EnglishDeckLang
  * @typedef {"english1" | "english2"} EnglishDeckKind
- * @typedef {{ id: string; factKey: string; side: "picture" | "word" | "he" | "en"; label: string; symbol?: string; word?: string; lang?: EnglishDeckLang }} EnglishCard
+ * @typedef {{ id: string; factKey: string; side: "picture" | "word" | "he" | "en"; label: string; symbol?: string; imageUrl?: string; word?: string; lang?: EnglishDeckLang }} EnglishCard
  */
 
 /** @type {EnglishTopic[]} */
@@ -55,7 +55,10 @@ export function entryLabel(e, lang) {
  */
 export function isValidEnglishEntry(e, lang = "en") {
   if (!e || typeof e.key !== "string") return false;
-  if (typeof e.symbol !== "string" || !e.symbol.trim()) return false;
+  const hasPicture =
+    (typeof e.symbol === "string" && e.symbol.trim()) ||
+    (typeof e.imageUrl === "string" && e.imageUrl.trim());
+  if (!hasPicture) return false;
   const label = entryLabel(
     /** @type {EnglishLexEntry} */ ({ ...e, word: e.word ?? "", wordHe: e.wordHe ?? "" }),
     lang,
@@ -134,7 +137,8 @@ export function buildEnglishDeck(entries, deckKind = "english1") {
       factKey: e.key,
       side: "picture",
       label: "",
-      symbol: e.symbol,
+      symbol: e.imageUrl ? undefined : e.symbol,
+      imageUrl: e.imageUrl,
       word: e.word,
       lang: "en",
     });

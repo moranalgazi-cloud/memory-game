@@ -1,5 +1,10 @@
 import "./style.css";
+import "./adventure.css";
+import "./screens.css";
+import "./tutorial.css";
 import { applyAppBranding } from "./branding.js";
+import { applyModeIcons, MODE_LABEL_KEYS } from "./mode-icons.js";
+import { applyNavIcons } from "./nav-icons.js";
 import {
   pickFacts,
   buildDeck,
@@ -36,6 +41,27 @@ import {
   hasAcceptedDisclaimer,
 } from "./disclaimer-ui.js";
 import { initAboutUi, refreshAboutLabels } from "./about-ui.js";
+import { initTutorialUi, openTutorialIfNeeded, refreshTutorialLabels } from "./tutorial-ui.js";
+import {
+  initRoadmapUi,
+  openRoadmapDialog,
+  refreshRoadmapLabels,
+  refreshRoadmapProgressPill,
+  showRoadmapReward,
+} from "./roadmap-ui.js";
+import {
+  getRoadmapSummary,
+  grantStarterStickerIfNeeded,
+  onSoloWin,
+  onTestPass,
+} from "./roadmap.js";
+import {
+  buildRecordsEmailContent,
+  copyRecordsTable,
+  isMobileLike,
+  openMobileGmailCompose,
+  shareRecordsForPaste,
+} from "./records-email.js";
 import {
   loadRecords,
   loadRecordsForUser,
@@ -52,6 +78,7 @@ import {
   removeUser,
   setCurrentUserSlug,
   getCurrentUser,
+  getCurrentUserSlug,
   isAdminUser,
   ensureUserRemoteIds,
   ensureAccountPlayer,
@@ -73,6 +100,7 @@ import {
   isSignedIn,
   getAuthUserId,
   getAuthEmail,
+  isDevTesterSession,
   getAuthDisplayName,
   getAuthAvatarUrl,
   signInWithGoogle,
@@ -89,6 +117,7 @@ import {
 } from "./multiplayer/online-session.js";
 import {
   initOnlinePlay,
+  openOnlineDialog,
   onlineLocalFlip,
   isOnlineGameActive,
   refreshOnlineLabels,
@@ -109,6 +138,7 @@ const movesEl = document.querySelector("#moves");
 const matchesEl = document.querySelector("#matches");
 const elapsedEl = document.querySelector("#elapsed");
 const winMessage = document.querySelector("#winMessage");
+const winChallengeHint = document.querySelector("#winChallengeHint");
 const winActions = document.querySelector("#winActions");
 const testMeBtn = document.querySelector("#testMeBtn");
 const quizDialog = document.querySelector("#quizDialog");
@@ -121,7 +151,8 @@ const quizSummary = document.querySelector("#quizSummary");
 const closeQuizBtn = document.querySelector("#closeQuiz");
 const dismissQuizBtn = document.querySelector("#dismissQuiz");
 const adminSpeedFinishBtn = document.querySelector("#adminSpeedFinish");
-const gameModeSelect = document.querySelector("#gameMode");
+const devWinGameBtn = document.querySelector("#devWinGame");
+const gameModePicker = document.querySelector("#gameModePicker");
 const pairCountSelect = document.querySelector("#pairCount");
 const englishLevelSelect = document.querySelector("#englishLevel");
 const sumsLevelSelect = document.querySelector("#sumsLevel");
@@ -149,10 +180,19 @@ const onlinePlayAgainBtn = document.querySelector("#onlinePlayAgain");
 const onlineLeaveAfterWinBtn = document.querySelector("#onlineLeaveAfterWin");
 const gameActionsEl = document.querySelector("#gameActions");
 const winGameActionsEl = document.querySelector("#winGameActions");
-const openRecordsBtn = document.querySelector("#openRecords");
+const quickNavRecordsBtn = document.querySelector("#quickNavRecords");
+const quickNavFriendBtn = document.querySelector("#quickNavFriend");
 const recordsDialog = document.querySelector("#recordsDialog");
 const closeRecordsBtn = document.querySelector("#closeRecords");
 const emailRecordsBtn = document.querySelector("#emailRecords");
+const recordsShareDialog = document.querySelector("#recordsShareDialog");
+const recordsShareTitle = document.querySelector("#recordsShareTitle");
+const recordsShareLead = document.querySelector("#recordsShareLead");
+const recordsSharePreview = document.querySelector("#recordsSharePreview");
+const recordsShareStatus = document.querySelector("#recordsShareStatus");
+const recordsShareCopyBtn = document.querySelector("#recordsShareCopy");
+const recordsShareGmailBtn = document.querySelector("#recordsShareGmail");
+const recordsShareCloseBtn = document.querySelector("#recordsShareClose");
 const gameTitle = document.querySelector("#gameTitle");
 const gameTagline = document.querySelector("#gameTagline");
 const onlineTurnBanner = document.querySelector("#onlineTurnBanner");
@@ -216,7 +256,7 @@ const settingsMenu = document.querySelector("#settingsMenu");
 /** @typedef {"easy" | "medium" | "hard"} MathLevel */
 /** @typedef {"easy" | "medium" | "hard"} FractionLevel */
 
-/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string; online?: boolean; turn?: 'host' | 'guest'; hostScore?: number; guestScore?: number; winner?: 'host' | 'guest' | null } | null} */
+/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; freshDeck?: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string; online?: boolean; turn?: 'host' | 'guest'; hostScore?: number; guestScore?: number; winner?: 'host' | 'guest' | null } | null} */
 let state = null;
 
 /** @type {string | null} */
@@ -274,29 +314,37 @@ function clearQuizAdvance() {
   }
 }
 
-/** @param {HTMLSelectElement | null} select */
-function applyGameModeOptionLabels(select) {
-  if (!select) return;
-  for (const opt of select.options) {
-    switch (opt.value) {
-      case "english1":
-        opt.textContent = t("modeEnglish1");
-        break;
-      case "english2":
-        opt.textContent = t("modeEnglish2");
-        break;
-      case "sums":
-        opt.textContent = t("modeSums");
-        break;
-      case "math":
-        opt.textContent = t("modeMath");
-        break;
-      case "fractions":
-        opt.textContent = t("modeFractions");
-        break;
-      default:
-        break;
-    }
+/** @returns {import("./records.js").GameMode} */
+function getSelectedGameModeFromPicker() {
+  const selected = gameModePicker?.querySelector(".game-mode-btn.is-selected");
+  const v = selected?.getAttribute("data-mode");
+  if (v === "english1" || v === "english2" || v === "fractions" || v === "sums" || v === "math") {
+    return v;
+  }
+  return "english1";
+}
+
+/** @param {import("./records.js").GameMode} mode */
+function setGameMode(mode) {
+  if (!gameModePicker) return;
+  for (const btn of gameModePicker.querySelectorAll(".game-mode-btn")) {
+    const on = btn.getAttribute("data-mode") === mode;
+    btn.classList.toggle("is-selected", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+}
+
+function refreshGameModePicker() {
+  if (!gameModePicker) return;
+  gameModePicker.setAttribute("aria-label", t("ariaGameMode"));
+  for (const btn of gameModePicker.querySelectorAll(".game-mode-btn")) {
+    const mode = btn.getAttribute("data-mode");
+    const labelKey = mode && MODE_LABEL_KEYS[/** @type {import("./records.js").GameMode} */ (mode)];
+    const label = labelKey ? t(labelKey) : "";
+    const text = btn.querySelector(".game-mode-btn__label");
+    if (text) text.textContent = label;
+    btn.title = label;
+    btn.setAttribute("aria-label", label);
   }
 }
 
@@ -338,7 +386,70 @@ function refreshOnlineChrome() {
 function hideWinActions() {
   if (winActions) winActions.hidden = true;
   if (testMeBtn) testMeBtn.hidden = true;
+  if (winChallengeHint) {
+    winChallengeHint.hidden = true;
+    winChallengeHint.textContent = "";
+  }
+  if (!state?.online) {
+    if (winRestartDeckBtn) winRestartDeckBtn.classList.remove("is-hidden");
+    if (restartDeckBtn) restartDeckBtn.classList.remove("is-hidden");
+  }
   refreshOnlineChrome();
+}
+
+/**
+ * @param {boolean} [deckWasRepeat]
+ * @returns {boolean}
+ */
+function shouldHideRestartForChallenge(deckWasRepeat = false) {
+  const slug = getCurrentUserSlug();
+  if (!slug) return false;
+  const { current, progress, target } = getRoadmapSummary(slug);
+  if (current.goal.type !== "wins" || target <= 1) return false;
+  if (progress > 0 && progress < target) return true;
+  if (deckWasRepeat && progress < target) return true;
+  return false;
+}
+
+function refreshWinChallengeUi() {
+  if (!state || state.online) return;
+  const slug = getCurrentUserSlug();
+  const deckWasRepeat = state.freshDeck === false;
+  const hideRestart = shouldHideRestartForChallenge(deckWasRepeat);
+
+  if (winRestartDeckBtn) winRestartDeckBtn.classList.toggle("is-hidden", hideRestart);
+  if (restartDeckBtn) restartDeckBtn.classList.toggle("is-hidden", hideRestart);
+
+  if (!winChallengeHint || !slug) return;
+
+  const { current, progress, target } = getRoadmapSummary(slug);
+  const multiWin = current.goal.type === "wins" && target > 1;
+  if (!multiWin) {
+    winChallengeHint.hidden = true;
+    winChallengeHint.textContent = "";
+    return;
+  }
+
+  if (deckWasRepeat && progress < target) {
+    winChallengeHint.textContent = t("winChallengeNeedNewGame", {
+      progress: String(progress),
+      target: String(target),
+    });
+    winChallengeHint.hidden = false;
+    return;
+  }
+
+  if (progress > 0 && progress < target) {
+    winChallengeHint.textContent = t("winChallengeUseNewGame", {
+      progress: String(progress),
+      target: String(target),
+    });
+    winChallengeHint.hidden = false;
+    return;
+  }
+
+  winChallengeHint.hidden = true;
+  winChallengeHint.textContent = "";
 }
 
 function showWinActions() {
@@ -401,11 +512,7 @@ function randomUnit() {
 }
 
 function getMode() {
-  const v = gameModeSelect?.value;
-  if (v === "english1" || v === "english2") return v;
-  if (v === "fractions") return "fractions";
-  if (v === "sums") return "sums";
-  return "math";
+  return getSelectedGameModeFromPicker();
 }
 
 /** @returns {SumsLevel} */
@@ -476,8 +583,43 @@ function getFractionLevelSettings(level) {
   return { pairCount: 4, tableMax: 5 };
 }
 
+/**
+ * @param {import("./records.js").GameMode} mode
+ * @returns {EnglishLevel | SumsLevel | MathLevel | FractionLevel}
+ */
+function getLevelForMode(mode) {
+  if (mode === "english1" || mode === "english2") return getEnglishLevel();
+  if (mode === "sums") return getSumsLevel();
+  if (mode === "math") return getMathLevel();
+  if (mode === "fractions") return getFractionLevel();
+  return "easy";
+}
+
+/**
+ * @param {{ mode: string; level?: string }} preset
+ */
+function applyRoadmapChallengePreset(preset) {
+  setGameMode(preset.mode);
+  refreshChrome();
+  const level = preset.level ?? "easy";
+  if (preset.mode === "english1" || preset.mode === "english2") {
+    if (englishLevelSelect) englishLevelSelect.value = level;
+  } else if (preset.mode === "sums") {
+    if (sumsLevelSelect) sumsLevelSelect.value = level;
+  } else if (preset.mode === "math") {
+    if (mathLevelSelect) mathLevelSelect.value = level;
+  } else if (preset.mode === "fractions") {
+    if (fractionLevelSelect) fractionLevelSelect.value = level;
+  }
+  refreshChrome();
+  startGame("options");
+}
+
 function refreshChrome() {
   applyAppBranding(t);
+  applyModeIcons();
+  applyNavIcons();
+  refreshGameModePicker();
   const mode = getMode();
   setPageTitleForMode(mode);
   if (gameTitle) {
@@ -538,9 +680,16 @@ function refreshChrome() {
   }
   if (testMeBtn) testMeBtn.textContent = t("testMe");
   if (dismissQuizBtn) dismissQuizBtn.setAttribute("aria-label", t("ariaCloseQuiz"));
-  if (openRecordsBtn) {
-    openRecordsBtn.textContent = t("records");
-    openRecordsBtn.setAttribute("aria-label", t("ariaRecords"));
+  if (quickNavRecordsBtn) {
+    const label = quickNavRecordsBtn.querySelector(".quick-nav__label");
+    if (label) label.textContent = t("records");
+    quickNavRecordsBtn.setAttribute("aria-label", t("ariaRecords"));
+  }
+  if (quickNavFriendBtn) {
+    const label = quickNavFriendBtn.querySelector(".quick-nav__label");
+    if (label) label.textContent = t("quickNavFriend");
+    quickNavFriendBtn.setAttribute("aria-label", t("onlinePlay"));
+    quickNavFriendBtn.classList.toggle("is-hidden", !isCloudSyncEnabled());
   }
   if (settingsMenuBtn) {
     settingsMenuBtn.setAttribute("aria-label", t("ariaSettings"));
@@ -557,9 +706,15 @@ function refreshChrome() {
     openAdminBtn.setAttribute("aria-label", t("ariaAdmin"));
   }
   refreshAdminSpeedFinish();
+  refreshDevWinGameBtn();
   if (adminSpeedFinishBtn) {
     adminSpeedFinishBtn.textContent = t("adminSpeedFinish");
     adminSpeedFinishBtn.setAttribute("aria-label", t("ariaAdminSpeedFinish"));
+  }
+  if (devWinGameBtn) {
+    devWinGameBtn.textContent = t("devWinGame");
+    devWinGameBtn.setAttribute("aria-label", t("ariaDevWinGame"));
+    devWinGameBtn.setAttribute("title", t("devWinGameHint"));
   }
   const udt = document.querySelector("#userDialogTitle");
   const udl = document.querySelector("#userDialogLead");
@@ -595,10 +750,6 @@ function refreshChrome() {
   if (adminUnlockSubmit) adminUnlockSubmit.textContent = t("adminUnlockSubmit");
   updateAdminPasswordToggleLabel();
 
-  if (gameModeSelect) {
-    gameModeSelect.setAttribute("aria-label", t("ariaGameMode"));
-    applyGameModeOptionLabels(gameModeSelect);
-  }
   if (onlineQuitBtn) {
     onlineQuitBtn.textContent = t("onlineQuit");
     onlineQuitBtn.setAttribute("aria-label", t("ariaOnlineQuit"));
@@ -684,9 +835,12 @@ function refreshChrome() {
   }
 
   refreshRecordsLabels();
+  refreshRoadmapLabels();
+  refreshRoadmapProgressPill();
   refreshOnlineLabels();
   refreshDisclaimerLabels();
   refreshAboutLabels();
+  refreshTutorialLabels();
   refreshOnlineChrome();
 }
 
@@ -833,6 +987,17 @@ function showOnlineWin(message, hostScore, guestScore) {
 function renderQuizPrompt(q) {
   if (!quizPrompt) return;
   quizPrompt.className = "quiz-prompt";
+  quizPrompt.replaceChildren();
+  if (quizSession?.mode === "english1" && q.imageUrl) {
+    quizPrompt.classList.add("quiz-prompt--picture");
+    const img = document.createElement("img");
+    img.className = "quiz-prompt__picture";
+    img.src = q.imageUrl;
+    img.alt = "";
+    img.decoding = "async";
+    quizPrompt.append(img);
+    return;
+  }
   if (quizSession?.mode === "english1" && q.prompt.length <= 4) {
     quizPrompt.classList.add("quiz-prompt--symbol");
     quizPrompt.textContent = q.prompt;
@@ -943,6 +1108,10 @@ function finishQuiz() {
   const { mode, questions, correct } = quizSession;
   const total = questions.length;
   recordTestResult(mode, correct, total);
+  const perfect = correct === total;
+  const roadmapResult = onTestPass(getCurrentUserSlug(), { mode, perfect });
+  if (roadmapResult.completed) showRoadmapReward(roadmapResult);
+  else if (roadmapResult.progressed) refreshRoadmapProgressPill();
   const pct = scorePercent(correct, total);
 
   if (quizChoices) quizChoices.replaceChildren();
@@ -1009,6 +1178,8 @@ function refreshRecordsLabels() {
   const hFrac = document.querySelector("#recordsHeadingFractions");
   const close = document.querySelector("#closeRecords");
   if (title) title.textContent = t("recordsTitle");
+  const subtitle = document.querySelector("#recordsSubtitle");
+  if (subtitle) subtitle.textContent = t("recordsSubtitle");
   if (gamesHeading) gamesHeading.textContent = t("recordsGamesHeading");
   if (testsHeading) testsHeading.textContent = t("recordsTestsHeading");
   if (hMath) hMath.textContent = t("recordsMath");
@@ -1067,6 +1238,11 @@ function refreshRecordsLabels() {
     emailRecordsBtn.textContent = t("emailRecords");
     emailRecordsBtn.setAttribute("aria-label", t("ariaEmailRecords"));
   }
+  if (recordsShareTitle) recordsShareTitle.textContent = t("emailRecordsShareTitle");
+  if (recordsShareLead) recordsShareLead.textContent = t("emailRecordsShareLead");
+  if (recordsShareCopyBtn) recordsShareCopyBtn.textContent = t("emailRecordsShareCopy");
+  if (recordsShareGmailBtn) recordsShareGmailBtn.textContent = t("emailRecordsShareGmail");
+  if (recordsShareCloseBtn) recordsShareCloseBtn.textContent = t("emailRecordsShareClose");
 }
 
 function fillRecordsDialog() {
@@ -1133,55 +1309,150 @@ function closeRecords() {
   recordsDialog?.close();
 }
 
-/**
- * Opens the default mail client with subject + body listing all mode stats.
- */
-function shareRecordsByEmail() {
-  const data = loadRecords();
-  /** @param {import("./records.js").GameMode} mode */
-  const block = (titleKey, mode) => {
-    const m = data[mode];
-    return [
-      t(titleKey),
-      `${t("recordsBestTime")}: ${formatDuration(m.bestTimeMs)}`,
-      `${t("recordsWon")}: ${m.gamesWon}`,
-      `${t("recordsPlayed")}: ${m.gamesPlayed}`,
-      "",
-    ];
+/** @type {boolean} */
+let recordsEmailBusy = false;
+
+function buildRecordsEmailLabels(playerName) {
+  return {
+    title: t("emailRecordsSubject"),
+    intro: t("emailRecordsIntro", { name: playerName }),
+    gamesHeading: t("recordsGamesHeading"),
+    testsHeading: t("recordsTestsHeading"),
+    playerLabel: t("emailRecordsPlayer"),
+    mode: t("emailRecordsModeColumn"),
+    bestTime: t("recordsBestTime"),
+    won: t("recordsWon"),
+    played: t("recordsPlayed"),
+    bestScore: t("recordsBestScore"),
+    testsPassed: t("recordsTestsPassed"),
+    testsTaken: t("recordsTestsTaken"),
+    modes: {
+      math: t("recordsMath"),
+      sums: t("recordsSums"),
+      english1: t("recordsEnglish1"),
+      english2: t("recordsEnglish2"),
+      fractions: t("recordsFractions"),
+    },
+    dir: getLocale() === "he" ? "rtl" : "ltr",
   };
-  /** @param {string} titleKey @param {import("./records.js").GameMode} mode */
-  const testBlock = (titleKey, mode) => {
-    const m = data.tests[mode];
-    return [
-      t(titleKey),
-      `${t("recordsBestScore")}: ${formatScorePercent(m.bestScorePercent)}`,
-      `${t("recordsTestsPassed")}: ${m.testsPassed}`,
-      `${t("recordsTestsTaken")}: ${m.testsTaken}`,
-      "",
-    ];
-  };
-  const lines = [
-    t("emailRecordsIntro", { name: getCurrentUser()?.name || t("userPlayingAs") }),
+}
+
+/** @type {{ subject: string; composeBody: string; htmlFragment: string; plainText: string } | null} */
+let recordsSharePayload = null;
+
+function clearRecordsShareStatus() {
+  if (!(recordsShareStatus instanceof HTMLElement)) return;
+  recordsShareStatus.hidden = true;
+  recordsShareStatus.textContent = "";
+  recordsShareStatus.classList.remove("is-error");
+}
+
+function showRecordsShareStatus(message, isError = false) {
+  if (!(recordsShareStatus instanceof HTMLElement)) return;
+  recordsShareStatus.textContent = message;
+  recordsShareStatus.hidden = false;
+  recordsShareStatus.classList.toggle("is-error", isError);
+}
+
+function buildRecordsComposeBody(labels, playerName) {
+  return [
+    labels.intro,
+    `${labels.playerLabel}: ${playerName}`,
     "",
-    t("recordsGamesHeading"),
-    ...block("recordsMath", "math"),
-    ...block("recordsSums", "sums"),
-    ...block("recordsEnglish1", "english1"),
-    ...block("recordsEnglish2", "english2"),
-    ...block("recordsFractions", "fractions"),
-    t("recordsTestsHeading"),
-    ...testBlock("recordsMath", "math"),
-    ...testBlock("recordsSums", "sums"),
-    ...testBlock("recordsEnglish1", "english1"),
-    ...testBlock("recordsEnglish2", "english2"),
-    ...testBlock("recordsFractions", "fractions"),
-  ];
-  while (lines.length > 0 && lines[lines.length - 1] === "") {
-    lines.pop();
+    t("emailRecordsPasteTableBelow"),
+  ].join("\n");
+}
+
+function openRecordsShareSheet() {
+  const playerName = getCurrentUser()?.name || t("userPlayingAs");
+  const labels = buildRecordsEmailLabels(playerName);
+  const data = loadRecords();
+  const { htmlFragment, plainText } = buildRecordsEmailContent(data, labels, playerName);
+
+  recordsSharePayload = {
+    subject: t("emailRecordsSubject"),
+    composeBody: buildRecordsComposeBody(labels, playerName),
+    htmlFragment,
+    plainText,
+  };
+
+  clearRecordsShareStatus();
+  if (recordsSharePreview instanceof HTMLElement) {
+    recordsSharePreview.innerHTML = htmlFragment;
+    recordsSharePreview.dir = labels.dir;
   }
-  const subject = encodeURIComponent(t("emailRecordsSubject"));
-  const body = encodeURIComponent(lines.join("\n"));
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+
+  refreshRecordsLabels();
+  recordsShareDialog?.showModal();
+}
+
+function closeRecordsShareSheet() {
+  recordsShareDialog?.close();
+  recordsSharePayload = null;
+  clearRecordsShareStatus();
+}
+
+async function copyRecordsShareTable() {
+  if (!recordsSharePayload) return;
+
+  const mode = await copyRecordsTable(
+    recordsSharePreview instanceof HTMLElement ? recordsSharePreview : null,
+    recordsSharePayload.htmlFragment,
+    recordsSharePayload.plainText,
+  );
+
+  if (mode) {
+    showRecordsShareStatus(t("emailRecordsShareCopied"));
+  } else {
+    showRecordsShareStatus(t("emailRecordsShareCopyFailed"), true);
+  }
+}
+
+function openRecordsShareGmail() {
+  if (!recordsSharePayload) return;
+  openMobileGmailCompose(recordsSharePayload.subject, recordsSharePayload.composeBody);
+  showRecordsShareStatus(t("emailRecordsShareGmailOpened"));
+}
+
+/** Copies the records HTML table and opens Gmail compose for one paste. */
+async function shareRecordsByEmail() {
+  if (recordsEmailBusy) return;
+
+  if (isMobileLike()) {
+    openRecordsShareSheet();
+    return;
+  }
+
+  const playerName = getCurrentUser()?.name || t("userPlayingAs");
+  const labels = buildRecordsEmailLabels(playerName);
+  const data = loadRecords();
+  const { htmlFragment, plainText } = buildRecordsEmailContent(data, labels, playerName);
+
+  recordsEmailBusy = true;
+  const prevLabel = emailRecordsBtn?.textContent ?? "";
+  if (emailRecordsBtn instanceof HTMLButtonElement) {
+    emailRecordsBtn.disabled = true;
+    emailRecordsBtn.textContent = t("emailRecordsPreparing");
+  }
+
+  try {
+    const mode = await shareRecordsForPaste({
+      htmlFragment,
+      plainText,
+      subject: t("emailRecordsSubject"),
+      composeBody: buildRecordsComposeBody(labels, playerName),
+    });
+    window.alert(t(mode === "plain" ? "emailRecordsPasteHintPlain" : "emailRecordsPasteHint"));
+  } catch (err) {
+    console.warn("[records] copy/share failed:", err);
+    window.alert(t("emailRecordsShareFailed"));
+  } finally {
+    recordsEmailBusy = false;
+    if (emailRecordsBtn instanceof HTMLButtonElement) {
+      emailRecordsBtn.disabled = false;
+      emailRecordsBtn.textContent = prevLabel || t("emailRecords");
+    }
+  }
 }
 
 function readOptions() {
@@ -1280,6 +1551,7 @@ function restartSameDeck() {
     lock: false,
     clockStart: null,
     winHandled: false,
+    freshDeck: false,
     englishSpeech: src.englishSpeech,
     englishTopicId: src.englishTopicId,
   };
@@ -1444,7 +1716,7 @@ function startGame(source) {
     lastDeckSource = { mode: "math", facts: [...facts] };
     cards = shuffle(buildDeck(facts, rng), rng);
     mode = "math";
-    if (gameModeSelect) gameModeSelect.value = "math";
+    setGameMode("math");
   }
 
   if (cards.length === 0) {
@@ -1484,7 +1756,7 @@ function startGame(source) {
       cards = shuffle(buildDeck(facts, rng), rng);
       mode = "math";
       englishSpeech = undefined;
-      if (gameModeSelect) gameModeSelect.value = "math";
+      setGameMode("math");
     }
   }
 
@@ -1498,6 +1770,7 @@ function startGame(source) {
     lock: false,
     clockStart: null,
     winHandled: false,
+    freshDeck: true,
     englishSpeech,
     englishTopicId,
   };
@@ -1541,6 +1814,28 @@ function refreshAdminSpeedFinish() {
   adminSpeedFinishBtn.classList.toggle("is-hidden", !show);
 }
 
+/** TEMP: testing helper — remove before release. */
+function refreshDevWinGameBtn() {
+  if (!devWinGameBtn) return;
+  const show =
+    isDevTesterSession() &&
+    Boolean(state && !state.winHandled && state.cards.length > 0 && !state.online);
+  devWinGameBtn.classList.toggle("is-hidden", !show);
+}
+
+/** TEMP: testing helper — remove before release. */
+function devWinGame() {
+  if (!state || state.winHandled || state.online) return;
+  cancelEnglishSpeech();
+  armCelebrationAudio();
+  if (state.clockStart === null) {
+    state.clockStart = Date.now() - 2000;
+  }
+  markAllCardsMatched();
+  renderBoard();
+  updateStats();
+}
+
 function completeGameWin() {
   if (!state || state.winHandled) return;
   state.winHandled = true;
@@ -1550,10 +1845,29 @@ function completeGameWin() {
   if (elapsed !== null && elapsed > 0) {
     recordWin(state.mode, elapsed);
   }
+  if (!state.online) {
+    const slug = getCurrentUserSlug();
+    const summary = slug ? getRoadmapSummary(slug) : null;
+    const multiWin = Boolean(
+      summary && summary.current.goal.type === "wins" && summary.target > 1,
+    );
+    const canCountForChallenge = !multiWin || state.freshDeck !== false;
+
+    if (canCountForChallenge) {
+      const roadmapResult = onSoloWin(slug, {
+        mode: state.mode,
+        level: getLevelForMode(state.mode),
+      });
+      if (roadmapResult.completed) showRoadmapReward(roadmapResult);
+      else if (roadmapResult.progressed) refreshRoadmapProgressPill();
+    }
+  }
   lastWinForQuiz = { mode: state.mode, cards: [...state.cards] };
   clearWinAutoRestart();
   showWinActions();
+  refreshWinChallengeUi();
   refreshAdminSpeedFinish();
+  refreshDevWinGameBtn();
 }
 
 function markAllCardsMatched() {
@@ -1702,14 +2016,7 @@ function renderBoard() {
             ? String(card.label)
             : `${pieN}/${pieD}`;
       }
-    } else if (card.symbol && card.side === "picture") {
-      front.classList.add("card-face--picture");
-      const sym = document.createElement("span");
-      sym.className = "card-symbol";
-      sym.textContent = card.symbol;
-      sym.setAttribute("aria-hidden", "true");
-      front.append(sym);
-    } else if (card.imageUrl) {
+    } else if (card.imageUrl && card.side === "picture") {
       front.classList.add("card-face--picture");
       const img = document.createElement("img");
       img.className = "card-picture";
@@ -1719,6 +2026,13 @@ function renderBoard() {
       img.loading = "lazy";
       img.referrerPolicy = "no-referrer";
       front.append(img);
+    } else if (card.symbol && card.side === "picture") {
+      front.classList.add("card-face--picture");
+      const sym = document.createElement("span");
+      sym.className = "card-symbol";
+      sym.textContent = card.symbol;
+      sym.setAttribute("aria-hidden", "true");
+      front.append(sym);
     } else if (card.side === "fraction" && card.label) {
       front.classList.add("card-face--fraction");
       front.textContent = card.label;
@@ -2234,6 +2548,13 @@ async function confirmUserChoiceAsync() {
       refreshChrome();
       startGame("switch-user");
     }
+    const tutorialUserSlug = pendingUserSlug;
+    grantStarterStickerIfNeeded(tutorialUserSlug);
+    queueMicrotask(() => {
+      requestAnimationFrame(() => {
+        openTutorialIfNeeded(tutorialUserSlug, () => openRoadmapDialog());
+      });
+    });
   } finally {
     if (cont) {
       cont.textContent = t("userContinue");
@@ -2362,12 +2683,21 @@ async function openAdminOverview() {
 
 initLocale();
 applyAppBranding(t);
+applyModeIcons();
+applyNavIcons();
 initDisclaimerUi({
   t,
   onAccepted: () => syncUserAddDisclaimerGate(),
   onGateChange: () => syncUserAddDisclaimerGate(),
 });
 initAboutUi({ t });
+initTutorialUi({ t });
+initRoadmapUi({
+  t,
+  getCurrentUserSlug,
+  getCurrentUser,
+  onStartChallenge: applyRoadmapChallengePreset,
+});
 
 document.querySelector("#openDisclaimerFromUser")?.addEventListener("click", () => {
   openDisclaimerDialog(hasAcceptedDisclaimer() ? "view" : "accept");
@@ -2539,6 +2869,7 @@ testMeBtn?.addEventListener("click", () => openQuiz());
 closeQuizBtn?.addEventListener("click", () => closeQuiz());
 dismissQuizBtn?.addEventListener("click", () => closeQuiz());
 adminSpeedFinishBtn?.addEventListener("click", () => speedFinishGame());
+devWinGameBtn?.addEventListener("click", () => devWinGame());
 onlineQuitBtn?.addEventListener("click", () => void quitOnlineGame());
 onlinePlayAgainBtn?.addEventListener("click", () => void playOnlineAgain());
 onlineLeaveAfterWinBtn?.addEventListener("click", () => void quitOnlineGame());
@@ -2550,7 +2881,21 @@ sumsLevelSelect?.addEventListener("change", () => startGame("options"));
 mathLevelSelect?.addEventListener("change", () => startGame("options"));
 fractionLevelSelect?.addEventListener("change", () => startGame("options"));
 tableMaxSelect?.addEventListener("change", () => startGame("options"));
-gameModeSelect?.addEventListener("change", () => startGame("options"));
+gameModePicker?.addEventListener("click", (e) => {
+  const btn = e.target instanceof Element ? e.target.closest(".game-mode-btn") : null;
+  if (!btn || btn.classList.contains("is-selected")) return;
+  const mode = btn.getAttribute("data-mode");
+  if (
+    mode === "english1" ||
+    mode === "english2" ||
+    mode === "sums" ||
+    mode === "math" ||
+    mode === "fractions"
+  ) {
+    setGameMode(mode);
+    startGame("options");
+  }
+});
 
 /** @typedef {"light" | "dark" | "fun"} ThemeName */
 
@@ -2652,6 +2997,9 @@ function refreshAuthUI() {
       }
     }
   }
+
+  refreshDevWinGameBtn();
+  refreshRoadmapLabels();
 }
 
 async function handleAuthButton() {
@@ -2761,9 +3109,16 @@ userGoogleBtn?.addEventListener("click", () => {
   void handleAuthButton();
 });
 
-openRecordsBtn?.addEventListener("click", openRecords);
+quickNavRecordsBtn?.addEventListener("click", openRecords);
+quickNavFriendBtn?.addEventListener("click", () => openOnlineDialog());
 closeRecordsBtn?.addEventListener("click", closeRecords);
-emailRecordsBtn?.addEventListener("click", shareRecordsByEmail);
+emailRecordsBtn?.addEventListener("click", () => void shareRecordsByEmail());
+recordsShareCopyBtn?.addEventListener("click", () => void copyRecordsShareTable());
+recordsShareGmailBtn?.addEventListener("click", openRecordsShareGmail);
+recordsShareCloseBtn?.addEventListener("click", closeRecordsShareSheet);
+recordsShareDialog?.addEventListener("click", (e) => {
+  if (e.target === recordsShareDialog) closeRecordsShareSheet();
+});
 recordsDialog?.addEventListener("click", (e) => {
   if (e.target === recordsDialog) closeRecords();
 });

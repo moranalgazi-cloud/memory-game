@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Baby">
+  <rect width="80" height="80" rx="12" fill="#fff7ed"/>
+  <circle cx="40" cy="34" r="15" fill="#fdd8b5"/>
+  <path d="M28 32c1-8 7-12 12-12s11 4 12 12" fill="#f4b183"/>
+  <circle cx="34" cy="34" r="2" fill="#2d1b12"/>
+  <circle cx="46" cy="34" r="2" fill="#2d1b12"/>
+  <circle cx="40" cy="40" r="2.5" fill="#f9a8d4"/>
+  <path d="M25 48c3 10 10 16 15 16s12-6 15-16" fill="#fde68a"/>
+  <circle cx="52" cy="42" r="4" fill="#f472b6"/>
+  <path d="M50 42h6v3h-6z" fill="#fff"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Family">
+  <rect width="80" height="80" rx="12" fill="#fef3c7"/>
+  <circle cx="24" cy="28" r="8" fill="#f4c4a0"/>
+  <path d="M16 38h16l-1 20H17L16 38z" fill="#e85d9b"/>
+  <circle cx="56" cy="28" r="8" fill="#e8b98e"/>
+  <path d="M48 38h16l-1 20H49L48 38z" fill="#2f6fed"/>
+  <circle cx="34" cy="36" r="7" fill="#f7c9a8"/>
+  <path d="M28 44h12l-1 14H29L28 44z" fill="#fb7185"/>
+  <circle cx="50" cy="36" r="7" fill="#f0c49a"/>
+  <path d="M44 44h12l-1 14H45L44 44z" fill="#22c55e"/>
+  <path d="M18 58h44v6H18z" fill="#94a3b8" opacity=".35"/>
+</svg>

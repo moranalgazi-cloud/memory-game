@@ -1,0 +1,16 @@
+name = "memory-games-send-records"
+main = "src/index.js"
+compatibility_date = "2024-06-01"
+
+# Secrets (never commit):
+#   npx wrangler secret put RESEND_API_KEY
+#
+# FROM_EMAIL must use a domain verified in Resend.
+
+[vars]
+ALLOWED_ORIGINS = "https://www.playmemorygames.win,http://localhost:5173"
+FROM_EMAIL = "Memory Games <onboarding@resend.dev>"
+
+[[routes]]
+pattern = "www.playmemorygames.win/api/send-records-email"
+zone_name = "playmemorygames.win"
