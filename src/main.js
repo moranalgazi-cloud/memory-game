@@ -2687,9 +2687,21 @@ async function applyGoogleIdentityIfSignedIn() {
     const acct = ensureAccountPlayer(uid, name, rows);
     if (!acct) return;
     ensureUserRemoteIds();
+    pendingUserSlug = acct.slug;
     refreshChrome();
-    if (userDialog?.open) renderUserPickerList();
     syncUserDialogAccountMode();
+    if (userDialog?.open) {
+      renderUserPickerList();
+      if (userDialogContinue) userDialogContinue.disabled = false;
+      // After Google sign-in (or first load while signed in), enter the game
+      // automatically. Skip when the picker was opened mid-game (e.g. to sign out).
+      const enteringFromPicker =
+        !booted || !document.body.classList.contains("has-active-player");
+      if (enteringFromPicker) {
+        await confirmUserChoiceAsync();
+        return;
+      }
+    }
     // Switch the board to the account player if we changed who is active.
     if (booted && prevSlug !== acct.slug && !isOnlineBoardActive()) {
       cancelEnglishSpeech();
