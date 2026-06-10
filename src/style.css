@@ -2287,12 +2287,6 @@ body:has(#userDialog[open]) .public-meta .public-meta__privacy {
   }
 }
 
-#board.board--your-turn {
-  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  outline-offset: 6px;
-  border-radius: var(--radius-md);
-}
-
 #board.board--waiting-turn .card:not(.is-flipped):not(.is-matched) {
   opacity: 0.45;
   cursor: not-allowed;

@@ -713,7 +713,7 @@ function refreshOnlineBoardInPlace() {
   }
   const session = getActiveOnlineSession();
   const myTurn = session?.role != null && state.turn === session.role;
-  board.classList.toggle("board--waiting-turn", !myTurn && !state.lock);
+  board.classList.toggle("board--waiting-turn", !myTurn);
   refreshOnlineTurnBanner();
 }
 
@@ -800,11 +800,10 @@ function refreshOnlineTagline() {
 
 function refreshOnlineTurnBanner() {
   if (!onlineTurnBanner || !onlineTurnBannerText) return;
-  const playing = Boolean(state?.online && isOnlineGameActive());
-  if (!playing || !state) {
+  const playing = Boolean(state?.online && state && !state.winHandled);
+  if (!playing) {
     onlineTurnBanner.classList.add("is-hidden");
     onlineTurnBanner.classList.remove("online-turn-banner--yours", "online-turn-banner--theirs");
-    if (board) board.classList.remove("board--your-turn");
     return;
   }
   const session = getActiveOnlineSession();
@@ -813,11 +812,14 @@ function refreshOnlineTurnBanner() {
   onlineTurnBanner.classList.remove("is-hidden");
   onlineTurnBanner.classList.toggle("online-turn-banner--yours", myTurn);
   onlineTurnBanner.classList.toggle("online-turn-banner--theirs", !myTurn);
-  onlineTurnBannerText.textContent = myTurn
-    ? t("onlineYourTurnBanner")
-    : t("onlineOpponentTurnBanner");
-  if (board) {
-    board.classList.toggle("board--your-turn", myTurn && !state.lock);
+  if (myTurn && state.lock) {
+    onlineTurnBannerText.textContent = t("onlineYourTurnResolving");
+  } else if (myTurn) {
+    onlineTurnBannerText.textContent = t("onlineYourTurnBanner");
+  } else if (state.lock) {
+    onlineTurnBannerText.textContent = t("onlineOpponentResolving");
+  } else {
+    onlineTurnBannerText.textContent = t("onlineOpponentTurnBanner");
   }
 }
 
@@ -1636,7 +1638,7 @@ function updateStats() {
     refreshOnlineTurnBanner();
     if (board) {
       const myTurn = role != null && state.turn === role;
-      board.classList.toggle("board--waiting-turn", !myTurn && !state.lock);
+      board.classList.toggle("board--waiting-turn", !myTurn);
     }
     return;
   }
@@ -1654,10 +1656,7 @@ function updateStats() {
     }
   }
 
-  if (board) {
-    board.classList.remove("board--waiting-turn");
-    board.classList.remove("board--your-turn");
-  }
+  if (board) board.classList.remove("board--waiting-turn");
   if (onlineTurnBanner) {
     onlineTurnBanner.classList.add("is-hidden");
     onlineTurnBanner.classList.remove("online-turn-banner--yours", "online-turn-banner--theirs");
@@ -1673,7 +1672,7 @@ function renderBoard() {
   if (state.online) {
     const session = getActiveOnlineSession();
     const myTurn = session?.role != null && state.turn === session.role;
-    board.classList.toggle("board--waiting-turn", !myTurn && !state.lock);
+    board.classList.toggle("board--waiting-turn", !myTurn);
     refreshOnlineTurnBanner();
   }
   board.replaceChildren();

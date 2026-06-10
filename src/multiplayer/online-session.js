@@ -73,6 +73,10 @@ export class OnlineSession {
     this.left = false;
     this.hostRematchReady = false;
     this.guestRematchReady = false;
+    /** @type {number} */
+    this.syncSeq = 0;
+    /** @type {number} */
+    this.lastSyncSeq = 0;
   }
 
   /** @param {string} text */
@@ -215,6 +219,8 @@ export class OnlineSession {
   startHostGame() {
     this.hostRematchReady = false;
     this.guestRematchReady = false;
+    this.syncSeq = 0;
+    this.lastSyncSeq = 0;
     const seed = Math.floor(Math.random() * 1_000_000_000);
     const hostConfig = buildOnlineHostConfig(this.hostOptions.mode, this.hostOptions.level);
     const { cards, config } = buildOnlineDeckFromSeed(hostConfig, seed);
@@ -261,6 +267,9 @@ export class OnlineSession {
 
     if (msg.type === "sync") {
       if (this.role === "guest" && this.playState) {
+        const seq = Number(msg.seq) || 0;
+        if (seq <= this.lastSyncSeq) return;
+        this.lastSyncSeq = seq;
         this.applyRemoteSnapshot(msg.snapshot);
       }
       return;
@@ -320,7 +329,8 @@ export class OnlineSession {
 
   broadcastSync() {
     if (!this.playState || this.role !== "host") return;
-    this.sendData({ type: "sync", snapshot: exportSnapshot(this.playState) });
+    this.syncSeq += 1;
+    this.sendData({ type: "sync", seq: this.syncSeq, snapshot: exportSnapshot(this.playState) });
     this.broadcastSyncToLocal();
     if (this.playState.winHandled) {
       this.phase = "ended";
