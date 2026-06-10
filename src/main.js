@@ -15,7 +15,7 @@ import {
   pickEnglishEntries,
   buildEnglishDeck,
 } from "./english-game.js";
-import { speakMemoryWord, cancelEnglishSpeech } from "./english-speech.js";
+import { speakEnglishCard, cancelEnglishSpeech } from "./english-speech.js";
 import {
   buildFractionPool,
   pickFractionEntries,
@@ -762,16 +762,8 @@ function applyOnlineSnapshot(snap, cards) {
 function speakEnglishCardIfNeeded(cardId) {
   if (!state || !isEnglishMode(state.mode)) return;
   const c = state.cards.find((x) => x.id === cardId);
-  const sp = state.englishSpeech;
-  if (!c?.word?.trim()) return;
-  if (state.mode === "english1") {
-    if (sp === "both") speakMemoryWord(c.word, "en");
-    else if (sp === "text" && c.side === "word") speakMemoryWord(c.word, "en");
-  } else if (state.mode === "english2") {
-    const lang = c.side === "he" ? "he" : "en";
-    if (sp === "both") speakMemoryWord(c.word, lang);
-    else if (sp === "text" && c.side === "en") speakMemoryWord(c.word, "en");
-  }
+  if (!c) return;
+  speakEnglishCard(c, state.mode, state.englishSpeech);
 }
 
 function syncOnlineEnglishSpeechFromFlipped() {
@@ -1806,17 +1798,7 @@ function onCardClick(id) {
   syncCardDom(id);
   if (isEnglishMode(state.mode)) {
     const c = state.cards.find((x) => x.id === id);
-    const sp = state.englishSpeech;
-    if (c?.word?.trim()) {
-      if (state.mode === "english1") {
-        if (sp === "both") speakMemoryWord(c.word, "en");
-        else if (sp === "text" && c.side === "word") speakMemoryWord(c.word, "en");
-      } else if (state.mode === "english2") {
-        const lang = c.side === "he" ? "he" : "en";
-        if (sp === "both") speakMemoryWord(c.word, lang);
-        else if (sp === "text" && c.side === "en") speakMemoryWord(c.word, "en");
-      }
-    }
+    if (c) speakEnglishCard(c, state.mode, state.englishSpeech);
   }
 
   if (state.flipped.length < 2) return;
