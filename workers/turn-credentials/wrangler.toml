@@ -11,7 +11,6 @@ compatibility_date = "2024-06-01"
 ALLOWED_ORIGINS = "https://www.playmemorygames.win,http://localhost:5173"
 TURN_TTL_SECONDS = "3600"
 
-# After deploy, attach route in Cloudflare dashboard OR uncomment:
-# [[routes]]
-# pattern = "www.playmemorygames.win/api/turn-credentials"
-# zone_name = "playmemorygames.win"
+[[routes]]
+pattern = "www.playmemorygames.win/api/turn-credentials"
+zone_name = "playmemorygames.win"
