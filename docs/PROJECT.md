@@ -4,7 +4,7 @@ A browser-first learning game for kids: flip cards, find pairs, and practice **E
 
 | | |
 |---|---|
-| **Live demo** | [moranalgazi-cloud.github.io/memory-game](https://moranalgazi-cloud.github.io/memory-game/) |
+| **Live demo** | [www.playmemorygames.win](https://www.playmemorygames.win/) |
 | **Stack** | Vanilla JavaScript, Vite, Vitest |
 | **Mobile** | Capacitor (Android); see [CAPACITOR.md](./CAPACITOR.md) |
 | **Languages** | English and Hebrew (עברית) UI |

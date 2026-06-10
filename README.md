@@ -2,7 +2,7 @@
 
 A Vite-powered web app with several memory-style learning games for kids: **English** (two modes), **multiplication**, **plus & minus**, and **fractions**. Play solo on one device, track records per player, and optionally sync stats to [Supabase](https://supabase.com). **Play online** with a friend (WebRTC + Supabase signaling) when cloud is configured.
 
-**Live demo:** [moranalgazi-cloud.github.io/memory-game](https://moranalgazi-cloud.github.io/memory-game/)
+**Live demo:** [www.playmemorygames.win](https://www.playmemorygames.win/)
 
 **Overview (1-pager):** [docs/PROJECT.md](docs/PROJECT.md) · **Disclaimer:** [docs/DISCLAIMER.md](docs/DISCLAIMER.md)
 

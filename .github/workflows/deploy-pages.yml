@@ -36,7 +36,7 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: "true"
-          GITHUB_PAGES_BASE: /memory-game/
+          GITHUB_PAGES_BASE: /
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
