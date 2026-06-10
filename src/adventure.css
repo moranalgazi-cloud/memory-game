@@ -744,7 +744,8 @@ html[lang="he"] .roadmap-reward-dialog button {
 }
 
 .adventure-dialog.is-dragging-sticker .adventure-panel {
-  overflow: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .album-tray__item:active {

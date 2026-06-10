@@ -140,6 +140,11 @@ function renderAboutBody() {
 
   appendParagraph(aboutBody, t("aboutIntro"));
 
+  const author = document.createElement("p");
+  author.className = "about-dialog__author";
+  author.textContent = t("aboutAuthor");
+  aboutBody.append(author);
+
   appendHeading(aboutBody, t("aboutHowTitle"));
   appendBulletList(aboutBody, [
     t("aboutHowStep1"),

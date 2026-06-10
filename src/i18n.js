@@ -172,6 +172,7 @@ const messages = {
     avatarPenguin: "Penguin",
     roadmapProgressLabel: "{{progress}} / {{target}}",
     roadmapStartChallenge: "Start level",
+    roadmapContinueChallenge: "Continue level",
     roadmapClose: "Close",
     roadmapDone: "Done!",
     roadmapLocked: "Beat earlier levels first",
@@ -249,6 +250,7 @@ const messages = {
     aboutCloseBtn: "Close",
     aboutIntro:
       "Memory games is a learning game for kids: flip cards, find pairs, and practice English, math, sums, and fractions. Each player on this device keeps their own scores.",
+    aboutAuthor: "Created by Moran Algazi",
     aboutHowTitle: "How to play",
     aboutHowStep1: "Choose who is playing from the settings menu (Player).",
     aboutHowStep2: "Pick a game and level from the toolbar.",
@@ -603,6 +605,7 @@ const messages = {
     avatarPenguin: "פינגווין",
     roadmapProgressLabel: "{{progress}} / {{target}}",
     roadmapStartChallenge: "התחל שלב",
+    roadmapContinueChallenge: "המשיכו בשלב",
     roadmapClose: "סגור",
     roadmapDone: "הושלם!",
     roadmapLocked: "עברו קודם את השלבים הקודמים",
@@ -680,6 +683,7 @@ const messages = {
     aboutCloseBtn: "סגור",
     aboutIntro:
       "משחקי הזיכרון הם משחק לימודי לילדים: הופכים קלפים, מוצאים זוגות, ומתרגלים אנגלית, חשבון, חיבור וחיסור ושברים. לכל שחקן במכשיר יש שיאים משלו.",
+    aboutAuthor: "נוצר על ידי מורן אלגזי",
     aboutHowTitle: "איך משחקים",
     aboutHowStep1: "בוחרים מי משחק בתפריט ההגדרות (שחקן).",
     aboutHowStep2: "בוחרים משחק ורמה בסרגל למעלה.",

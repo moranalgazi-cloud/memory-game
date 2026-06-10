@@ -47,8 +47,11 @@ let albumView = "picker";
 /** @type {string | null} */
 let selectedAlbumWeek = null;
 
-/** @type {{ pendingId: string; weekId: string; slug: string; ghost: HTMLElement; offsetX: number; offsetY: number; pointerId: number; sourceEl: HTMLElement } | null} */
+/** @type {{ pendingId: string; weekId: string; slug: string; ghost: HTMLElement; offsetX: number; offsetY: number; pointerId: number; sourceEl: HTMLElement; lastClientY: number } | null} */
 let activeDrag = null;
+
+/** @type {number | null} */
+let dragScrollRaf = null;
 
 /** @type {HTMLElement | null} */
 let roadmapDragLayer = null;
@@ -106,6 +109,60 @@ function closeSettingsMenu() {
 function syncRoadmapDevBtn(isMap = roadmapTabMap?.classList.contains("is-active")) {
   if (!roadmapDevCompleteBtn) return;
   roadmapDevCompleteBtn.hidden = !isMap || !isDevTesterSession();
+}
+
+function syncRoadmapStartButton() {
+  if (!roadmapStartBtn || !deps) return;
+  const slug = deps.getCurrentUserSlug();
+  const summary = getRoadmapSummary(slug);
+  const inProgress = summary.progress > 0 && summary.progress < summary.target;
+  roadmapStartBtn.textContent = deps.t(
+    inProgress ? "roadmapContinueChallenge" : "roadmapStartChallenge",
+  );
+}
+
+function getDragScrollContainer() {
+  if (roadmapPanelAlbum?.hidden) return null;
+  return roadmapPanelAlbum;
+}
+
+/** @param {number} clientY */
+function applyDragEdgeScroll(clientY) {
+  const scrollEl = getDragScrollContainer();
+  if (!scrollEl || scrollEl.scrollHeight <= scrollEl.clientHeight) return;
+
+  const rect = scrollEl.getBoundingClientRect();
+  const edge = 84;
+  const maxStep = 18;
+
+  if (clientY < rect.top + edge) {
+    const intensity = 1 - Math.max(0, clientY - rect.top) / edge;
+    scrollEl.scrollTop -= maxStep * intensity;
+  } else if (clientY > rect.bottom - edge) {
+    const intensity = 1 - Math.max(0, rect.bottom - clientY) / edge;
+    scrollEl.scrollTop += maxStep * intensity;
+  }
+}
+
+function dragAutoScrollTick() {
+  if (!activeDrag) {
+    stopDragAutoScroll();
+    return;
+  }
+  applyDragEdgeScroll(activeDrag.lastClientY);
+  dragScrollRaf = requestAnimationFrame(dragAutoScrollTick);
+}
+
+function startDragAutoScroll() {
+  stopDragAutoScroll();
+  dragScrollRaf = requestAnimationFrame(dragAutoScrollTick);
+}
+
+function stopDragAutoScroll() {
+  if (dragScrollRaf !== null) {
+    cancelAnimationFrame(dragScrollRaf);
+    dragScrollRaf = null;
+  }
 }
 
 function setRoadmapTab(tab) {
@@ -256,7 +313,9 @@ function cancelActiveDrag() {
 function onDragPointerMove(e) {
   if (!activeDrag || activeDrag.pointerId !== e.pointerId) return;
   e.preventDefault();
+  activeDrag.lastClientY = e.clientY;
   positionDragGhost(e.clientX, e.clientY);
+  applyDragEdgeScroll(e.clientY);
   clearSlotHovers();
   slotAtPoint(e.clientX, e.clientY)?.classList.add("album-slot--hover");
 }
@@ -268,6 +327,7 @@ function finishDragPointer(e) {
   const slotEl = slotAtPoint(e.clientX, e.clientY);
   clearSlotHovers();
   detachDragListeners();
+  stopDragAutoScroll();
   ghost.remove();
   sourceEl.classList.remove("album-tray__item--dragging");
   roadmapDialog?.classList.remove("is-dragging-sticker");
@@ -295,7 +355,7 @@ export function refreshRoadmapLabels() {
   if (roadmapTitleEl) roadmapTitleEl.textContent = t("roadmapTitle");
   if (roadmapSubtitleEl) roadmapSubtitleEl.textContent = t("roadmapSubtitle");
   if (roadmapCloseBtn) roadmapCloseBtn.textContent = t("roadmapClose");
-  if (roadmapStartBtn) roadmapStartBtn.textContent = t("roadmapStartChallenge");
+  syncRoadmapStartButton();
   if (roadmapRewardCloseBtn) roadmapRewardCloseBtn.textContent = t("roadmapClose");
   if (roadmapTabMap) roadmapTabMap.textContent = t("roadmapTabMap");
   if (roadmapTabAlbum) roadmapTabAlbum.textContent = t("roadmapTabAlbum");
@@ -305,9 +365,11 @@ export function refreshRoadmapLabels() {
 }
 
 export function refreshRoadmapProgressPill() {
-  if (!deps || !roadmapProgressPill) return;
+  if (!deps) return;
   const slug = deps.getCurrentUserSlug();
   const summary = getRoadmapSummary(slug);
+  syncRoadmapStartButton();
+  if (!roadmapProgressPill) return;
 
   roadmapProgressPill.hidden = false;
   roadmapProgressPill.textContent = `L${summary.current.level} · ${summary.progress}/${summary.target}`;
@@ -643,11 +705,13 @@ function createDraggablePending(pendingId, stickerId, weekId, slug) {
       offsetY: e.clientY - rect.top,
       pointerId: e.pointerId,
       sourceEl: wrap,
+      lastClientY: e.clientY,
     };
     positionDragGhost(e.clientX, e.clientY);
     wrap.classList.add("album-tray__item--dragging");
     roadmapDialog?.classList.add("is-dragging-sticker");
     attachDragListeners();
+    startDragAutoScroll();
   };
 
   wrap.addEventListener("pointerdown", beginDrag);
@@ -754,6 +818,7 @@ export function renderRoadmapDialog() {
   renderRoadmapMap();
   if (!roadmapPanelAlbum?.hidden) renderAlbumView();
   refreshRoadmapProgressPill();
+  syncRoadmapStartButton();
 }
 
 export function openRoadmapDialog() {
