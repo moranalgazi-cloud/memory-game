@@ -94,6 +94,7 @@ import {
   refreshOnlineLabels,
   quitOnlineGame,
   playOnlineAgain,
+  isRematchPeerLeft,
 } from "./online-ui.js";
 
 // Theme constants live up top: refreshChrome() runs during module init and
@@ -318,7 +319,7 @@ function refreshOnlineChrome() {
     onlineQuitBtn.classList.toggle("is-hidden", !playing);
   }
   if (onlinePlayAgainBtn) {
-    onlinePlayAgainBtn.classList.toggle("is-hidden", !ended);
+    onlinePlayAgainBtn.classList.toggle("is-hidden", !ended || isRematchPeerLeft());
   }
   if (onlineLeaveAfterWinBtn) {
     onlineLeaveAfterWinBtn.classList.toggle("is-hidden", !ended);

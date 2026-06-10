@@ -66,6 +66,8 @@ let onlineBusy = false;
 
 let exitingOnline = false;
 
+let rematchPeerLeft = false;
+
 /**
  * @param {OnlineUiDeps} d
  */
@@ -251,14 +253,20 @@ function setOnlineStatus(key) {
 }
 
 function resetRematchUi() {
+  rematchPeerLeft = false;
   if (onlineRematchStatus) {
     onlineRematchStatus.textContent = "";
     onlineRematchStatus.classList.add("is-hidden");
   }
   if (onlinePlayAgainBtn instanceof HTMLButtonElement) {
     onlinePlayAgainBtn.disabled = false;
+    onlinePlayAgainBtn.classList.remove("is-hidden");
     onlinePlayAgainBtn.textContent = deps?.t("onlinePlayAgain") ?? "Play again with friend";
   }
+}
+
+export function isRematchPeerLeft() {
+  return rematchPeerLeft;
 }
 
 /**
@@ -268,13 +276,14 @@ function refreshRematchUi(status) {
   if (!deps) return;
   const t = deps.t;
   if (status.peerLeft) {
+    rematchPeerLeft = true;
     if (onlineRematchStatus) {
       onlineRematchStatus.textContent = t("onlineRematchPeerLeft");
       onlineRematchStatus.classList.remove("is-hidden");
     }
     if (onlinePlayAgainBtn instanceof HTMLButtonElement) {
-      onlinePlayAgainBtn.disabled = false;
-      onlinePlayAgainBtn.textContent = t("onlinePlayAgain");
+      onlinePlayAgainBtn.disabled = true;
+      onlinePlayAgainBtn.classList.add("is-hidden");
     }
     return;
   }
