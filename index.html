@@ -40,17 +40,40 @@
   <body>
     <!-- Always outside #appRoot so Google/crawlers see it even when the app shell is hidden. -->
     <section id="publicMeta" class="public-meta">
-      <p id="appPurpose" class="app-purpose">
-        Memory games helps kids practice English, math, and fractions by matching pairs of
-        cards. Play solo on this device or challenge a friend online.
-      </p>
-      <footer class="site-footer">
-        <a
-          href="https://moranalgazi-cloud.github.io/memory-game/privacy.html"
-          id="privacyPolicyLink"
-          class="site-footer__link"
-        >Privacy policy</a>
-      </footer>
+      <div class="public-meta__panel">
+        <h1 id="publicAppTitle" class="public-meta__title">Memory games</h1>
+        <p id="appPurpose" class="app-purpose">
+          Memory games helps kids practice English, math, and fractions by matching pairs of
+          cards. Play solo on this device or challenge a friend online.
+        </p>
+
+        <h2 id="publicWhatTitle" class="public-meta__heading">What this app does</h2>
+        <ul class="public-meta__list">
+          <li id="publicWhat1">
+            Flip cards and find matching pairs to practice English, multiplication, addition,
+            subtraction, and fractions.
+          </li>
+          <li id="publicWhat2">Each player on this device keeps their own scores and records.</li>
+          <li id="publicWhat3">
+            Play solo on one phone or tablet, or challenge a friend online.
+          </li>
+        </ul>
+
+        <h2 id="publicGoogleTitle" class="public-meta__heading">Why sign in with Google</h2>
+        <p id="publicGooglePurpose" class="public-meta__text">
+          Google sign-in is optional. It saves your game progress to the cloud so you can continue
+          on another device. We only use your Google account to identify your player profile — we
+          do not read your email, contacts, or other Google data.
+        </p>
+
+        <p class="public-meta__privacy">
+          <a
+            href="privacy.html"
+            id="privacyPolicyLink"
+            class="public-meta__privacy-link"
+          >Privacy policy</a>
+        </p>
+      </div>
     </section>
 
     <div id="appRoot" class="app">

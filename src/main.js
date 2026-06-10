@@ -155,6 +155,13 @@ const emailRecordsBtn = document.querySelector("#emailRecords");
 const gameTitle = document.querySelector("#gameTitle");
 const gameTagline = document.querySelector("#gameTagline");
 const appPurposeEl = document.querySelector("#appPurpose");
+const publicAppTitleEl = document.querySelector("#publicAppTitle");
+const publicWhatTitleEl = document.querySelector("#publicWhatTitle");
+const publicWhat1El = document.querySelector("#publicWhat1");
+const publicWhat2El = document.querySelector("#publicWhat2");
+const publicWhat3El = document.querySelector("#publicWhat3");
+const publicGoogleTitleEl = document.querySelector("#publicGoogleTitle");
+const publicGooglePurposeEl = document.querySelector("#publicGooglePurpose");
 const labelGameMode = document.querySelector("#labelGameMode");
 const labelPairs = document.querySelector("#labelPairs");
 const labelEnglishLevel = document.querySelector("#labelEnglishLevel");
@@ -478,6 +485,13 @@ function refreshChrome() {
     else gameTitle.textContent = t("titleMath");
   }
   if (appPurposeEl) appPurposeEl.textContent = t("appPurpose");
+  if (publicAppTitleEl) publicAppTitleEl.textContent = t("publicAppTitle");
+  if (publicWhatTitleEl) publicWhatTitleEl.textContent = t("publicWhatTitle");
+  if (publicWhat1El) publicWhat1El.textContent = t("publicWhat1");
+  if (publicWhat2El) publicWhat2El.textContent = t("publicWhat2");
+  if (publicWhat3El) publicWhat3El.textContent = t("publicWhat3");
+  if (publicGoogleTitleEl) publicGoogleTitleEl.textContent = t("publicGoogleTitle");
+  if (publicGooglePurposeEl) publicGooglePurposeEl.textContent = t("publicGooglePurpose");
   if (gameTagline) {
     if (
       state &&

@@ -163,8 +163,75 @@ body {
   text-align: center;
 }
 
+.public-meta__panel {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: 1.1rem 1.15rem 1.2rem;
+  text-align: start;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 22px var(--shadow-soft);
+}
+
+.public-meta__title {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.75rem, 6vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+  background: linear-gradient(100deg, var(--accent-strong), var(--accent), var(--accent-alt));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.public-meta__heading {
+  margin: 1.15rem 0 0.45rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.public-meta__list {
+  margin: 0;
+  padding-inline-start: 1.2rem;
+  line-height: 1.5;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.public-meta__list li + li {
+  margin-top: 0.35rem;
+}
+
+.public-meta__text {
+  margin: 0;
+  line-height: 1.45;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .public-meta .app-purpose {
   margin-top: 0;
+  text-align: center;
+}
+
+.public-meta__privacy {
+  margin: 1.1rem 0 0;
+  text-align: center;
+}
+
+.public-meta__privacy-link {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--accent-alt);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.public-meta__privacy-link:hover {
+  color: var(--accent);
 }
 
 .site-footer {
@@ -1926,7 +1993,7 @@ select:focus-visible {
 }
 
 /* Public footer link sits under the modal backdrop; hide it while the picker is open. */
-body:has(#userDialog[open]) .public-meta .site-footer {
+body:has(#userDialog[open]) .public-meta .public-meta__privacy {
   visibility: hidden;
 }
 

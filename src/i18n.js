@@ -27,6 +27,15 @@ const messages = {
     taglineFractions: "Match each fraction to its pie picture.",
     appPurpose:
       "Memory games helps kids practice English, math, and fractions by matching pairs of cards. Play solo on this device or challenge a friend online.",
+    publicAppTitle: "Memory games",
+    publicWhatTitle: "What this app does",
+    publicWhat1:
+      "Flip cards and find matching pairs to practice English, multiplication, addition, subtraction, and fractions.",
+    publicWhat2: "Each player on this device keeps their own scores and records.",
+    publicWhat3: "Play solo on one phone or tablet, or challenge a friend online.",
+    publicGoogleTitle: "Why sign in with Google",
+    publicGooglePurpose:
+      "Google sign-in is optional. It saves your game progress to the cloud so you can continue on another device. We only use your Google account to identify your player profile — we do not read your email, contacts, or other Google data.",
     pairs: "Pairs",
     englishLevel: "English level",
     englishLevelEasy: "Easy — voice on all cards",
@@ -335,6 +344,15 @@ const messages = {
     taglineFractions: "התאימו כל שבר לתמונת העוגה שלו.",
     appPurpose:
       "משחקי הזיכרון עוזרים לילדים לתרגל אנגלית, חשבון ושברים בהתאמת זוגות קלפים. משחקים לבד במכשיר הזה או מאתגרים חבר ברשת.",
+    publicAppTitle: "משחקי הזיכרון",
+    publicWhatTitle: "מה האפליקציה עושה",
+    publicWhat1:
+      "הופכים קלפים ומוצאים זוגות תואמים כדי לתרגל אנגלית, כפל, חיבור, חיסור ושברים.",
+    publicWhat2: "לכל שחקן במכשיר יש שיאים ורשומות משלו.",
+    publicWhat3: "משחקים לבד בטלפון או בטאבלט, או מאתגרים חבר ברשת.",
+    publicGoogleTitle: "למה להתחבר עם Google",
+    publicGooglePurpose:
+      "התחברות עם Google היא אופציונלית. היא שומרת את ההתקדמות בענן כדי שתוכלו להמשיך במכשיר אחר. אנחנו משתמשים בחשבון Google רק כדי לזהות את פרופיל השחקן — לא קוראים אימייל, אנשי קשר או נתוני Google אחרים.",
     pairs: "זוגות",
     englishLevel: "רמת אנגלית",
     englishLevelEasy: "קל — קול בכל הכרטיסים",
