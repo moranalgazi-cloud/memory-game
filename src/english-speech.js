@@ -10,6 +10,9 @@
  * @property {SpeechLang} lang
  */
 
+/** @type {Promise<void>} */
+let speakChain = Promise.resolve();
+
 /**
  * @param {{ side?: string; lang?: string; word?: string; label?: string }} card
  * @param {"english1" | "english2"} gameMode
@@ -46,6 +49,7 @@ export function speakEnglishCard(card, gameMode, speechMode) {
 export function cancelEnglishSpeech() {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
+  speakChain = Promise.resolve();
 }
 
 /** @param {SpeechSynthesisVoice[]} voices @param {SpeechLang} lang */
@@ -54,6 +58,7 @@ function pickVoice(voices, lang) {
     return (
       voices.find((v) => v.lang === "he-IL") ??
       voices.find((v) => v.lang.startsWith("he")) ??
+      voices.find((v) => /hebrew|עברית/i.test(v.name)) ??
       null
     );
   }
@@ -85,6 +90,53 @@ function withVoices(run) {
 }
 
 /**
+ * @param {string} phrase
+ * @param {SpeechLang} lang
+ * @returns {Promise<void>}
+ */
+function speakMemoryWordNow(phrase, lang) {
+  return new Promise((resolve) => {
+    withVoices((voices) => {
+      const synth = window.speechSynthesis;
+      if (synth.paused) synth.resume();
+
+      const u = new SpeechSynthesisUtterance(phrase);
+      u.lang = lang === "he" ? "he-IL" : "en-US";
+      const voice = pickVoice(voices, lang);
+      if (voice) u.voice = voice;
+      u.rate = lang === "he" ? 0.85 : 0.9;
+
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        resolve();
+      };
+      u.onend = finish;
+      u.onerror = finish;
+      setTimeout(finish, Math.max(2500, phrase.length * 100));
+
+      synth.speak(u);
+
+      if (lang === "he" && !voice) {
+        window.setTimeout(() => {
+          const retryVoices = synth.getVoices();
+          const retryVoice = pickVoice(retryVoices, "he");
+          if (!retryVoice || done) return;
+          const retry = new SpeechSynthesisUtterance(phrase);
+          retry.lang = "he-IL";
+          retry.voice = retryVoice;
+          retry.rate = 0.85;
+          retry.onend = finish;
+          retry.onerror = finish;
+          synth.speak(retry);
+        }, 250);
+      }
+    });
+  });
+}
+
+/**
  * @param {string} text
  * @param {SpeechLang} [lang]
  */
@@ -92,17 +144,12 @@ export function speakMemoryWord(text, lang = "en") {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   const phrase = String(text ?? "").trim();
   if (!phrase) return;
-  const synth = window.speechSynthesis;
   try {
-    withVoices((voices) => {
-      synth.cancel();
-      const u = new SpeechSynthesisUtterance(phrase);
-      u.lang = lang === "he" ? "he-IL" : "en-US";
-      const voice = pickVoice(voices, lang);
-      if (voice) u.voice = voice;
-      u.rate = 0.9;
-      synth.speak(u);
-    });
+    speakChain = speakChain
+      .then(() => speakMemoryWordNow(phrase, lang))
+      .catch((e) => {
+        console.warn("[english-speech] speak failed:", e);
+      });
   } catch (e) {
     console.warn("[english-speech] speak failed:", e);
   }
@@ -115,4 +162,7 @@ export function speakEnglishMemoryWord(text) {
 
 if (typeof window !== "undefined" && window.speechSynthesis) {
   window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener("voiceschanged", () => {
+    window.speechSynthesis.getVoices();
+  });
 }

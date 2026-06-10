@@ -727,7 +727,6 @@ function applyOnlineSnapshot(snap, cards) {
   const inPlace = boardMatchesCards(cards);
   if (!inPlace) lastOnlineFlippedIds = [];
   state = applySnapshotToState(snap, /** @type {any[]} */ (cards), getOnlineGameConfig());
-  cancelEnglishSpeech();
   hideWinActions();
   if (winMessage) winMessage.textContent = "";
   if (state && gameTagline) {
@@ -1781,7 +1780,6 @@ function onCardClick(id) {
     if (!session || session.role !== state.turn) return;
     armCelebrationAudio();
     onlineLocalFlip(id);
-    speakEnglishCardIfNeeded(id);
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
