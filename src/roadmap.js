@@ -13,6 +13,8 @@ import {
 } from "./roadmap-albums.js";
 import { DEFAULT_AVATAR_ID } from "./roadmap-avatars.js";
 import { ROADMAP_MAX_LEVELS } from "./roadmap-map-spots.js";
+import { english1LabelKey } from "./english2-source.js";
+import { getLocale } from "./i18n.js";
 
 /**
  * @typedef {{ type: "wins"; mode?: GameMode | null; level?: GameLevel | null; count: number }} WinsGoal
@@ -94,6 +96,12 @@ const MODE_LABEL_KEYS = {
   english2: "modeEnglish2",
   fractions: "modeFractions",
 };
+
+/** @param {GameMode} mode */
+function modeLabelKey(mode) {
+  if (mode === "english1") return english1LabelKey(getLocale(), "mode");
+  return MODE_LABEL_KEYS[mode];
+}
 
 /** @type {Record<GameLevel, string>} */
 const DIFFICULTY_LABEL_KEYS = {
@@ -278,10 +286,10 @@ export function formatChallengeTitle(challenge, t) {
     return t("roadmapChallengeTestTitle", { level: String(challenge.level) });
   }
   if (goal.type === "fastWin") {
-    const mode = goal.mode ? t(MODE_LABEL_KEYS[goal.mode]) : t("roadmapChallengeAnyMode");
+    const mode = goal.mode ? t(modeLabelKey(goal.mode)) : t("roadmapChallengeAnyMode");
     return t("roadmapChallengeFastTitle", { level: String(challenge.level), mode });
   }
-  const mode = goal.mode ? t(MODE_LABEL_KEYS[goal.mode]) : "";
+  const mode = goal.mode ? t(modeLabelKey(goal.mode)) : "";
   return t("roadmapChallengeWinsTitle", { level: String(challenge.level), mode });
 }
 
@@ -299,7 +307,7 @@ export function formatChallengeDesc(challenge, t) {
       mode: modeLabel,
     });
   }
-  const mode = goal.mode ? t(MODE_LABEL_KEYS[goal.mode]) : t("roadmapChallengeAnyMode");
+  const mode = goal.mode ? t(modeLabelKey(goal.mode)) : t("roadmapChallengeAnyMode");
   const difficulty = goal.level ? t(DIFFICULTY_LABEL_KEYS[goal.level]) : "";
   if (goal.type === "fastWin") {
     return t("roadmapChallengeFastDesc", {
@@ -514,6 +522,26 @@ export function saveRoadmap(slug, state) {
   } catch (e) {
     console.warn("[roadmap] Failed to save:", e);
   }
+  try {
+    import("./cloud-sync.js").then(({ scheduleCloudSyncForSlug }) => {
+      scheduleCloudSyncForSlug(slug);
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Lightweight summary for cloud analytics (not full sticker state).
+ * @param {string | null | undefined} slug
+ */
+export function getRoadmapCloudSummary(slug) {
+  const state = loadRoadmap(slug);
+  return {
+    currentLevel: state.currentLevel,
+    completedCount: Array.isArray(state.completedLevels) ? state.completedLevels.length : 0,
+    albumWeek: getAlbumPeriodId(),
+  };
 }
 
 /**

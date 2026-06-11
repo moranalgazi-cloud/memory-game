@@ -129,6 +129,9 @@
                 <select id="locale" aria-label="Language">
                   <option value="en">English</option>
                   <option value="he">עברית</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                  <option value="es">Español</option>
                 </select>
               </label>
               <button type="button" id="themeToggle" class="btn btn--ghost settings-menu__btn">
@@ -191,6 +194,15 @@
               <option value="easy" selected>Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
+            </select>
+          </label>
+          <label id="english2SourceField" class="field is-hidden">
+            <span id="labelEnglish2Source" class="field__label">Translate from</span>
+            <select id="english2Source" aria-label="English 2 source language">
+              <option value="he">Hebrew</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="es">Spanish</option>
             </select>
           </label>
           <label id="sumsLevelField" class="field is-hidden">
@@ -900,6 +912,9 @@
             <select id="userDialogLocale" aria-label="Language">
               <option value="en">English</option>
               <option value="he">עברית</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
             </select>
           </label>
         </div>
@@ -932,6 +947,17 @@
             <span id="labelNewUser" class="field__label">New player name</span>
             <input id="newUserName" type="text" maxlength="32" autocomplete="nickname" />
           </label>
+          <label class="field user-dialog__age">
+            <span id="labelNewUserAge" class="field__label">Age</span>
+            <select id="newUserAge" required>
+              <option value="" disabled selected hidden>Choose age range</option>
+              <option value="5_6">5–6</option>
+              <option value="7_8">7–8</option>
+              <option value="9_10">9–10</option>
+              <option value="10_11">10–11</option>
+              <option value="12_plus">12+</option>
+            </select>
+          </label>
           <p id="userAddError" class="user-add-error is-hidden" role="alert"></p>
           <div class="user-dialog__actions">
             <button type="button" id="addUserBtn" class="btn btn--ghost">Add player</button>
@@ -947,6 +973,28 @@
             target="_blank"
             rel="noopener noreferrer"
           >Privacy policy</a>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="agePromptDialog" class="user-dialog">
+      <div class="user-dialog__inner">
+        <h2 id="agePromptTitle" class="user-dialog__title">How old are you?</h2>
+        <p id="agePromptLead" class="user-dialog__lead"></p>
+        <label class="field user-dialog__age">
+          <span id="labelAgePrompt" class="field__label">Age range</span>
+          <select id="agePromptSelect" required>
+            <option value="" disabled selected hidden>Choose age range</option>
+            <option value="5_6">5–6</option>
+            <option value="7_8">7–8</option>
+            <option value="9_10">9–10</option>
+            <option value="10_11">10–11</option>
+            <option value="12_plus">12+</option>
+          </select>
+        </label>
+        <p id="agePromptError" class="user-add-error is-hidden" role="alert"></p>
+        <div class="user-dialog__footer">
+          <button type="button" id="agePromptSave" class="btn btn--primary">Save</button>
         </div>
       </div>
     </dialog>

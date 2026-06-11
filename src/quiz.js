@@ -92,16 +92,19 @@ export function extractQuizFacts(mode, cards) {
         });
       }
     } else if (mode === "english2") {
-      const he = group.find((c) => /** @type {{ side?: string }} */ (c).side === "he");
       const en = group.find((c) => /** @type {{ side?: string }} */ (c).side === "en");
-      const hebrew = he?.label ?? he?.word;
+      const src = group.find((c) => {
+        const side = /** @type {{ side?: string }} */ (c).side;
+        return side === "he" || side === "fr" || side === "de" || side === "es";
+      });
+      const sourceText = src?.label ?? src?.word;
       const english = en?.label ?? en?.word;
-      if (hebrew && english) {
+      if (sourceText && english) {
         facts.push({
           key,
-          prompt: String(hebrew),
+          prompt: String(sourceText),
           answer: String(english),
-          hebrew: String(hebrew),
+          hebrew: String(sourceText),
           english: String(english),
         });
       }

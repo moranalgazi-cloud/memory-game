@@ -1,0 +1,3 @@
+# Edge Function: admin-stats uses a custom ADMIN_STATS_SECRET, not a Supabase JWT.
+[functions.admin-stats]
+verify_jwt = false

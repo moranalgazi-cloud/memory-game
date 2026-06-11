@@ -15,7 +15,9 @@ import {
   clearRoomFromLocation,
 } from "./multiplayer/room-code.js";
 import { celebrateWin } from "./celebrate.js";
-import { MODE_LABEL_KEYS } from "./mode-icons.js";
+import { getLocale } from "./i18n.js";
+import { isEnglish2ModeAvailable } from "./english2-source.js";
+import { getModeLabelKey } from "./mode-icons.js";
 
 let onlineWinShown = false;
 
@@ -86,8 +88,11 @@ export function initOnlinePlay(d) {
 
   onlineGameModePicker?.addEventListener("click", (e) => {
     const btn = e.target instanceof Element ? e.target.closest(".game-mode-btn") : null;
-    if (!btn || btn.classList.contains("is-selected") || btn.disabled) return;
+    if (!btn || btn.classList.contains("is-selected") || btn.disabled || btn.classList.contains("is-hidden")) {
+      return;
+    }
     const mode = btn.getAttribute("data-mode");
+    if (mode === "english2" && !isEnglish2ModeAvailable(getLocale())) return;
     if (
       mode === "english1" ||
       mode === "english2" ||
@@ -249,7 +254,7 @@ export function refreshOnlineLabels() {
     for (const opt of onlineGameMode.options) {
       switch (opt.value) {
         case "english1":
-          opt.textContent = t("modeEnglish1");
+          opt.textContent = t(getModeLabelKey("english1", getLocale()));
           break;
         case "english2":
           opt.textContent = t("modeEnglish2");
@@ -298,9 +303,24 @@ function setOnlineLevel(level) {
 function refreshOnlineGameModePicker() {
   if (!onlineGameModePicker || !deps) return;
   const t = deps.t;
+  const showEng2 = isEnglish2ModeAvailable(getLocale());
   for (const btn of onlineGameModePicker.querySelectorAll(".game-mode-btn")) {
+    if (btn.getAttribute("data-mode") === "english2") {
+      btn.classList.toggle("is-hidden", !showEng2);
+      if (!showEng2 && btn.classList.contains("is-selected")) setOnlineGameMode("english1");
+    }
+  }
+  if (onlineGameMode instanceof HTMLSelectElement) {
+    for (const opt of onlineGameMode.querySelectorAll('option[value="english2"]')) {
+      opt.hidden = !showEng2;
+      opt.disabled = !showEng2;
+    }
+    if (!showEng2 && onlineGameMode.value === "english2") onlineGameMode.value = "english1";
+  }
+  for (const btn of onlineGameModePicker.querySelectorAll(".game-mode-btn:not(.is-hidden)")) {
     const mode = btn.getAttribute("data-mode");
-    const labelKey = mode && MODE_LABEL_KEYS[/** @type {import("./records.js").GameMode} */ (mode)];
+    const labelKey =
+      mode && getModeLabelKey(/** @type {import("./records.js").GameMode} */ (mode), getLocale());
     const label = labelKey ? t(labelKey) : "";
     const text = btn.querySelector(".game-mode-btn__label");
     if (text) text.textContent = label;

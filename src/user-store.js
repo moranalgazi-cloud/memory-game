@@ -1,4 +1,5 @@
 import { ADMIN_USERNAMES } from "./user-config.js";
+import { isValidAgeRange } from "./age-range.js";
 import { isCloudSyncEnabled, syncAllLocalUsersToCloud } from "./cloud-sync.js";
 
 let warnedCloudSyncDisabled = false;
@@ -57,7 +58,8 @@ function allocateRemoteId() {
 }
 
 /**
- * @typedef {{ slug: string; name: string; createdAt: number; lastPlayedAt?: number; remoteId?: string; authOwner?: string }} AppUser
+ * @typedef {import("./age-range.js").AgeRange} AgeRange
+ * @typedef {{ slug: string; name: string; createdAt: number; lastPlayedAt?: number; remoteId?: string; authOwner?: string; ageRange?: AgeRange }} AppUser
  */
 
 /** @returns {AppUser[]} */
@@ -187,11 +189,14 @@ export function ensureUserRemoteIds() {
 
 /**
  * @param {string} displayName
- * @returns {{ ok: true, user: AppUser } | { ok: false, reason: "length" | "duplicate" | "storage" }}
+ * @param {{ ageRange?: AgeRange }} [opts]
+ * @returns {{ ok: true, user: AppUser } | { ok: false, reason: "length" | "duplicate" | "storage" | "age" }}
  */
-export function addUser(displayName) {
+export function addUser(displayName, opts = {}) {
   const name = displayName.trim();
   if (name.length < 2 || name.length > 32) return { ok: false, reason: "length" };
+  const ageRange = opts.ageRange;
+  if (!ageRange || !isValidAgeRange(ageRange)) return { ok: false, reason: "age" };
   if (readUsers().some((u) => u.name.trim().toLowerCase() === name.toLowerCase())) {
     return { ok: false, reason: "duplicate" };
   }
@@ -202,6 +207,7 @@ export function addUser(displayName) {
     name,
     createdAt: Date.now(),
     remoteId: allocateRemoteId(),
+    ageRange,
   };
   const users = readUsers();
   users.push(user);
@@ -270,6 +276,27 @@ export function getCurrentUser() {
   const slug = getCurrentUserSlug();
   if (!slug) return null;
   return readUsers().find((u) => u.slug === slug) ?? null;
+}
+
+/** @returns {AppUser[]} */
+export function listUsersMissingAgeRange() {
+  return readUsers().filter((u) => !isValidAgeRange(u.ageRange));
+}
+
+/**
+ * @param {string} slug
+ * @param {AgeRange} ageRange
+ * @returns {boolean}
+ */
+export function setUserAgeRange(slug, ageRange) {
+  if (!isValidAgeRange(ageRange)) return false;
+  const users = readUsers();
+  const u = users.find((x) => x.slug === slug);
+  if (!u) return false;
+  u.ageRange = ageRange;
+  if (!writeUsers(users)) return false;
+  scheduleSyncAllUsersToCloudIfEnabled();
+  return true;
 }
 
 /** @param {AppUser | null} user */

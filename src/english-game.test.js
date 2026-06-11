@@ -69,7 +69,7 @@ describe("buildEnglishDeck", () => {
   });
 
   it("english2: pairs Hebrew text with English text (no icon)", () => {
-    const deck = buildEnglishDeck([entry], "english2");
+    const deck = buildEnglishDeck([entry], "english2", "he");
     expect(deck).toHaveLength(2);
     const he = deck.find((c) => c.side === "he");
     const en = deck.find((c) => c.side === "en");
@@ -79,6 +79,13 @@ describe("buildEnglishDeck", () => {
     expect(en?.label).toBe("Ball");
     expect(isPairMatch(he ?? null, en ?? null)).toBe(true);
     expect(isPairMatch(he ?? null, he ?? null)).toBe(false);
+  });
+
+  it("english2: pairs French text with English when source is fr", () => {
+    const frEntry = { key: "ball", word: "Ball", wordHe: "כדור", wordFr: "balle", symbol: "⚽" };
+    const deck = buildEnglishDeck([frEntry], "english2", "fr");
+    const fr = deck.find((c) => c.side === "fr");
+    expect(fr?.label).toBe("balle");
   });
 });
 

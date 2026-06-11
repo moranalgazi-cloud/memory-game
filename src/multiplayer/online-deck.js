@@ -45,7 +45,9 @@ export function inferOnlineModeFromCards(cards) {
   const sides = new Set(
     cards.map((c) => /** @type {{ side?: string }} */ (c).side).filter(Boolean),
   );
-  if (sides.has("he") || sides.has("en")) return "english2";
+  if (sides.has("he") || sides.has("fr") || sides.has("de") || sides.has("es") || sides.has("en")) {
+    return "english2";
+  }
   if (sides.has("picture")) return "english1";
   if (sides.has("fraction") || sides.has("diagram")) return "fractions";
   if (sides.has("expr")) {

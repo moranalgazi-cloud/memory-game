@@ -1,6 +1,13 @@
 import gameBoardImg from "../docs/images/game-board.svg?url";
 import gameModesImg from "../docs/images/game-modes.svg?url";
 import onlinePlayImg from "../docs/images/online-play.svg?url";
+import {
+  getEnglish2SourceLang,
+  english2SourceLangName,
+  isEnglish2ModeAvailable,
+  english1LabelKey,
+} from "./english2-source.js";
+import { getLocale } from "./i18n.js";
 import { getModeIconUrl } from "./mode-icons.js";
 
 /**
@@ -110,7 +117,7 @@ function appendModesTable(container, rows) {
     const tr = document.createElement("tr");
     const tdGame = document.createElement("td");
     tdGame.className = "about-dialog__mode-cell";
-    const iconUrl = getModeIconUrl(mode);
+    const iconUrl = getModeIconUrl(mode, { english2SourceLang: getEnglish2SourceLang() });
     if (iconUrl) {
       const img = document.createElement("img");
       img.className = "about-dialog__mode-icon";
@@ -155,13 +162,23 @@ function renderAboutBody() {
   appendAboutImage(aboutBody, gameBoardImg, t("aboutImgBoardAlt"));
 
   appendHeading(aboutBody, t("aboutModesTitle"));
-  appendModesTable(aboutBody, [
-    ["english1", t("modeEnglish1"), t("aboutModeEnglish1")],
-    ["english2", t("modeEnglish2"), t("aboutModeEnglish2")],
+  /** @type {[string, string, string][]} */
+  const aboutModes = [
+    ["english1", t(english1LabelKey(getLocale(), "mode")), t("aboutModeEnglish1")],
     ["sums", t("modeSums"), t("aboutModeSums")],
     ["math", t("modeMath"), t("aboutModeMath")],
     ["fractions", t("modeFractions"), t("aboutModeFractions")],
-  ]);
+  ];
+  if (isEnglish2ModeAvailable(getLocale())) {
+    aboutModes.splice(1, 0, [
+      "english2",
+      t("modeEnglish2"),
+      t("aboutModeEnglish2", {
+        sourceLangName: english2SourceLangName(getEnglish2SourceLang(), t),
+      }),
+    ]);
+  }
+  appendModesTable(aboutBody, aboutModes);
   appendAboutImage(aboutBody, gameModesImg, t("aboutImgModesAlt"));
   appendParagraph(aboutBody, t("aboutEnglishNote"));
 

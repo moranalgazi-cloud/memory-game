@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
+import { isValidAgeRange } from "./age-range.js";
 import { listUsers, ensureUserRemoteIds, reassignRemoteId, stampAuthOwner } from "./user-store.js";
 import { loadRecordsForUser } from "./records.js";
+import { getRoadmapCloudSummary } from "./roadmap.js";
 import { ensureAuthReady, getAuthUserId } from "./auth.js";
 
 const DEVICE_KEY = "memory-app-device-id-v1";
@@ -153,6 +155,9 @@ export async function syncUserBySlug(slug) {
   const stats = loadRecordsForUser(slug);
   const lastPlayedAt =
     typeof user.lastPlayedAt === "number" && Number.isFinite(user.lastPlayedAt) ? user.lastPlayedAt : null;
+  const roadmap = getRoadmapCloudSummary(slug);
+  const createdAtMs =
+    typeof user.createdAt === "number" && Number.isFinite(user.createdAt) ? user.createdAt : Date.now();
 
   /** @type {Record<string, unknown>} */
   const row = {
@@ -163,7 +168,12 @@ export async function syncUserBySlug(slug) {
     stats,
     last_played_at: lastPlayedAt,
     updated_at: new Date().toISOString(),
+    created_at: new Date(createdAtMs).toISOString(),
+    roadmap,
   };
+  if (isValidAgeRange(user.ageRange)) {
+    row.age_range = user.ageRange;
+  }
 
   let { error } = await c.from("memory_players").upsert(row, { onConflict: "id" });
 

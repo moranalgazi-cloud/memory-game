@@ -3,7 +3,7 @@ import "./adventure.css";
 import "./screens.css";
 import "./tutorial.css";
 import { applyAppBranding } from "./branding.js";
-import { applyModeIcons, MODE_LABEL_KEYS } from "./mode-icons.js";
+import { applyModeIcons, getModeLabelKey } from "./mode-icons.js";
 import { applyNavIcons } from "./nav-icons.js";
 import {
   pickFacts,
@@ -34,6 +34,16 @@ import {
   uniqueSumResultCount,
 } from "./sums-game.js";
 import { initLocale, setLocale, getLocale, t, setPageTitleForMode } from "./i18n.js";
+import {
+  getEnglish2SourceLang,
+  setEnglish2SourceLang,
+  english2SourceLangName,
+  english2SourceIsRtl,
+  defaultEnglish2SourceForLocale,
+  initEnglish2SourceFromLocale,
+  isEnglish2ModeAvailable,
+  english1LabelKey,
+} from "./english2-source.js";
 import {
   initDisclaimerUi,
   openDisclaimerDialog,
@@ -72,11 +82,14 @@ import {
   formatScorePercent,
 } from "./records.js";
 import { buildQuizFromGame, scorePercent } from "./quiz.js";
+import { isValidAgeRange } from "./age-range.js";
 import {
   listUsers,
   addUser,
   removeUser,
   setCurrentUserSlug,
+  setUserAgeRange,
+  listUsersMissingAgeRange,
   getCurrentUser,
   getCurrentUserSlug,
   isAdminUser,
@@ -160,6 +173,9 @@ const mathLevelSelect = document.querySelector("#mathLevel");
 const fractionLevelSelect = document.querySelector("#fractionLevel");
 const pairsField = document.querySelector("#pairsField");
 const englishLevelField = document.querySelector("#englishLevelField");
+const english2SourceField = document.querySelector("#english2SourceField");
+const english2SourceSelect = document.querySelector("#english2Source");
+const labelEnglish2Source = document.querySelector("#labelEnglish2Source");
 const sumsLevelField = document.querySelector("#sumsLevelField");
 const mathLevelField = document.querySelector("#mathLevelField");
 const fractionLevelField = document.querySelector("#fractionLevelField");
@@ -171,6 +187,11 @@ const tablesField = document.querySelector("#tablesField");
 const localeSelect = document.querySelector("#locale");
 const userDialogLocale = document.querySelector("#userDialogLocale");
 const labelUserDialogLanguage = document.querySelector("#labelUserDialogLanguage");
+const newUserAgeSelect = document.querySelector("#newUserAge");
+const agePromptDialog = document.querySelector("#agePromptDialog");
+const agePromptSelect = document.querySelector("#agePromptSelect");
+const agePromptSave = document.querySelector("#agePromptSave");
+const agePromptError = document.querySelector("#agePromptError");
 const newGameBtn = document.querySelector("#newGame");
 const restartDeckBtn = document.querySelector("#restartDeck");
 const winNewGameBtn = document.querySelector("#winNewGame");
@@ -316,12 +337,30 @@ function clearQuizAdvance() {
 
 /** @returns {import("./records.js").GameMode} */
 function getSelectedGameModeFromPicker() {
-  const selected = gameModePicker?.querySelector(".game-mode-btn.is-selected");
+  const selected = gameModePicker?.querySelector(
+    ".game-mode-btn.is-selected:not(.is-hidden)",
+  );
   const v = selected?.getAttribute("data-mode");
+  if (v === "english2" && !isEnglish2ModeAvailable(getLocale())) return "english1";
   if (v === "english1" || v === "english2" || v === "fractions" || v === "sums" || v === "math") {
     return v;
   }
   return "english1";
+}
+
+function syncEnglish2ModeVisibility() {
+  const show = isEnglish2ModeAvailable(getLocale());
+  for (const el of document.querySelectorAll('[data-mode="english2"]')) {
+    el.classList.toggle("is-hidden", !show);
+  }
+  for (const opt of document.querySelectorAll('option[value="english2"]')) {
+    opt.hidden = !show;
+    opt.disabled = !show;
+  }
+  if (!show) {
+    const wasEng2 = gameModePicker?.querySelector('.game-mode-btn[data-mode="english2"].is-selected');
+    if (wasEng2) setGameMode("english1");
+  }
 }
 
 /** @param {import("./records.js").GameMode} mode */
@@ -336,10 +375,12 @@ function setGameMode(mode) {
 
 function refreshGameModePicker() {
   if (!gameModePicker) return;
+  syncEnglish2ModeVisibility();
   gameModePicker.setAttribute("aria-label", t("ariaGameMode"));
-  for (const btn of gameModePicker.querySelectorAll(".game-mode-btn")) {
+  for (const btn of gameModePicker.querySelectorAll(".game-mode-btn:not(.is-hidden)")) {
     const mode = btn.getAttribute("data-mode");
-    const labelKey = mode && MODE_LABEL_KEYS[/** @type {import("./records.js").GameMode} */ (mode)];
+    const labelKey =
+      mode && getModeLabelKey(/** @type {import("./records.js").GameMode} */ (mode), getLocale());
     const label = labelKey ? t(labelKey) : "";
     const text = btn.querySelector(".game-mode-btn__label");
     if (text) text.textContent = label;
@@ -618,15 +659,25 @@ function applyRoadmapChallengePreset(preset) {
   startGame("options");
 }
 
+/** @returns {Record<string, string>} */
+function english2TaglineVars(extra = {}) {
+  const sourceLang = getEnglish2SourceLang();
+  return {
+    sourceLangName: english2SourceLangName(sourceLang, t),
+    ...extra,
+  };
+}
+
 function refreshChrome() {
   applyAppBranding(t);
+  syncEnglish2ModeVisibility();
   applyModeIcons();
   applyNavIcons();
   refreshGameModePicker();
   const mode = getMode();
   setPageTitleForMode(mode);
   if (gameTitle) {
-    if (mode === "english1") gameTitle.textContent = t("titleEnglish1");
+    if (mode === "english1") gameTitle.textContent = t(english1LabelKey(getLocale(), "title"));
     else if (mode === "english2") gameTitle.textContent = t("titleEnglish2");
     else if (mode === "fractions") gameTitle.textContent = t("titleFractions");
     else if (mode === "sums") gameTitle.textContent = t("titleSums");
@@ -647,11 +698,14 @@ function refreshChrome() {
       state.englishTopicId
     ) {
       const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
-      gameTagline.textContent = t(tagKey, {
-        topic: t(englishTopicMessageKey(state.englishTopicId)),
-      });
+      gameTagline.textContent = t(
+        tagKey,
+        state.mode === "english2"
+          ? english2TaglineVars({ topic: t(englishTopicMessageKey(state.englishTopicId)) })
+          : { topic: t(englishTopicMessageKey(state.englishTopicId)) },
+      );
     } else if (mode === "english1") gameTagline.textContent = t("taglineEnglish1Generic");
-    else if (mode === "english2") gameTagline.textContent = t("taglineEnglish2Generic");
+    else if (mode === "english2") gameTagline.textContent = t("taglineEnglish2Generic", english2TaglineVars());
     else if (mode === "fractions") gameTagline.textContent = t("taglineFractions");
     else if (mode === "sums") gameTagline.textContent = t("taglineSums");
     else gameTagline.textContent = t("taglineMath");
@@ -739,6 +793,23 @@ function refreshChrome() {
   if (addUserBtn) addUserBtn.textContent = t("addUser");
   if (userDialogContinue) userDialogContinue.textContent = t("userContinue");
   if (userDialogPrivacyLink) userDialogPrivacyLink.textContent = t("privacyPolicyLink");
+  const labelNewUserAge = document.querySelector("#labelNewUserAge");
+  const agePromptTitle = document.querySelector("#agePromptTitle");
+  const agePromptLead = document.querySelector("#agePromptLead");
+  const labelAgePrompt = document.querySelector("#labelAgePrompt");
+  if (labelNewUserAge) labelNewUserAge.textContent = t("userAgeLabel");
+  for (const sel of [newUserAgeSelect, agePromptSelect]) {
+    if (!(sel instanceof HTMLSelectElement)) continue;
+    for (const opt of sel.querySelectorAll("option[value]")) {
+      const v = opt.getAttribute("value");
+      if (v && v.includes("_")) opt.textContent = t(`ageRange_${v}`);
+      else if (!v) opt.textContent = t("ageRangeChoose");
+    }
+  }
+  if (agePromptTitle) agePromptTitle.textContent = t("agePromptTitle");
+  if (agePromptLead) agePromptLead.textContent = t("agePromptLead");
+  if (labelAgePrompt) labelAgePrompt.textContent = t("userAgeLabel");
+  if (agePromptSave) agePromptSave.textContent = t("agePromptSave");
   if (privacyPolicyLink) privacyPolicyLink.textContent = t("privacyPolicyLink");
   if (adt) adt.textContent = t("adminDialogTitle");
   if (adh) adh.textContent = t("adminDialogHint");
@@ -803,6 +874,18 @@ function refreshChrome() {
     );
   }
   if (englishLevelField) englishLevelField.classList.toggle("is-hidden", !isEnglishMode(mode));
+  if (english2SourceField) english2SourceField.classList.toggle("is-hidden", mode !== "english2");
+  if (labelEnglish2Source) labelEnglish2Source.textContent = t("english2SourceLabel");
+  if (english2SourceSelect) {
+    english2SourceSelect.value = getEnglish2SourceLang();
+    english2SourceSelect.setAttribute("aria-label", t("ariaEnglish2Source"));
+    for (const opt of english2SourceSelect.querySelectorAll("option")) {
+      const v = opt.getAttribute("value");
+      if (v === "he" || v === "fr" || v === "de" || v === "es") {
+        opt.textContent = t(`langName_${v}`);
+      }
+    }
+  }
   if (sumsLevelField) sumsLevelField.classList.toggle("is-hidden", mode !== "sums");
   if (mathLevelField) mathLevelField.classList.toggle("is-hidden", mode !== "math");
   if (fractionLevelField) fractionLevelField.classList.toggle("is-hidden", mode !== "fractions");
@@ -890,9 +973,12 @@ function applyOnlineSnapshot(snap, cards) {
     setPageTitleForMode(state.mode);
     if (isEnglishMode(state.mode) && state.englishTopicId) {
       const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
-      gameTagline.textContent = t(tagKey, {
-        topic: t(englishTopicMessageKey(state.englishTopicId)),
-      });
+      gameTagline.textContent = t(
+        tagKey,
+        state.mode === "english2"
+          ? english2TaglineVars({ topic: t(englishTopicMessageKey(state.englishTopicId)) })
+          : { topic: t(englishTopicMessageKey(state.englishTopicId)) },
+      );
     } else if (state.mode === "fractions") {
       gameTagline.textContent = t("taglineFractions");
     } else if (state.mode === "sums") {
@@ -935,9 +1021,12 @@ function refreshOnlineTagline() {
   if (!state?.online || !gameTagline) return;
   if (isEnglishMode(state.mode) && state.englishTopicId) {
     const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
-    gameTagline.textContent = t(tagKey, {
-      topic: t(englishTopicMessageKey(state.englishTopicId)),
-    });
+    gameTagline.textContent = t(
+      tagKey,
+      state.mode === "english2"
+        ? english2TaglineVars({ topic: t(englishTopicMessageKey(state.englishTopicId)) })
+        : { topic: t(englishTopicMessageKey(state.englishTopicId)) },
+    );
   } else if (state.mode === "fractions") {
     gameTagline.textContent = t("taglineFractions");
   } else if (state.mode === "sums") {
@@ -1007,8 +1096,10 @@ function renderQuizPrompt(q) {
     return;
   }
   if (quizSession?.mode === "english2") {
-    quizPrompt.classList.add("quiz-prompt--hebrew");
-    quizPrompt.textContent = `${t("quizEnglishFor")} ${q.prompt}`;
+    if (english2SourceIsRtl(getEnglish2SourceLang())) {
+      quizPrompt.classList.add("quiz-prompt--hebrew");
+    }
+    quizPrompt.textContent = `${t("quizEnglishFor", english2TaglineVars())} ${q.prompt}`;
     return;
   }
   if (quizSession?.mode === "english1") {
@@ -1057,7 +1148,11 @@ function renderQuizQuestion() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "quiz-choice";
-    if (quizSession?.mode === "english2") btn.classList.add("quiz-choice--hebrew");
+    if (quizSession?.mode === "english2" && !english2SourceIsRtl(getEnglish2SourceLang())) {
+      btn.classList.add("quiz-choice--english");
+    } else if (quizSession?.mode === "english2") {
+      btn.classList.add("quiz-choice--hebrew");
+    }
     btn.textContent = label;
     btn.addEventListener("click", () => handleQuizAnswer(i));
     quizChoices.append(btn);
@@ -1187,7 +1282,7 @@ function refreshRecordsLabels() {
   if (testsHeading) testsHeading.textContent = t("recordsTestsHeading");
   if (hMath) hMath.textContent = t("recordsMath");
   if (hSums) hSums.textContent = t("recordsSums");
-  if (hEng1) hEng1.textContent = t("recordsEnglish1");
+  if (hEng1) hEng1.textContent = t(english1LabelKey(getLocale(), "records"));
   if (hEng2) hEng2.textContent = t("recordsEnglish2");
   if (hFrac) hFrac.textContent = t("recordsFractions");
   if (close) close.textContent = t("recordsClose");
@@ -1229,7 +1324,7 @@ function refreshRecordsLabels() {
   const testHeadings = [
     ["#recordsTestHeadingMath", "recordsMath"],
     ["#recordsTestHeadingSums", "recordsSums"],
-    ["#recordsTestHeadingEnglish1", "recordsEnglish1"],
+    ["#recordsTestHeadingEnglish1", english1LabelKey(getLocale(), "records")],
     ["#recordsTestHeadingEnglish2", "recordsEnglish2"],
     ["#recordsTestHeadingFractions", "recordsFractions"],
   ];
@@ -1332,7 +1427,7 @@ function buildRecordsEmailLabels(playerName) {
     modes: {
       math: t("recordsMath"),
       sums: t("recordsSums"),
-      english1: t("recordsEnglish1"),
+      english1: t(english1LabelKey(getLocale(), "records")),
       english2: t("recordsEnglish2"),
       fractions: t("recordsFractions"),
     },
@@ -1561,9 +1656,12 @@ function restartSameDeck() {
 
   if (isEnglishMode(src.mode) && src.englishTopicId && gameTagline) {
     const tagKey = src.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
-    gameTagline.textContent = t(tagKey, {
-      topic: t(englishTopicMessageKey(src.englishTopicId)),
-    });
+    gameTagline.textContent = t(
+      tagKey,
+      src.mode === "english2"
+        ? english2TaglineVars({ topic: t(englishTopicMessageKey(src.englishTopicId)) })
+        : { topic: t(englishTopicMessageKey(src.englishTopicId)) },
+    );
   }
 
   hideWinActions();
@@ -1655,10 +1753,11 @@ function startGame(source) {
       const pool = getEnglishPool(topicId);
       const maxPairs = pool.length;
       const count = Math.min(pairCount, maxPairs);
-      let entries = pickEnglishEntries(pool, count, mode, rng);
+      const sourceLang = mode === "english2" ? getEnglish2SourceLang() : "en";
+      let entries = pickEnglishEntries(pool, count, mode, rng, sourceLang);
       const sigKey = mode === "english1" ? "english1" : "english2";
       signature =
-        `${englishLevel}\0${topicId}\0` +
+        `${englishLevel}\0${topicId}\0${sourceLang}\0` +
         [...entries].map((e) => e.key).sort().join("\0");
       let tries = 0;
       while (
@@ -1667,9 +1766,9 @@ function startGame(source) {
         tries < 64 &&
         count < maxPairs
       ) {
-        entries = pickEnglishEntries(pool, count, mode, rng);
+        entries = pickEnglishEntries(pool, count, mode, rng, sourceLang);
         signature =
-          `${englishLevel}\0${topicId}\0` +
+          `${englishLevel}\0${topicId}\0${sourceLang}\0` +
           [...entries].map((e) => e.key).sort().join("\0");
         tries += 1;
       }
@@ -1680,13 +1779,16 @@ function startGame(source) {
         englishTopicId: topicId,
         englishSpeech: es,
       };
-      cards = shuffle(buildEnglishDeck(entries, mode), rng);
+      cards = shuffle(buildEnglishDeck(entries, mode, sourceLang), rng);
       englishTopicId = topicId;
       if (gameTagline) {
         const tagKey = mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
-        gameTagline.textContent = t(tagKey, {
-          topic: t(englishTopicMessageKey(topicId)),
-        });
+        gameTagline.textContent = t(
+          tagKey,
+          mode === "english2"
+            ? english2TaglineVars({ topic: t(englishTopicMessageKey(topicId)) })
+            : { topic: t(englishTopicMessageKey(topicId)) },
+        );
       }
     } else {
       const { pairCount, tableMax, fractionLevel } = readOptions();
@@ -1780,7 +1882,7 @@ function startGame(source) {
 
   if (winMessage) {
     if (mode === "english1") winMessage.textContent = t("winEnglish1");
-    else if (mode === "english2") winMessage.textContent = t("winEnglish2");
+    else if (mode === "english2") winMessage.textContent = t("winEnglish2", english2TaglineVars());
     else if (mode === "fractions") winMessage.textContent = t("winFractions");
     else if (mode === "sums") winMessage.textContent = t("winSums");
     else winMessage.textContent = t("winMath");
@@ -2043,7 +2145,7 @@ function renderBoard() {
       front.classList.add("card-face--fraction");
       front.textContent = card.label;
     } else {
-      if (card.side === "he" || (card.side === "word" && card.lang === "he")) {
+      if (english2SourceIsRtl(card.lang ?? card.side)) {
         front.classList.add("card-face--hebrew");
       } else if (card.side === "en") {
         front.classList.add("card-face--english");
@@ -2188,7 +2290,11 @@ function syncCardDom(id) {
 
   if (up && (card?.symbol || card?.imageUrl) && card.word) {
     btn.setAttribute("aria-label", t("ariaPictureCard", { word: card.word }));
-  } else if (up && card?.side === "he" && card.label) {
+  } else if (
+    up &&
+    (card?.side === "he" || card?.side === "fr" || card?.side === "de" || card?.side === "es") &&
+    card.label
+  ) {
     btn.setAttribute("aria-label", String(card.label));
   } else if (up && card?.side === "en" && card.label) {
     btn.setAttribute("aria-label", String(card.label));
@@ -2479,15 +2585,18 @@ async function tryAddUserAsync() {
     return;
   }
   const raw = newUserNameInput?.value ?? "";
-  const result = addUser(raw);
+  const ageRaw = newUserAgeSelect instanceof HTMLSelectElement ? newUserAgeSelect.value : "";
+  const result = addUser(raw, { ageRange: /** @type {import("./age-range.js").AgeRange} */ (ageRaw) });
   if (result.ok) {
     pendingUserSlug = result.user.slug;
     if (newUserNameInput) newUserNameInput.value = "";
+    if (newUserAgeSelect instanceof HTMLSelectElement) newUserAgeSelect.selectedIndex = 0;
     renderUserPickerList();
     await confirmUserChoiceAsync();
     return;
   }
   if (result.reason === "duplicate") showUserAddError(t("userErrorDuplicateName"));
+  else if (result.reason === "age") showUserAddError(t("userErrorAgeRequired"));
   else if (result.reason === "storage") showUserAddError(t("userErrorStorage"));
   else showUserAddError(t("userErrorLengthName"));
 }
@@ -2496,11 +2605,65 @@ function confirmUserChoice() {
   void confirmUserChoiceAsync();
 }
 
+/** @returns {Promise<boolean>} */
+async function ensurePlayerAgeRange(slug) {
+  const user = listUsers().find((u) => u.slug === slug);
+  if (!user || isValidAgeRange(user.ageRange)) return true;
+  return new Promise((resolve) => {
+    if (!agePromptDialog || !agePromptSelect || !agePromptSave) {
+      resolve(false);
+      return;
+    }
+    if (agePromptError) {
+      agePromptError.textContent = "";
+      agePromptError.classList.add("is-hidden");
+    }
+    agePromptSelect.selectedIndex = 0;
+    agePromptDialog.showModal();
+
+    const onSave = () => {
+      const value = agePromptSelect instanceof HTMLSelectElement ? agePromptSelect.value : "";
+      if (!isValidAgeRange(value)) {
+        if (agePromptError) {
+          agePromptError.textContent = t("userErrorAgeRequired");
+          agePromptError.classList.remove("is-hidden");
+        }
+        return;
+      }
+      if (!setUserAgeRange(slug, /** @type {import("./age-range.js").AgeRange} */ (value))) {
+        if (agePromptError) {
+          agePromptError.textContent = t("userErrorStorage");
+          agePromptError.classList.remove("is-hidden");
+        }
+        return;
+      }
+      cleanup();
+      resolve(true);
+    };
+
+    const onCancel = (e) => {
+      e.preventDefault();
+    };
+
+    const cleanup = () => {
+      agePromptSave?.removeEventListener("click", onSave);
+      agePromptDialog.removeEventListener("cancel", onCancel);
+      agePromptDialog.close();
+    };
+
+    agePromptSave?.addEventListener("click", onSave);
+    agePromptDialog.addEventListener("cancel", onCancel);
+  });
+}
+
 async function confirmUserChoiceAsync() {
   if (!pendingUserSlug) return;
   const cont = userDialogContinue;
   const slug = pendingUserSlug;
   const isFirstBoot = !booted;
+
+  const ageOk = await ensurePlayerAgeRange(slug);
+  if (!ageOk) return;
 
   clearAdminSession();
   if (!setCurrentUserSlug(slug)) {
@@ -2676,6 +2839,7 @@ async function openAdminOverview() {
 }
 
 initLocale();
+initEnglish2SourceFromLocale(getLocale());
 applyAppBranding(t);
 applyModeIcons();
 applyNavIcons();
@@ -2877,8 +3041,9 @@ fractionLevelSelect?.addEventListener("change", () => startGame("options"));
 tableMaxSelect?.addEventListener("change", () => startGame("options"));
 gameModePicker?.addEventListener("click", (e) => {
   const btn = e.target instanceof Element ? e.target.closest(".game-mode-btn") : null;
-  if (!btn || btn.classList.contains("is-selected")) return;
+  if (!btn || btn.classList.contains("is-selected") || btn.classList.contains("is-hidden")) return;
   const mode = btn.getAttribute("data-mode");
+  if (mode === "english2" && !isEnglish2ModeAvailable(getLocale())) return;
   if (
     mode === "english1" ||
     mode === "english2" ||
@@ -3076,12 +3241,32 @@ async function applyGoogleIdentityIfSignedIn() {
 /** @param {HTMLSelectElement | null} source */
 function applyGameLocaleFromSelect(source) {
   const v = source?.value;
-  if (v === "en" || v === "he") {
+  if (v === "en" || v === "he" || v === "fr" || v === "de" || v === "es") {
+    const prevLocale = getLocale();
+    if (v === prevLocale) return;
+
+    const wasEng2 = booted && getMode() === "english2";
     setLocale(v);
+    setEnglish2SourceLang(defaultEnglish2SourceForLocale(v));
+    if (v === "en" && wasEng2) setGameMode("english1");
     refreshChrome();
-    if (booted) renderBoard();
+    if (booted) {
+      // English 2 deck is tied to source language — rebuild when locale (and source) changes.
+      if (wasEng2) startGame("options");
+      else renderBoard();
+    }
   }
 }
+
+english2SourceSelect?.addEventListener("change", () => {
+  const v = english2SourceSelect.value;
+  if (v === "he" || v === "fr" || v === "de" || v === "es") {
+    setEnglish2SourceLang(v);
+    applyModeIcons();
+    refreshChrome();
+    if (booted && getMode() === "english2") startGame("options");
+  }
+});
 
 localeSelect?.addEventListener("change", () => {
   applyGameLocaleFromSelect(localeSelect);

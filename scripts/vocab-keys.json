@@ -1,0 +1,1106 @@
+[
+  {
+    "key": "monday",
+    "en": "Monday"
+  },
+  {
+    "key": "tuesday",
+    "en": "Tuesday"
+  },
+  {
+    "key": "wednesday",
+    "en": "Wednesday"
+  },
+  {
+    "key": "thursday",
+    "en": "Thursday"
+  },
+  {
+    "key": "friday",
+    "en": "Friday"
+  },
+  {
+    "key": "saturday",
+    "en": "Saturday"
+  },
+  {
+    "key": "sunday",
+    "en": "Sunday"
+  },
+  {
+    "key": "today",
+    "en": "Today"
+  },
+  {
+    "key": "tomorrow",
+    "en": "Tomorrow"
+  },
+  {
+    "key": "yesterday",
+    "en": "Yesterday"
+  },
+  {
+    "key": "morning",
+    "en": "Morning"
+  },
+  {
+    "key": "night",
+    "en": "Night"
+  },
+  {
+    "key": "car",
+    "en": "Car"
+  },
+  {
+    "key": "bus",
+    "en": "Bus"
+  },
+  {
+    "key": "train",
+    "en": "Train"
+  },
+  {
+    "key": "bike",
+    "en": "Bike"
+  },
+  {
+    "key": "plane",
+    "en": "Plane"
+  },
+  {
+    "key": "boat",
+    "en": "Boat"
+  },
+  {
+    "key": "truck",
+    "en": "Truck"
+  },
+  {
+    "key": "taxi",
+    "en": "Taxi"
+  },
+  {
+    "key": "subway",
+    "en": "Subway"
+  },
+  {
+    "key": "helicopter",
+    "en": "Helicopter"
+  },
+  {
+    "key": "scooter",
+    "en": "Scooter"
+  },
+  {
+    "key": "ship",
+    "en": "Ship"
+  },
+  {
+    "key": "dog",
+    "en": "Dog"
+  },
+  {
+    "key": "cat",
+    "en": "Cat"
+  },
+  {
+    "key": "lion",
+    "en": "Lion"
+  },
+  {
+    "key": "tiger",
+    "en": "Tiger"
+  },
+  {
+    "key": "elephant",
+    "en": "Elephant"
+  },
+  {
+    "key": "bear",
+    "en": "Bear"
+  },
+  {
+    "key": "rabbit",
+    "en": "Rabbit"
+  },
+  {
+    "key": "horse",
+    "en": "Horse"
+  },
+  {
+    "key": "cow",
+    "en": "Cow"
+  },
+  {
+    "key": "pig",
+    "en": "Pig"
+  },
+  {
+    "key": "sheep",
+    "en": "Sheep"
+  },
+  {
+    "key": "monkey",
+    "en": "Monkey"
+  },
+  {
+    "key": "fish",
+    "en": "Fish"
+  },
+  {
+    "key": "whale",
+    "en": "Whale"
+  },
+  {
+    "key": "dolphin",
+    "en": "Dolphin"
+  },
+  {
+    "key": "shark",
+    "en": "Shark"
+  },
+  {
+    "key": "octopus",
+    "en": "Octopus"
+  },
+  {
+    "key": "crab",
+    "en": "Crab"
+  },
+  {
+    "key": "jellyfish",
+    "en": "Jellyfish"
+  },
+  {
+    "key": "turtle",
+    "en": "Turtle"
+  },
+  {
+    "key": "seal",
+    "en": "Seal"
+  },
+  {
+    "key": "starfish",
+    "en": "Starfish"
+  },
+  {
+    "key": "lobster",
+    "en": "Lobster"
+  },
+  {
+    "key": "seahorse",
+    "en": "Seahorse"
+  },
+  {
+    "key": "eagle",
+    "en": "Eagle"
+  },
+  {
+    "key": "owl",
+    "en": "Owl"
+  },
+  {
+    "key": "parrot",
+    "en": "Parrot"
+  },
+  {
+    "key": "duck",
+    "en": "Duck"
+  },
+  {
+    "key": "chicken",
+    "en": "Chicken"
+  },
+  {
+    "key": "penguin",
+    "en": "Penguin"
+  },
+  {
+    "key": "flamingo",
+    "en": "Flamingo"
+  },
+  {
+    "key": "sparrow",
+    "en": "Sparrow"
+  },
+  {
+    "key": "peacock",
+    "en": "Peacock"
+  },
+  {
+    "key": "swan",
+    "en": "Swan"
+  },
+  {
+    "key": "crow",
+    "en": "Crow"
+  },
+  {
+    "key": "hummingbird",
+    "en": "Hummingbird"
+  },
+  {
+    "key": "book",
+    "en": "Book"
+  },
+  {
+    "key": "pencil",
+    "en": "Pencil"
+  },
+  {
+    "key": "eraser",
+    "en": "Eraser"
+  },
+  {
+    "key": "ruler",
+    "en": "Ruler"
+  },
+  {
+    "key": "desk",
+    "en": "Desk"
+  },
+  {
+    "key": "chair",
+    "en": "Chair"
+  },
+  {
+    "key": "backpack",
+    "en": "Backpack"
+  },
+  {
+    "key": "teacher",
+    "en": "Teacher"
+  },
+  {
+    "key": "student",
+    "en": "Student"
+  },
+  {
+    "key": "bell",
+    "en": "Bell"
+  },
+  {
+    "key": "crayon",
+    "en": "Crayon"
+  },
+  {
+    "key": "notebook",
+    "en": "Notebook"
+  },
+  {
+    "key": "road",
+    "en": "Road"
+  },
+  {
+    "key": "light",
+    "en": "Light"
+  },
+  {
+    "key": "sign",
+    "en": "Sign"
+  },
+  {
+    "key": "sidewalk",
+    "en": "Sidewalk"
+  },
+  {
+    "key": "bridge",
+    "en": "Bridge"
+  },
+  {
+    "key": "park",
+    "en": "Park"
+  },
+  {
+    "key": "bench",
+    "en": "Bench"
+  },
+  {
+    "key": "mailbox",
+    "en": "Mailbox"
+  },
+  {
+    "key": "trash",
+    "en": "Trash"
+  },
+  {
+    "key": "crosswalk",
+    "en": "Crosswalk"
+  },
+  {
+    "key": "fountain",
+    "en": "Fountain"
+  },
+  {
+    "key": "statue",
+    "en": "Statue"
+  },
+  {
+    "key": "red",
+    "en": "Red"
+  },
+  {
+    "key": "blue",
+    "en": "Blue"
+  },
+  {
+    "key": "green",
+    "en": "Green"
+  },
+  {
+    "key": "yellow",
+    "en": "Yellow"
+  },
+  {
+    "key": "orange",
+    "en": "Orange"
+  },
+  {
+    "key": "purple",
+    "en": "Purple"
+  },
+  {
+    "key": "pink",
+    "en": "Pink"
+  },
+  {
+    "key": "brown",
+    "en": "Brown"
+  },
+  {
+    "key": "black",
+    "en": "Black"
+  },
+  {
+    "key": "white",
+    "en": "White"
+  },
+  {
+    "key": "gray",
+    "en": "Gray"
+  },
+  {
+    "key": "gold",
+    "en": "Gold"
+  },
+  {
+    "key": "apple",
+    "en": "Apple"
+  },
+  {
+    "key": "banana",
+    "en": "Banana"
+  },
+  {
+    "key": "orange",
+    "en": "Orange"
+  },
+  {
+    "key": "grape",
+    "en": "Grape"
+  },
+  {
+    "key": "strawberry",
+    "en": "Strawberry"
+  },
+  {
+    "key": "watermelon",
+    "en": "Watermelon"
+  },
+  {
+    "key": "peach",
+    "en": "Peach"
+  },
+  {
+    "key": "pear",
+    "en": "Pear"
+  },
+  {
+    "key": "lemon",
+    "en": "Lemon"
+  },
+  {
+    "key": "cherry",
+    "en": "Cherry"
+  },
+  {
+    "key": "pineapple",
+    "en": "Pineapple"
+  },
+  {
+    "key": "mango",
+    "en": "Mango"
+  },
+  {
+    "key": "mom",
+    "en": "Mom"
+  },
+  {
+    "key": "dad",
+    "en": "Dad"
+  },
+  {
+    "key": "sister",
+    "en": "Sister"
+  },
+  {
+    "key": "brother",
+    "en": "Brother"
+  },
+  {
+    "key": "baby",
+    "en": "Baby"
+  },
+  {
+    "key": "grandma",
+    "en": "Grandma"
+  },
+  {
+    "key": "grandpa",
+    "en": "Grandpa"
+  },
+  {
+    "key": "aunt",
+    "en": "Aunt"
+  },
+  {
+    "key": "uncle",
+    "en": "Uncle"
+  },
+  {
+    "key": "cousin",
+    "en": "Cousin"
+  },
+  {
+    "key": "parents",
+    "en": "Parents"
+  },
+  {
+    "key": "family",
+    "en": "Family"
+  },
+  {
+    "key": "head",
+    "en": "Head"
+  },
+  {
+    "key": "hand",
+    "en": "Hand"
+  },
+  {
+    "key": "foot",
+    "en": "Foot"
+  },
+  {
+    "key": "eye",
+    "en": "Eye"
+  },
+  {
+    "key": "ear",
+    "en": "Ear"
+  },
+  {
+    "key": "nose",
+    "en": "Nose"
+  },
+  {
+    "key": "mouth",
+    "en": "Mouth"
+  },
+  {
+    "key": "teeth",
+    "en": "Teeth"
+  },
+  {
+    "key": "hair",
+    "en": "Hair"
+  },
+  {
+    "key": "arm",
+    "en": "Arm"
+  },
+  {
+    "key": "leg",
+    "en": "Leg"
+  },
+  {
+    "key": "heart",
+    "en": "Heart"
+  },
+  {
+    "key": "sun",
+    "en": "Sun"
+  },
+  {
+    "key": "rain",
+    "en": "Rain"
+  },
+  {
+    "key": "cloud",
+    "en": "Cloud"
+  },
+  {
+    "key": "snow",
+    "en": "Snow"
+  },
+  {
+    "key": "wind",
+    "en": "Wind"
+  },
+  {
+    "key": "storm",
+    "en": "Storm"
+  },
+  {
+    "key": "rainbow",
+    "en": "Rainbow"
+  },
+  {
+    "key": "hot",
+    "en": "Hot"
+  },
+  {
+    "key": "cold",
+    "en": "Cold"
+  },
+  {
+    "key": "fog",
+    "en": "Fog"
+  },
+  {
+    "key": "lightning",
+    "en": "Lightning"
+  },
+  {
+    "key": "umbrella",
+    "en": "Umbrella"
+  },
+  {
+    "key": "shirt",
+    "en": "Shirt"
+  },
+  {
+    "key": "pants",
+    "en": "Pants"
+  },
+  {
+    "key": "shoes",
+    "en": "Shoes"
+  },
+  {
+    "key": "socks",
+    "en": "Socks"
+  },
+  {
+    "key": "hat",
+    "en": "Hat"
+  },
+  {
+    "key": "coat",
+    "en": "Coat"
+  },
+  {
+    "key": "dress",
+    "en": "Dress"
+  },
+  {
+    "key": "skirt",
+    "en": "Skirt"
+  },
+  {
+    "key": "gloves",
+    "en": "Gloves"
+  },
+  {
+    "key": "scarf",
+    "en": "Scarf"
+  },
+  {
+    "key": "jacket",
+    "en": "Jacket"
+  },
+  {
+    "key": "boots",
+    "en": "Boots"
+  },
+  {
+    "key": "bread",
+    "en": "Bread"
+  },
+  {
+    "key": "milk",
+    "en": "Milk"
+  },
+  {
+    "key": "egg",
+    "en": "Egg"
+  },
+  {
+    "key": "cheese",
+    "en": "Cheese"
+  },
+  {
+    "key": "rice",
+    "en": "Rice"
+  },
+  {
+    "key": "soup",
+    "en": "Soup"
+  },
+  {
+    "key": "pizza",
+    "en": "Pizza"
+  },
+  {
+    "key": "salad",
+    "en": "Salad"
+  },
+  {
+    "key": "cookie",
+    "en": "Cookie"
+  },
+  {
+    "key": "cake",
+    "en": "Cake"
+  },
+  {
+    "key": "honey",
+    "en": "Honey"
+  },
+  {
+    "key": "butter",
+    "en": "Butter"
+  },
+  {
+    "key": "ball",
+    "en": "Ball"
+  },
+  {
+    "key": "soccer",
+    "en": "Soccer"
+  },
+  {
+    "key": "basketball",
+    "en": "Basketball"
+  },
+  {
+    "key": "tennis",
+    "en": "Tennis"
+  },
+  {
+    "key": "swim",
+    "en": "Swim"
+  },
+  {
+    "key": "run",
+    "en": "Run"
+  },
+  {
+    "key": "jump",
+    "en": "Jump"
+  },
+  {
+    "key": "skate",
+    "en": "Skate"
+  },
+  {
+    "key": "golf",
+    "en": "Golf"
+  },
+  {
+    "key": "yoga",
+    "en": "Yoga"
+  },
+  {
+    "key": "dance",
+    "en": "Dance"
+  },
+  {
+    "key": "baseball",
+    "en": "Baseball"
+  },
+  {
+    "key": "bed",
+    "en": "Bed"
+  },
+  {
+    "key": "sofa",
+    "en": "Sofa"
+  },
+  {
+    "key": "table",
+    "en": "Table"
+  },
+  {
+    "key": "chair",
+    "en": "Chair"
+  },
+  {
+    "key": "lamp",
+    "en": "Lamp"
+  },
+  {
+    "key": "door",
+    "en": "Door"
+  },
+  {
+    "key": "window",
+    "en": "Window"
+  },
+  {
+    "key": "kitchen",
+    "en": "Kitchen"
+  },
+  {
+    "key": "bath",
+    "en": "Bath"
+  },
+  {
+    "key": "fridge",
+    "en": "Fridge"
+  },
+  {
+    "key": "clock",
+    "en": "Clock"
+  },
+  {
+    "key": "mirror",
+    "en": "Mirror"
+  },
+  {
+    "key": "doctor",
+    "en": "Doctor"
+  },
+  {
+    "key": "teacher",
+    "en": "Teacher"
+  },
+  {
+    "key": "firefighter",
+    "en": "Firefighter"
+  },
+  {
+    "key": "police",
+    "en": "Police"
+  },
+  {
+    "key": "chef",
+    "en": "Chef"
+  },
+  {
+    "key": "farmer",
+    "en": "Farmer"
+  },
+  {
+    "key": "pilot",
+    "en": "Pilot"
+  },
+  {
+    "key": "artist",
+    "en": "Artist"
+  },
+  {
+    "key": "nurse",
+    "en": "Nurse"
+  },
+  {
+    "key": "builder",
+    "en": "Builder"
+  },
+  {
+    "key": "vet",
+    "en": "Vet"
+  },
+  {
+    "key": "singer",
+    "en": "Singer"
+  },
+  {
+    "key": "tree",
+    "en": "Tree"
+  },
+  {
+    "key": "flower",
+    "en": "Flower"
+  },
+  {
+    "key": "grass",
+    "en": "Grass"
+  },
+  {
+    "key": "mountain",
+    "en": "Mountain"
+  },
+  {
+    "key": "river",
+    "en": "River"
+  },
+  {
+    "key": "lake",
+    "en": "Lake"
+  },
+  {
+    "key": "forest",
+    "en": "Forest"
+  },
+  {
+    "key": "rock",
+    "en": "Rock"
+  },
+  {
+    "key": "leaf",
+    "en": "Leaf"
+  },
+  {
+    "key": "bee",
+    "en": "Bee"
+  },
+  {
+    "key": "butterfly",
+    "en": "Butterfly"
+  },
+  {
+    "key": "moon",
+    "en": "Moon"
+  },
+  {
+    "key": "happy",
+    "en": "Happy"
+  },
+  {
+    "key": "sad",
+    "en": "Sad"
+  },
+  {
+    "key": "angry",
+    "en": "Angry"
+  },
+  {
+    "key": "scared",
+    "en": "Scared"
+  },
+  {
+    "key": "tired",
+    "en": "Tired"
+  },
+  {
+    "key": "excited",
+    "en": "Excited"
+  },
+  {
+    "key": "bored",
+    "en": "Bored"
+  },
+  {
+    "key": "proud",
+    "en": "Proud"
+  },
+  {
+    "key": "shy",
+    "en": "Shy"
+  },
+  {
+    "key": "love",
+    "en": "Love"
+  },
+  {
+    "key": "calm",
+    "en": "Calm"
+  },
+  {
+    "key": "surprised",
+    "en": "Surprised"
+  },
+  {
+    "key": "one",
+    "en": "One"
+  },
+  {
+    "key": "two",
+    "en": "Two"
+  },
+  {
+    "key": "three",
+    "en": "Three"
+  },
+  {
+    "key": "four",
+    "en": "Four"
+  },
+  {
+    "key": "five",
+    "en": "Five"
+  },
+  {
+    "key": "six",
+    "en": "Six"
+  },
+  {
+    "key": "seven",
+    "en": "Seven"
+  },
+  {
+    "key": "eight",
+    "en": "Eight"
+  },
+  {
+    "key": "nine",
+    "en": "Nine"
+  },
+  {
+    "key": "ten",
+    "en": "Ten"
+  },
+  {
+    "key": "eleven",
+    "en": "Eleven"
+  },
+  {
+    "key": "twelve",
+    "en": "Twelve"
+  },
+  {
+    "key": "circle",
+    "en": "Circle"
+  },
+  {
+    "key": "square",
+    "en": "Square"
+  },
+  {
+    "key": "triangle",
+    "en": "Triangle"
+  },
+  {
+    "key": "star",
+    "en": "Star"
+  },
+  {
+    "key": "heart",
+    "en": "Heart"
+  },
+  {
+    "key": "oval",
+    "en": "Oval"
+  },
+  {
+    "key": "rectangle",
+    "en": "Rectangle"
+  },
+  {
+    "key": "diamond",
+    "en": "Diamond"
+  },
+  {
+    "key": "line",
+    "en": "Line"
+  },
+  {
+    "key": "cube",
+    "en": "Cube"
+  },
+  {
+    "key": "sphere",
+    "en": "Sphere"
+  },
+  {
+    "key": "cone",
+    "en": "Cone"
+  },
+  {
+    "key": "piano",
+    "en": "Piano"
+  },
+  {
+    "key": "guitar",
+    "en": "Guitar"
+  },
+  {
+    "key": "drum",
+    "en": "Drum"
+  },
+  {
+    "key": "violin",
+    "en": "Violin"
+  },
+  {
+    "key": "flute",
+    "en": "Flute"
+  },
+  {
+    "key": "trumpet",
+    "en": "Trumpet"
+  },
+  {
+    "key": "microphone",
+    "en": "Microphone"
+  },
+  {
+    "key": "song",
+    "en": "Song"
+  },
+  {
+    "key": "dance",
+    "en": "Dance"
+  },
+  {
+    "key": "radio",
+    "en": "Radio"
+  },
+  {
+    "key": "headphones",
+    "en": "Headphones"
+  },
+  {
+    "key": "notes",
+    "en": "Notes"
+  },
+  {
+    "key": "pyramid",
+    "en": "Pyramid"
+  },
+  {
+    "key": "tower",
+    "en": "Tower"
+  },
+  {
+    "key": "beach",
+    "en": "Beach"
+  },
+  {
+    "key": "castle",
+    "en": "Castle"
+  },
+  {
+    "key": "temple",
+    "en": "Temple"
+  },
+  {
+    "key": "market",
+    "en": "Market"
+  },
+  {
+    "key": "museum",
+    "en": "Museum"
+  },
+  {
+    "key": "zoo",
+    "en": "Zoo"
+  },
+  {
+    "key": "farm",
+    "en": "Farm"
+  },
+  {
+    "key": "airport",
+    "en": "Airport"
+  },
+  {
+    "key": "harbor",
+    "en": "Harbor"
+  },
+  {
+    "key": "cave",
+    "en": "Cave"
+  }
+]

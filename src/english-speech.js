@@ -2,7 +2,7 @@
  * Read aloud memory words using the Web Speech API.
  */
 
-/** @typedef {"en" | "he"} SpeechLang */
+/** @typedef {"en" | "he" | "fr" | "de" | "es"} SpeechLang */
 
 /**
  * @typedef {Object} EnglishCardSpeech
@@ -29,7 +29,11 @@ export function resolveEnglishCardSpeech(card, gameMode, speechMode) {
     return null;
   }
 
-  const lang = card.lang === "he" || card.side === "he" ? "he" : "en";
+  const side = card.side ?? card.lang;
+  const lang =
+    side === "he" || side === "fr" || side === "de" || side === "es"
+      ? /** @type {SpeechLang} */ (side)
+      : "en";
   if (speechMode === "both") return { text, lang };
   if (speechMode === "text" && card.side === "en") return { text, lang: "en" };
   return null;
@@ -52,20 +56,25 @@ export function cancelEnglishSpeech() {
   speakChain = Promise.resolve();
 }
 
+/** @param {SpeechLang} lang */
+function speechLocale(lang) {
+  if (lang === "he") return "he-IL";
+  if (lang === "fr") return "fr-FR";
+  if (lang === "de") return "de-DE";
+  if (lang === "es") return "es-ES";
+  return "en-US";
+}
+
 /** @param {SpeechSynthesisVoice[]} voices @param {SpeechLang} lang */
 function pickVoice(voices, lang) {
-  if (lang === "he") {
-    return (
-      voices.find((v) => v.lang === "he-IL") ??
-      voices.find((v) => v.lang.startsWith("he")) ??
-      voices.find((v) => /hebrew|עברית/i.test(v.name)) ??
-      null
-    );
-  }
+  const locale = speechLocale(lang);
   return (
-    voices.find((v) => v.lang === "en-US") ??
-    voices.find((v) => v.lang.startsWith("en")) ??
-    null
+    voices.find((v) => v.lang === locale) ??
+    voices.find((v) => v.lang.startsWith(locale.slice(0, 2))) ??
+    (lang === "he" ? voices.find((v) => /hebrew|עברית/i.test(v.name)) : null) ??
+    (lang === "en"
+      ? voices.find((v) => v.lang === "en-US") ?? voices.find((v) => v.lang.startsWith("en"))
+      : null)
   );
 }
 

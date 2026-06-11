@@ -1,0 +1,1357 @@
+{
+  "airport": {
+    "fr": "Aéroport",
+    "de": "Flughafen",
+    "es": "Aeropuerto"
+  },
+  "angry": {
+    "fr": "Fâché",
+    "de": "Wütend",
+    "es": "Enojado"
+  },
+  "apple": {
+    "fr": "Pomme",
+    "de": "Apfel",
+    "es": "Manzana"
+  },
+  "arm": {
+    "fr": "Bras",
+    "de": "Arm",
+    "es": "Brazo"
+  },
+  "artist": {
+    "fr": "Artiste",
+    "de": "Künstler",
+    "es": "Artista"
+  },
+  "aunt": {
+    "fr": "Tante",
+    "de": "Tante",
+    "es": "Tía"
+  },
+  "baby": {
+    "fr": "Bébé",
+    "de": "Baby",
+    "es": "Bebé"
+  },
+  "backpack": {
+    "fr": "Sac à dos",
+    "de": "Rucksack",
+    "es": "Mochila"
+  },
+  "ball": {
+    "fr": "Balle",
+    "de": "Ball",
+    "es": "Pelota"
+  },
+  "banana": {
+    "fr": "Banane",
+    "de": "Banane",
+    "es": "Plátano"
+  },
+  "baseball": {
+    "fr": "Baseball",
+    "de": "Baseball",
+    "es": "Béisbol"
+  },
+  "basketball": {
+    "fr": "Basketball",
+    "de": "Basketball",
+    "es": "Baloncesto"
+  },
+  "bath": {
+    "fr": "Bain",
+    "de": "Bad",
+    "es": "Baño"
+  },
+  "beach": {
+    "fr": "Plage",
+    "de": "Strand",
+    "es": "Playa"
+  },
+  "bear": {
+    "fr": "Ours",
+    "de": "Bär",
+    "es": "Oso"
+  },
+  "bed": {
+    "fr": "Lit",
+    "de": "Bett",
+    "es": "Cama"
+  },
+  "bee": {
+    "fr": "Abeille",
+    "de": "Biene",
+    "es": "Abeja"
+  },
+  "bell": {
+    "fr": "Cloche",
+    "de": "Glocke",
+    "es": "Campana"
+  },
+  "bench": {
+    "fr": "Banc",
+    "de": "Bank",
+    "es": "Banco"
+  },
+  "bike": {
+    "fr": "Vélo",
+    "de": "Fahrrad",
+    "es": "Bicicleta"
+  },
+  "black": {
+    "fr": "Noir",
+    "de": "Schwarz",
+    "es": "Negro"
+  },
+  "blue": {
+    "fr": "Bleu",
+    "de": "Blau",
+    "es": "Azul"
+  },
+  "boat": {
+    "fr": "Bateau",
+    "de": "Boot",
+    "es": "Barco"
+  },
+  "book": {
+    "fr": "Livre",
+    "de": "Buch",
+    "es": "Libro"
+  },
+  "boots": {
+    "fr": "Bottes",
+    "de": "Stiefel",
+    "es": "Botas"
+  },
+  "bored": {
+    "fr": "Ennuyé",
+    "de": "Gelangweilt",
+    "es": "Aburrido"
+  },
+  "bread": {
+    "fr": "Pain",
+    "de": "Brot",
+    "es": "Pan"
+  },
+  "bridge": {
+    "fr": "Pont",
+    "de": "Brücke",
+    "es": "Puente"
+  },
+  "brother": {
+    "fr": "Frère",
+    "de": "Bruder",
+    "es": "Hermano"
+  },
+  "brown": {
+    "fr": "Marron",
+    "de": "Braun",
+    "es": "Marrón"
+  },
+  "builder": {
+    "fr": "Maçon",
+    "de": "Bauarbeiter",
+    "es": "Constructor"
+  },
+  "bus": {
+    "fr": "Bus",
+    "de": "Bus",
+    "es": "Autobús"
+  },
+  "butter": {
+    "fr": "Beurre",
+    "de": "Butter",
+    "es": "Mantequilla"
+  },
+  "butterfly": {
+    "fr": "Papillon",
+    "de": "Schmetterling",
+    "es": "Mariposa"
+  },
+  "cake": {
+    "fr": "Gâteau",
+    "de": "Kuchen",
+    "es": "Pastel"
+  },
+  "calm": {
+    "fr": "Calme",
+    "de": "Ruhig",
+    "es": "Tranquilo"
+  },
+  "car": {
+    "fr": "Voiture",
+    "de": "Auto",
+    "es": "Coche"
+  },
+  "castle": {
+    "fr": "Château",
+    "de": "Schloss",
+    "es": "Castillo"
+  },
+  "cat": {
+    "fr": "Chat",
+    "de": "Katze",
+    "es": "Gato"
+  },
+  "cave": {
+    "fr": "Grotte",
+    "de": "Höhle",
+    "es": "Cueva"
+  },
+  "chair": {
+    "fr": "Chaise",
+    "de": "Stuhl",
+    "es": "Silla"
+  },
+  "cheese": {
+    "fr": "Fromage",
+    "de": "Käse",
+    "es": "Queso"
+  },
+  "chef": {
+    "fr": "Cuisinier",
+    "de": "Koch",
+    "es": "Cocinero"
+  },
+  "cherry": {
+    "fr": "Cerise",
+    "de": "Kirsche",
+    "es": "Cereza"
+  },
+  "chicken": {
+    "fr": "Poule",
+    "de": "Huhn",
+    "es": "Gallina"
+  },
+  "circle": {
+    "fr": "Cercle",
+    "de": "Kreis",
+    "es": "Círculo"
+  },
+  "clock": {
+    "fr": "Horloge",
+    "de": "Uhr",
+    "es": "Reloj"
+  },
+  "cloud": {
+    "fr": "Nuage",
+    "de": "Wolke",
+    "es": "Nube"
+  },
+  "coat": {
+    "fr": "Manteau",
+    "de": "Mantel",
+    "es": "Abrigo"
+  },
+  "cold": {
+    "fr": "Froid",
+    "de": "Kalt",
+    "es": "Frío"
+  },
+  "cone": {
+    "fr": "Cône",
+    "de": "Kegel",
+    "es": "Cono"
+  },
+  "cookie": {
+    "fr": "Biscuit",
+    "de": "Keks",
+    "es": "Galleta"
+  },
+  "cousin": {
+    "fr": "Cousin",
+    "de": "Cousin",
+    "es": "Primo"
+  },
+  "cow": {
+    "fr": "Vache",
+    "de": "Kuh",
+    "es": "Vaca"
+  },
+  "crab": {
+    "fr": "Crabe",
+    "de": "Krabbe",
+    "es": "Cangrejo"
+  },
+  "crayon": {
+    "fr": "Crayon de couleur",
+    "de": "Buntstift",
+    "es": "Crayón de color"
+  },
+  "crosswalk": {
+    "fr": "Passage piéton",
+    "de": "Zebrastreifen",
+    "es": "Paso de cebra"
+  },
+  "crow": {
+    "fr": "Corbeau",
+    "de": "Krähe",
+    "es": "Cuervo"
+  },
+  "cube": {
+    "fr": "Cube",
+    "de": "Würfel",
+    "es": "Cubo"
+  },
+  "dad": {
+    "fr": "Papa",
+    "de": "Papa",
+    "es": "Papá"
+  },
+  "dance": {
+    "fr": "Danser",
+    "de": "Tanzen",
+    "es": "Bailar"
+  },
+  "desk": {
+    "fr": "Bureau",
+    "de": "Schreibtisch",
+    "es": "Escritorio"
+  },
+  "diamond": {
+    "fr": "Losange",
+    "de": "Raute",
+    "es": "Rombo"
+  },
+  "doctor": {
+    "fr": "Médecin",
+    "de": "Arzt",
+    "es": "Médico"
+  },
+  "dog": {
+    "fr": "Chien",
+    "de": "Hund",
+    "es": "Perro"
+  },
+  "dolphin": {
+    "fr": "Dauphin",
+    "de": "Delfin",
+    "es": "Delfín"
+  },
+  "door": {
+    "fr": "Porte",
+    "de": "Tür",
+    "es": "Puerta"
+  },
+  "dress": {
+    "fr": "Robe",
+    "de": "Kleid",
+    "es": "Vestido"
+  },
+  "drum": {
+    "fr": "Tambour",
+    "de": "Trommel",
+    "es": "Tambor"
+  },
+  "duck": {
+    "fr": "Canard",
+    "de": "Ente",
+    "es": "Pato"
+  },
+  "eagle": {
+    "fr": "Aigle",
+    "de": "Adler",
+    "es": "Águila"
+  },
+  "ear": {
+    "fr": "Oreille",
+    "de": "Ohr",
+    "es": "Oreja"
+  },
+  "egg": {
+    "fr": "Œuf",
+    "de": "Ei",
+    "es": "Huevo"
+  },
+  "eight": {
+    "fr": "Huit",
+    "de": "Acht",
+    "es": "Ocho"
+  },
+  "elephant": {
+    "fr": "Éléphant",
+    "de": "Elefant",
+    "es": "Elefante"
+  },
+  "eleven": {
+    "fr": "Onze",
+    "de": "Elf",
+    "es": "Once"
+  },
+  "eraser": {
+    "fr": "Gomme",
+    "de": "Radiergummi",
+    "es": "Goma"
+  },
+  "excited": {
+    "fr": "Excité",
+    "de": "Aufgeregt",
+    "es": "Emocionado"
+  },
+  "eye": {
+    "fr": "Œil",
+    "de": "Auge",
+    "es": "Ojo"
+  },
+  "family": {
+    "fr": "Famille",
+    "de": "Familie",
+    "es": "Familia"
+  },
+  "farm": {
+    "fr": "Ferme",
+    "de": "Bauernhof",
+    "es": "Granja"
+  },
+  "farmer": {
+    "fr": "Fermier",
+    "de": "Bauer",
+    "es": "Granjero"
+  },
+  "firefighter": {
+    "fr": "Pompier",
+    "de": "Feuerwehrmann",
+    "es": "Bombero"
+  },
+  "fish": {
+    "fr": "Poisson",
+    "de": "Fisch",
+    "es": "Pez"
+  },
+  "five": {
+    "fr": "Cinq",
+    "de": "Fünf",
+    "es": "Cinco"
+  },
+  "flamingo": {
+    "fr": "Flamant",
+    "de": "Flamingo",
+    "es": "Flamenco"
+  },
+  "flower": {
+    "fr": "Fleur",
+    "de": "Blume",
+    "es": "Flor"
+  },
+  "flute": {
+    "fr": "Flûte",
+    "de": "Flöte",
+    "es": "Flauta"
+  },
+  "fog": {
+    "fr": "Brouillard",
+    "de": "Nebel",
+    "es": "Niebla"
+  },
+  "foot": {
+    "fr": "Pied",
+    "de": "Fuß",
+    "es": "Pie"
+  },
+  "forest": {
+    "fr": "Forêt",
+    "de": "Wald",
+    "es": "Bosque"
+  },
+  "fountain": {
+    "fr": "Fontaine",
+    "de": "Brunnen",
+    "es": "Fuente"
+  },
+  "four": {
+    "fr": "Quatre",
+    "de": "Vier",
+    "es": "Cuatro"
+  },
+  "friday": {
+    "fr": "Vendredi",
+    "de": "Freitag",
+    "es": "Viernes"
+  },
+  "fridge": {
+    "fr": "Frigo",
+    "de": "Kühlschrank",
+    "es": "Nevera"
+  },
+  "gloves": {
+    "fr": "Gants",
+    "de": "Handschuhe",
+    "es": "Guantes"
+  },
+  "gold": {
+    "fr": "Or",
+    "de": "Gold",
+    "es": "Dorado"
+  },
+  "golf": {
+    "fr": "Golf",
+    "de": "Golf",
+    "es": "Golf"
+  },
+  "grandma": {
+    "fr": "Mamie",
+    "de": "Oma",
+    "es": "Abuela"
+  },
+  "grandpa": {
+    "fr": "Papi",
+    "de": "Opa",
+    "es": "Abuelo"
+  },
+  "grape": {
+    "fr": "Raisin",
+    "de": "Traube",
+    "es": "Uva"
+  },
+  "grass": {
+    "fr": "Herbe",
+    "de": "Gras",
+    "es": "Césped"
+  },
+  "gray": {
+    "fr": "Gris",
+    "de": "Grau",
+    "es": "Gris"
+  },
+  "green": {
+    "fr": "Vert",
+    "de": "Grün",
+    "es": "Verde"
+  },
+  "guitar": {
+    "fr": "Guitare",
+    "de": "Gitarre",
+    "es": "Guitarra"
+  },
+  "hair": {
+    "fr": "Cheveux",
+    "de": "Haare",
+    "es": "Pelo"
+  },
+  "hand": {
+    "fr": "Main",
+    "de": "Hand",
+    "es": "Mano"
+  },
+  "happy": {
+    "fr": "Heureux",
+    "de": "Glücklich",
+    "es": "Feliz"
+  },
+  "harbor": {
+    "fr": "Port",
+    "de": "Hafen",
+    "es": "Puerto"
+  },
+  "hat": {
+    "fr": "Chapeau",
+    "de": "Hut",
+    "es": "Sombrero"
+  },
+  "head": {
+    "fr": "Tête",
+    "de": "Kopf",
+    "es": "Cabeza"
+  },
+  "headphones": {
+    "fr": "Casque",
+    "de": "Kopfhörer",
+    "es": "Auriculares"
+  },
+  "heart": {
+    "fr": "Cœur",
+    "de": "Herz",
+    "es": "Corazón"
+  },
+  "helicopter": {
+    "fr": "Hélicoptère",
+    "de": "Hubschrauber",
+    "es": "Helicóptero"
+  },
+  "honey": {
+    "fr": "Miel",
+    "de": "Honig",
+    "es": "Miel"
+  },
+  "horse": {
+    "fr": "Cheval",
+    "de": "Pferd",
+    "es": "Caballo"
+  },
+  "hot": {
+    "fr": "Chaud",
+    "de": "Heiß",
+    "es": "Caliente"
+  },
+  "hummingbird": {
+    "fr": "Colibri",
+    "de": "Kolibri",
+    "es": "Colibrí"
+  },
+  "jacket": {
+    "fr": "Veste",
+    "de": "Jacke",
+    "es": "Chaqueta"
+  },
+  "jellyfish": {
+    "fr": "Méduse",
+    "de": "Qualle",
+    "es": "Medusa"
+  },
+  "jump": {
+    "fr": "Sauter",
+    "de": "Springen",
+    "es": "Saltar"
+  },
+  "kitchen": {
+    "fr": "Cuisine",
+    "de": "Küche",
+    "es": "Cocina"
+  },
+  "lake": {
+    "fr": "Lac",
+    "de": "See",
+    "es": "Lago"
+  },
+  "lamp": {
+    "fr": "Lampe",
+    "de": "Lampe",
+    "es": "Lámpara"
+  },
+  "leaf": {
+    "fr": "Feuille",
+    "de": "Blatt",
+    "es": "Hoja"
+  },
+  "leg": {
+    "fr": "Jambe",
+    "de": "Bein",
+    "es": "Pierna"
+  },
+  "lemon": {
+    "fr": "Citron",
+    "de": "Zitrone",
+    "es": "Limón"
+  },
+  "light": {
+    "fr": "Feu",
+    "de": "Ampel",
+    "es": "Semáforo"
+  },
+  "lightning": {
+    "fr": "Éclair",
+    "de": "Blitz",
+    "es": "Rayo"
+  },
+  "line": {
+    "fr": "Ligne",
+    "de": "Linie",
+    "es": "Línea"
+  },
+  "lion": {
+    "fr": "Lion",
+    "de": "Löwe",
+    "es": "León"
+  },
+  "lobster": {
+    "fr": "Homard",
+    "de": "Hummer",
+    "es": "Langosta"
+  },
+  "love": {
+    "fr": "Amour",
+    "de": "Liebe",
+    "es": "Amor"
+  },
+  "mailbox": {
+    "fr": "Boîte aux lettres",
+    "de": "Briefkasten",
+    "es": "Buzón"
+  },
+  "mango": {
+    "fr": "Mangue",
+    "de": "Mango",
+    "es": "Mango"
+  },
+  "market": {
+    "fr": "Marché",
+    "de": "Markt",
+    "es": "Mercado"
+  },
+  "microphone": {
+    "fr": "Micro",
+    "de": "Mikrofon",
+    "es": "Micrófono"
+  },
+  "milk": {
+    "fr": "Lait",
+    "de": "Milch",
+    "es": "Leche"
+  },
+  "mirror": {
+    "fr": "Miroir",
+    "de": "Spiegel",
+    "es": "Espejo"
+  },
+  "mom": {
+    "fr": "Maman",
+    "de": "Mama",
+    "es": "Mamá"
+  },
+  "monday": {
+    "fr": "Lundi",
+    "de": "Montag",
+    "es": "Lunes"
+  },
+  "monkey": {
+    "fr": "Singe",
+    "de": "Affe",
+    "es": "Mono"
+  },
+  "moon": {
+    "fr": "Lune",
+    "de": "Mond",
+    "es": "Luna"
+  },
+  "morning": {
+    "fr": "Matin",
+    "de": "Morgen",
+    "es": "Mañana"
+  },
+  "mountain": {
+    "fr": "Montagne",
+    "de": "Berg",
+    "es": "Montaña"
+  },
+  "mouth": {
+    "fr": "Bouche",
+    "de": "Mund",
+    "es": "Boca"
+  },
+  "museum": {
+    "fr": "Musée",
+    "de": "Museum",
+    "es": "Museo"
+  },
+  "night": {
+    "fr": "Nuit",
+    "de": "Nacht",
+    "es": "Noche"
+  },
+  "nine": {
+    "fr": "Neuf",
+    "de": "Neun",
+    "es": "Nueve"
+  },
+  "nose": {
+    "fr": "Nez",
+    "de": "Nase",
+    "es": "Nariz"
+  },
+  "notebook": {
+    "fr": "Cahier",
+    "de": "Heft",
+    "es": "Cuaderno"
+  },
+  "notes": {
+    "fr": "Notes",
+    "de": "Noten",
+    "es": "Notas"
+  },
+  "nurse": {
+    "fr": "Infirmière",
+    "de": "Krankenschwester",
+    "es": "Enfermera"
+  },
+  "octopus": {
+    "fr": "Pieuvre",
+    "de": "Krake",
+    "es": "Pulpo"
+  },
+  "one": {
+    "fr": "Un",
+    "de": "Eins",
+    "es": "Uno"
+  },
+  "orange": {
+    "fr": "Orange",
+    "de": "Orange",
+    "es": "Naranja"
+  },
+  "oval": {
+    "fr": "Ovale",
+    "de": "Oval",
+    "es": "Óvalo"
+  },
+  "owl": {
+    "fr": "Hibou",
+    "de": "Eule",
+    "es": "Búho"
+  },
+  "pants": {
+    "fr": "Pantalon",
+    "de": "Hose",
+    "es": "Pantalones"
+  },
+  "parents": {
+    "fr": "Parents",
+    "de": "Eltern",
+    "es": "Padres"
+  },
+  "park": {
+    "fr": "Parc",
+    "de": "Park",
+    "es": "Parque"
+  },
+  "parrot": {
+    "fr": "Perroquet",
+    "de": "Papagei",
+    "es": "Loro"
+  },
+  "peach": {
+    "fr": "Pêche",
+    "de": "Pfirsich",
+    "es": "Melocotón"
+  },
+  "peacock": {
+    "fr": "Paon",
+    "de": "Pfau",
+    "es": "Pavo real"
+  },
+  "pear": {
+    "fr": "Poire",
+    "de": "Birne",
+    "es": "Pera"
+  },
+  "pencil": {
+    "fr": "Crayon",
+    "de": "Bleistift",
+    "es": "Lápiz"
+  },
+  "penguin": {
+    "fr": "Pingouin",
+    "de": "Pinguin",
+    "es": "Pingüino"
+  },
+  "piano": {
+    "fr": "Piano",
+    "de": "Klavier",
+    "es": "Piano"
+  },
+  "pig": {
+    "fr": "Cochon",
+    "de": "Schwein",
+    "es": "Cerdo"
+  },
+  "pilot": {
+    "fr": "Pilote",
+    "de": "Pilot",
+    "es": "Piloto"
+  },
+  "pineapple": {
+    "fr": "Ananas",
+    "de": "Ananas",
+    "es": "Piña"
+  },
+  "pink": {
+    "fr": "Rose",
+    "de": "Rosa",
+    "es": "Rosa"
+  },
+  "pizza": {
+    "fr": "Pizza",
+    "de": "Pizza",
+    "es": "Pizza"
+  },
+  "plane": {
+    "fr": "Avion",
+    "de": "Flugzeug",
+    "es": "Avión"
+  },
+  "police": {
+    "fr": "Policier",
+    "de": "Polizist",
+    "es": "Policía"
+  },
+  "proud": {
+    "fr": "Fier",
+    "de": "Stolz",
+    "es": "Orgulloso"
+  },
+  "purple": {
+    "fr": "Violet",
+    "de": "Lila",
+    "es": "Morado"
+  },
+  "pyramid": {
+    "fr": "Pyramide",
+    "de": "Pyramide",
+    "es": "Pirámide"
+  },
+  "rabbit": {
+    "fr": "Lapin",
+    "de": "Hase",
+    "es": "Conejo"
+  },
+  "radio": {
+    "fr": "Radio",
+    "de": "Radio",
+    "es": "Radio"
+  },
+  "rain": {
+    "fr": "Pluie",
+    "de": "Regen",
+    "es": "Lluvia"
+  },
+  "rainbow": {
+    "fr": "Arc-en-ciel",
+    "de": "Regenbogen",
+    "es": "Arcoíris"
+  },
+  "rectangle": {
+    "fr": "Rectangle",
+    "de": "Rechteck",
+    "es": "Rectángulo"
+  },
+  "red": {
+    "fr": "Rouge",
+    "de": "Rot",
+    "es": "Rojo"
+  },
+  "rice": {
+    "fr": "Riz",
+    "de": "Reis",
+    "es": "Arroz"
+  },
+  "river": {
+    "fr": "Rivière",
+    "de": "Fluss",
+    "es": "Río"
+  },
+  "road": {
+    "fr": "Route",
+    "de": "Straße",
+    "es": "Carretera"
+  },
+  "rock": {
+    "fr": "Rocher",
+    "de": "Fels",
+    "es": "Roca"
+  },
+  "ruler": {
+    "fr": "Règle",
+    "de": "Lineal",
+    "es": "Regla"
+  },
+  "run": {
+    "fr": "Courir",
+    "de": "Laufen",
+    "es": "Correr"
+  },
+  "sad": {
+    "fr": "Triste",
+    "de": "Traurig",
+    "es": "Triste"
+  },
+  "salad": {
+    "fr": "Salade",
+    "de": "Salat",
+    "es": "Ensalada"
+  },
+  "saturday": {
+    "fr": "Samedi",
+    "de": "Samstag",
+    "es": "Sábado"
+  },
+  "scared": {
+    "fr": "Peur",
+    "de": "Angst",
+    "es": "Asustado"
+  },
+  "scarf": {
+    "fr": "Écharpe",
+    "de": "Schal",
+    "es": "Bufanda"
+  },
+  "scooter": {
+    "fr": "Trottinette",
+    "de": "Roller",
+    "es": "Patinete"
+  },
+  "seahorse": {
+    "fr": "Hippocampe",
+    "de": "Seepferdchen",
+    "es": "Caballito de mar"
+  },
+  "seal": {
+    "fr": "Phoque",
+    "de": "Robbe",
+    "es": "Foca"
+  },
+  "seven": {
+    "fr": "Sept",
+    "de": "Sieben",
+    "es": "Siete"
+  },
+  "shark": {
+    "fr": "Requin",
+    "de": "Hai",
+    "es": "Tiburón"
+  },
+  "sheep": {
+    "fr": "Mouton",
+    "de": "Schaf",
+    "es": "Oveja"
+  },
+  "ship": {
+    "fr": "Navire",
+    "de": "Schiff",
+    "es": "Barco"
+  },
+  "shirt": {
+    "fr": "T-shirt",
+    "de": "Hemd",
+    "es": "Camiseta"
+  },
+  "shoes": {
+    "fr": "Chaussures",
+    "de": "Schuhe",
+    "es": "Zapatos"
+  },
+  "shy": {
+    "fr": "Timide",
+    "de": "Schüchtern",
+    "es": "Tímido"
+  },
+  "sidewalk": {
+    "fr": "Trottoir",
+    "de": "Gehweg",
+    "es": "Acera"
+  },
+  "sign": {
+    "fr": "Panneau",
+    "de": "Schild",
+    "es": "Señal"
+  },
+  "singer": {
+    "fr": "Chanteur",
+    "de": "Sänger",
+    "es": "Cantante"
+  },
+  "sister": {
+    "fr": "Sœur",
+    "de": "Schwester",
+    "es": "Hermana"
+  },
+  "six": {
+    "fr": "Six",
+    "de": "Sechs",
+    "es": "Seis"
+  },
+  "skate": {
+    "fr": "Patiner",
+    "de": "Skaten",
+    "es": "Patinar"
+  },
+  "skirt": {
+    "fr": "Jupe",
+    "de": "Rock",
+    "es": "Falda"
+  },
+  "snow": {
+    "fr": "Neige",
+    "de": "Schnee",
+    "es": "Nieve"
+  },
+  "soccer": {
+    "fr": "Football",
+    "de": "Fußball",
+    "es": "Fútbol"
+  },
+  "socks": {
+    "fr": "Chaussettes",
+    "de": "Socken",
+    "es": "Calcetines"
+  },
+  "sofa": {
+    "fr": "Canapé",
+    "de": "Sofa",
+    "es": "Sofá"
+  },
+  "song": {
+    "fr": "Chanson",
+    "de": "Lied",
+    "es": "Canción"
+  },
+  "soup": {
+    "fr": "Soupe",
+    "de": "Suppe",
+    "es": "Sopa"
+  },
+  "sparrow": {
+    "fr": "Moineau",
+    "de": "Spatz",
+    "es": "Gorrión"
+  },
+  "sphere": {
+    "fr": "Sphère",
+    "de": "Kugel",
+    "es": "Esfera"
+  },
+  "square": {
+    "fr": "Carré",
+    "de": "Quadrat",
+    "es": "Cuadrado"
+  },
+  "star": {
+    "fr": "Étoile",
+    "de": "Stern",
+    "es": "Estrella"
+  },
+  "starfish": {
+    "fr": "Étoile de mer",
+    "de": "Seestern",
+    "es": "Estrella de mar"
+  },
+  "statue": {
+    "fr": "Statue",
+    "de": "Statue",
+    "es": "Estatua"
+  },
+  "storm": {
+    "fr": "Orage",
+    "de": "Sturm",
+    "es": "Tormenta"
+  },
+  "strawberry": {
+    "fr": "Fraise",
+    "de": "Erdbeere",
+    "es": "Fresa"
+  },
+  "student": {
+    "fr": "Élève",
+    "de": "Schüler",
+    "es": "Alumno"
+  },
+  "subway": {
+    "fr": "Métro",
+    "de": "U-Bahn",
+    "es": "Metro"
+  },
+  "sun": {
+    "fr": "Soleil",
+    "de": "Sonne",
+    "es": "Sol"
+  },
+  "sunday": {
+    "fr": "Dimanche",
+    "de": "Sonntag",
+    "es": "Domingo"
+  },
+  "surprised": {
+    "fr": "Surpris",
+    "de": "Überrascht",
+    "es": "Sorprendido"
+  },
+  "swan": {
+    "fr": "Cygne",
+    "de": "Schwan",
+    "es": "Cisne"
+  },
+  "swim": {
+    "fr": "Nager",
+    "de": "Schwimmen",
+    "es": "Nadar"
+  },
+  "table": {
+    "fr": "Table",
+    "de": "Tisch",
+    "es": "Mesa"
+  },
+  "taxi": {
+    "fr": "Taxi",
+    "de": "Taxi",
+    "es": "Taxi"
+  },
+  "teacher": {
+    "fr": "Professeur",
+    "de": "Lehrer",
+    "es": "Profesor"
+  },
+  "teeth": {
+    "fr": "Dents",
+    "de": "Zähne",
+    "es": "Dientes"
+  },
+  "temple": {
+    "fr": "Temple",
+    "de": "Tempel",
+    "es": "Templo"
+  },
+  "ten": {
+    "fr": "Dix",
+    "de": "Zehn",
+    "es": "Diez"
+  },
+  "tennis": {
+    "fr": "Tennis",
+    "de": "Tennis",
+    "es": "Tenis"
+  },
+  "three": {
+    "fr": "Trois",
+    "de": "Drei",
+    "es": "Tres"
+  },
+  "thursday": {
+    "fr": "Jeudi",
+    "de": "Donnerstag",
+    "es": "Jueves"
+  },
+  "tiger": {
+    "fr": "Tigre",
+    "de": "Tiger",
+    "es": "Tigre"
+  },
+  "tired": {
+    "fr": "Fatigué",
+    "de": "Müde",
+    "es": "Cansado"
+  },
+  "today": {
+    "fr": "Aujourd'hui",
+    "de": "Heute",
+    "es": "Hoy"
+  },
+  "tomorrow": {
+    "fr": "Demain",
+    "de": "Morgen",
+    "es": "Mañana"
+  },
+  "tower": {
+    "fr": "Tour",
+    "de": "Turm",
+    "es": "Torre"
+  },
+  "train": {
+    "fr": "Train",
+    "de": "Zug",
+    "es": "Tren"
+  },
+  "trash": {
+    "fr": "Poubelle",
+    "de": "Mülleimer",
+    "es": "Basura"
+  },
+  "tree": {
+    "fr": "Arbre",
+    "de": "Baum",
+    "es": "Árbol"
+  },
+  "triangle": {
+    "fr": "Triangle",
+    "de": "Dreieck",
+    "es": "Triángulo"
+  },
+  "truck": {
+    "fr": "Camion",
+    "de": "Lastwagen",
+    "es": "Camión"
+  },
+  "trumpet": {
+    "fr": "Trompette",
+    "de": "Trompete",
+    "es": "Trompeta"
+  },
+  "tuesday": {
+    "fr": "Mardi",
+    "de": "Dienstag",
+    "es": "Martes"
+  },
+  "turtle": {
+    "fr": "Tortue",
+    "de": "Schildkröte",
+    "es": "Tortuga"
+  },
+  "twelve": {
+    "fr": "Douze",
+    "de": "Zwölf",
+    "es": "Doce"
+  },
+  "two": {
+    "fr": "Deux",
+    "de": "Zwei",
+    "es": "Dos"
+  },
+  "umbrella": {
+    "fr": "Parapluie",
+    "de": "Regenschirm",
+    "es": "Paraguas"
+  },
+  "uncle": {
+    "fr": "Oncle",
+    "de": "Onkel",
+    "es": "Tío"
+  },
+  "vet": {
+    "fr": "Vétérinaire",
+    "de": "Tierarzt",
+    "es": "Veterinario"
+  },
+  "violin": {
+    "fr": "Violon",
+    "de": "Geige",
+    "es": "Violín"
+  },
+  "watermelon": {
+    "fr": "Pastèque",
+    "de": "Wassermelone",
+    "es": "Sandía"
+  },
+  "wednesday": {
+    "fr": "Mercredi",
+    "de": "Mittwoch",
+    "es": "Miércoles"
+  },
+  "whale": {
+    "fr": "Baleine",
+    "de": "Wal",
+    "es": "Ballena"
+  },
+  "white": {
+    "fr": "Blanc",
+    "de": "Weiß",
+    "es": "Blanco"
+  },
+  "wind": {
+    "fr": "Vent",
+    "de": "Wind",
+    "es": "Viento"
+  },
+  "window": {
+    "fr": "Fenêtre",
+    "de": "Fenster",
+    "es": "Ventana"
+  },
+  "yellow": {
+    "fr": "Jaune",
+    "de": "Gelb",
+    "es": "Amarillo"
+  },
+  "yesterday": {
+    "fr": "Hier",
+    "de": "Gestern",
+    "es": "Ayer"
+  },
+  "yoga": {
+    "fr": "Yoga",
+    "de": "Yoga",
+    "es": "Yoga"
+  },
+  "zoo": {
+    "fr": "Zoo",
+    "de": "Zoo",
+    "es": "Zoológico"
+  }
+}

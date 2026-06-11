@@ -7,73 +7,109 @@
           "key": "monday",
           "word": "Monday",
           "wordHe": "יום שני",
-          "symbol": "1️⃣"
+          "symbol": "1️⃣",
+          "wordFr": "Lundi",
+          "wordDe": "Montag",
+          "wordEs": "Lunes"
         },
         {
           "key": "tuesday",
           "word": "Tuesday",
           "wordHe": "יום שלישי",
-          "symbol": "2️⃣"
+          "symbol": "2️⃣",
+          "wordFr": "Mardi",
+          "wordDe": "Dienstag",
+          "wordEs": "Martes"
         },
         {
           "key": "wednesday",
           "word": "Wednesday",
           "wordHe": "יום רביעי",
-          "symbol": "3️⃣"
+          "symbol": "3️⃣",
+          "wordFr": "Mercredi",
+          "wordDe": "Mittwoch",
+          "wordEs": "Miércoles"
         },
         {
           "key": "thursday",
           "word": "Thursday",
           "wordHe": "יום חמישי",
-          "symbol": "4️⃣"
+          "symbol": "4️⃣",
+          "wordFr": "Jeudi",
+          "wordDe": "Donnerstag",
+          "wordEs": "Jueves"
         },
         {
           "key": "friday",
           "word": "Friday",
           "wordHe": "יום שישי",
-          "symbol": "5️⃣"
+          "symbol": "5️⃣",
+          "wordFr": "Vendredi",
+          "wordDe": "Freitag",
+          "wordEs": "Viernes"
         },
         {
           "key": "saturday",
           "word": "Saturday",
           "wordHe": "יום שבת",
-          "symbol": "6️⃣"
+          "symbol": "6️⃣",
+          "wordFr": "Samedi",
+          "wordDe": "Samstag",
+          "wordEs": "Sábado"
         },
         {
           "key": "sunday",
           "word": "Sunday",
           "wordHe": "יום ראשון",
-          "symbol": "7️⃣"
+          "symbol": "7️⃣",
+          "wordFr": "Dimanche",
+          "wordDe": "Sonntag",
+          "wordEs": "Domingo"
         },
         {
           "key": "today",
           "word": "Today",
           "wordHe": "היום",
-          "symbol": "📍"
+          "symbol": "📍",
+          "wordFr": "Aujourd'hui",
+          "wordDe": "Heute",
+          "wordEs": "Hoy"
         },
         {
           "key": "tomorrow",
           "word": "Tomorrow",
           "wordHe": "מחר",
-          "symbol": "🔜"
+          "symbol": "🔜",
+          "wordFr": "Demain",
+          "wordDe": "Morgen",
+          "wordEs": "Mañana"
         },
         {
           "key": "yesterday",
           "word": "Yesterday",
           "wordHe": "אתמול",
-          "symbol": "⏪"
+          "symbol": "⏪",
+          "wordFr": "Hier",
+          "wordDe": "Gestern",
+          "wordEs": "Ayer"
         },
         {
           "key": "morning",
           "word": "Morning",
           "wordHe": "בוקר",
-          "symbol": "🌅"
+          "symbol": "🌅",
+          "wordFr": "Matin",
+          "wordDe": "Morgen",
+          "wordEs": "Mañana"
         },
         {
           "key": "night",
           "word": "Night",
           "wordHe": "לילה",
-          "symbol": "🌙"
+          "symbol": "🌙",
+          "wordFr": "Nuit",
+          "wordDe": "Nacht",
+          "wordEs": "Noche"
         }
       ]
     },
@@ -84,73 +120,109 @@
           "key": "car",
           "word": "Car",
           "wordHe": "מכונית",
-          "symbol": "🚗"
+          "symbol": "🚗",
+          "wordFr": "Voiture",
+          "wordDe": "Auto",
+          "wordEs": "Coche"
         },
         {
           "key": "bus",
           "word": "Bus",
           "wordHe": "אוטובוס",
-          "symbol": "🚌"
+          "symbol": "🚌",
+          "wordFr": "Bus",
+          "wordDe": "Bus",
+          "wordEs": "Autobús"
         },
         {
           "key": "train",
           "word": "Train",
           "wordHe": "רכבת",
-          "symbol": "🚆"
+          "symbol": "🚆",
+          "wordFr": "Train",
+          "wordDe": "Zug",
+          "wordEs": "Tren"
         },
         {
           "key": "bike",
           "word": "Bike",
           "wordHe": "אופניים",
-          "symbol": "🚲"
+          "symbol": "🚲",
+          "wordFr": "Vélo",
+          "wordDe": "Fahrrad",
+          "wordEs": "Bicicleta"
         },
         {
           "key": "plane",
           "word": "Plane",
           "wordHe": "מטוס",
-          "symbol": "✈️"
+          "symbol": "✈️",
+          "wordFr": "Avion",
+          "wordDe": "Flugzeug",
+          "wordEs": "Avión"
         },
         {
           "key": "boat",
           "word": "Boat",
           "wordHe": "סירה",
-          "symbol": "⛵"
+          "symbol": "⛵",
+          "wordFr": "Bateau",
+          "wordDe": "Boot",
+          "wordEs": "Barco"
         },
         {
           "key": "truck",
           "word": "Truck",
           "wordHe": "משאית",
-          "symbol": "🚚"
+          "symbol": "🚚",
+          "wordFr": "Camion",
+          "wordDe": "Lastwagen",
+          "wordEs": "Camión"
         },
         {
           "key": "taxi",
           "word": "Taxi",
           "wordHe": "מונית",
-          "symbol": "🚕"
+          "symbol": "🚕",
+          "wordFr": "Taxi",
+          "wordDe": "Taxi",
+          "wordEs": "Taxi"
         },
         {
           "key": "subway",
           "word": "Subway",
           "wordHe": "רכבת תחתית",
-          "symbol": "🚇"
+          "symbol": "🚇",
+          "wordFr": "Métro",
+          "wordDe": "U-Bahn",
+          "wordEs": "Metro"
         },
         {
           "key": "helicopter",
           "word": "Helicopter",
           "wordHe": "מסוק",
-          "symbol": "🚁"
+          "symbol": "🚁",
+          "wordFr": "Hélicoptère",
+          "wordDe": "Hubschrauber",
+          "wordEs": "Helicóptero"
         },
         {
           "key": "scooter",
           "word": "Scooter",
           "wordHe": "קורקינט",
-          "symbol": "🛴"
+          "symbol": "🛴",
+          "wordFr": "Trottinette",
+          "wordDe": "Roller",
+          "wordEs": "Patinete"
         },
         {
           "key": "ship",
           "word": "Ship",
           "wordHe": "אונייה",
-          "symbol": "🚢"
+          "symbol": "🚢",
+          "wordFr": "Navire",
+          "wordDe": "Schiff",
+          "wordEs": "Barco"
         }
       ]
     },
@@ -161,73 +233,109 @@
           "key": "dog",
           "word": "Dog",
           "wordHe": "כלב",
-          "symbol": "🐕"
+          "symbol": "🐕",
+          "wordFr": "Chien",
+          "wordDe": "Hund",
+          "wordEs": "Perro"
         },
         {
           "key": "cat",
           "word": "Cat",
           "wordHe": "חתול",
-          "symbol": "🐈"
+          "symbol": "🐈",
+          "wordFr": "Chat",
+          "wordDe": "Katze",
+          "wordEs": "Gato"
         },
         {
           "key": "lion",
           "word": "Lion",
           "wordHe": "אריה",
-          "symbol": "🦁"
+          "symbol": "🦁",
+          "wordFr": "Lion",
+          "wordDe": "Löwe",
+          "wordEs": "León"
         },
         {
           "key": "tiger",
           "word": "Tiger",
           "wordHe": "נמר",
-          "symbol": "🐯"
+          "symbol": "🐯",
+          "wordFr": "Tigre",
+          "wordDe": "Tiger",
+          "wordEs": "Tigre"
         },
         {
           "key": "elephant",
           "word": "Elephant",
           "wordHe": "פיל",
-          "symbol": "🐘"
+          "symbol": "🐘",
+          "wordFr": "Éléphant",
+          "wordDe": "Elefant",
+          "wordEs": "Elefante"
         },
         {
           "key": "bear",
           "word": "Bear",
           "wordHe": "דוב",
-          "symbol": "🐻"
+          "symbol": "🐻",
+          "wordFr": "Ours",
+          "wordDe": "Bär",
+          "wordEs": "Oso"
         },
         {
           "key": "rabbit",
           "word": "Rabbit",
           "wordHe": "ארנב",
-          "symbol": "🐰"
+          "symbol": "🐰",
+          "wordFr": "Lapin",
+          "wordDe": "Hase",
+          "wordEs": "Conejo"
         },
         {
           "key": "horse",
           "word": "Horse",
           "wordHe": "סוס",
-          "symbol": "🐴"
+          "symbol": "🐴",
+          "wordFr": "Cheval",
+          "wordDe": "Pferd",
+          "wordEs": "Caballo"
         },
         {
           "key": "cow",
           "word": "Cow",
           "wordHe": "פרה",
-          "symbol": "🐄"
+          "symbol": "🐄",
+          "wordFr": "Vache",
+          "wordDe": "Kuh",
+          "wordEs": "Vaca"
         },
         {
           "key": "pig",
           "word": "Pig",
           "wordHe": "חזיר",
-          "symbol": "🐷"
+          "symbol": "🐷",
+          "wordFr": "Cochon",
+          "wordDe": "Schwein",
+          "wordEs": "Cerdo"
         },
         {
           "key": "sheep",
           "word": "Sheep",
           "wordHe": "כבשה",
-          "symbol": "🐑"
+          "symbol": "🐑",
+          "wordFr": "Mouton",
+          "wordDe": "Schaf",
+          "wordEs": "Oveja"
         },
         {
           "key": "monkey",
           "word": "Monkey",
           "wordHe": "קוף",
-          "symbol": "🐒"
+          "symbol": "🐒",
+          "wordFr": "Singe",
+          "wordDe": "Affe",
+          "wordEs": "Mono"
         }
       ]
     },
@@ -238,73 +346,109 @@
           "key": "fish",
           "word": "Fish",
           "wordHe": "דג",
-          "symbol": "🐟"
+          "symbol": "🐟",
+          "wordFr": "Poisson",
+          "wordDe": "Fisch",
+          "wordEs": "Pez"
         },
         {
           "key": "whale",
           "word": "Whale",
           "wordHe": "לווייתן",
-          "symbol": "🐋"
+          "symbol": "🐋",
+          "wordFr": "Baleine",
+          "wordDe": "Wal",
+          "wordEs": "Ballena"
         },
         {
           "key": "dolphin",
           "word": "Dolphin",
           "wordHe": "דולפין",
-          "symbol": "🐬"
+          "symbol": "🐬",
+          "wordFr": "Dauphin",
+          "wordDe": "Delfin",
+          "wordEs": "Delfín"
         },
         {
           "key": "shark",
           "word": "Shark",
           "wordHe": "כריש",
-          "symbol": "🦈"
+          "symbol": "🦈",
+          "wordFr": "Requin",
+          "wordDe": "Hai",
+          "wordEs": "Tiburón"
         },
         {
           "key": "octopus",
           "word": "Octopus",
           "wordHe": "תמנון",
-          "symbol": "🐙"
+          "symbol": "🐙",
+          "wordFr": "Pieuvre",
+          "wordDe": "Krake",
+          "wordEs": "Pulpo"
         },
         {
           "key": "crab",
           "word": "Crab",
           "wordHe": "סרטן",
-          "symbol": "🦀"
+          "symbol": "🦀",
+          "wordFr": "Crabe",
+          "wordDe": "Krabbe",
+          "wordEs": "Cangrejo"
         },
         {
           "key": "jellyfish",
           "word": "Jellyfish",
           "wordHe": "מדוזה",
-          "symbol": "🪼"
+          "symbol": "🪼",
+          "wordFr": "Méduse",
+          "wordDe": "Qualle",
+          "wordEs": "Medusa"
         },
         {
           "key": "turtle",
           "word": "Turtle",
           "wordHe": "צב",
-          "symbol": "🐢"
+          "symbol": "🐢",
+          "wordFr": "Tortue",
+          "wordDe": "Schildkröte",
+          "wordEs": "Tortuga"
         },
         {
           "key": "seal",
           "word": "Seal",
           "wordHe": "כלב ים",
-          "symbol": "🦭"
+          "symbol": "🦭",
+          "wordFr": "Phoque",
+          "wordDe": "Robbe",
+          "wordEs": "Foca"
         },
         {
           "key": "starfish",
           "word": "Starfish",
           "wordHe": "כוכב ים",
-          "symbol": "⭐"
+          "symbol": "⭐",
+          "wordFr": "Étoile de mer",
+          "wordDe": "Seestern",
+          "wordEs": "Estrella de mar"
         },
         {
           "key": "lobster",
           "word": "Lobster",
           "wordHe": "לובסטר",
-          "symbol": "🦞"
+          "symbol": "🦞",
+          "wordFr": "Homard",
+          "wordDe": "Hummer",
+          "wordEs": "Langosta"
         },
         {
           "key": "seahorse",
           "word": "Seahorse",
           "wordHe": "סוס ים",
-          "symbol": "🐡"
+          "symbol": "🐡",
+          "wordFr": "Hippocampe",
+          "wordDe": "Seepferdchen",
+          "wordEs": "Caballito de mar"
         }
       ]
     },
@@ -315,73 +459,109 @@
           "key": "eagle",
           "word": "Eagle",
           "wordHe": "נשר",
-          "symbol": "🦅"
+          "symbol": "🦅",
+          "wordFr": "Aigle",
+          "wordDe": "Adler",
+          "wordEs": "Águila"
         },
         {
           "key": "owl",
           "word": "Owl",
           "wordHe": "ינשוף",
-          "symbol": "🦉"
+          "symbol": "🦉",
+          "wordFr": "Hibou",
+          "wordDe": "Eule",
+          "wordEs": "Búho"
         },
         {
           "key": "parrot",
           "word": "Parrot",
           "wordHe": "תוכי",
-          "symbol": "🦜"
+          "symbol": "🦜",
+          "wordFr": "Perroquet",
+          "wordDe": "Papagei",
+          "wordEs": "Loro"
         },
         {
           "key": "duck",
           "word": "Duck",
           "wordHe": "ברווז",
-          "symbol": "🦆"
+          "symbol": "🦆",
+          "wordFr": "Canard",
+          "wordDe": "Ente",
+          "wordEs": "Pato"
         },
         {
           "key": "chicken",
           "word": "Chicken",
           "wordHe": "תרנגולת",
-          "symbol": "🐔"
+          "symbol": "🐔",
+          "wordFr": "Poule",
+          "wordDe": "Huhn",
+          "wordEs": "Gallina"
         },
         {
           "key": "penguin",
           "word": "Penguin",
           "wordHe": "פינגווין",
-          "symbol": "🐧"
+          "symbol": "🐧",
+          "wordFr": "Pingouin",
+          "wordDe": "Pinguin",
+          "wordEs": "Pingüino"
         },
         {
           "key": "flamingo",
           "word": "Flamingo",
           "wordHe": "פלמינגו",
-          "symbol": "🦩"
+          "symbol": "🦩",
+          "wordFr": "Flamant",
+          "wordDe": "Flamingo",
+          "wordEs": "Flamenco"
         },
         {
           "key": "sparrow",
           "word": "Sparrow",
           "wordHe": "דרור",
-          "symbol": "🐦"
+          "symbol": "🐦",
+          "wordFr": "Moineau",
+          "wordDe": "Spatz",
+          "wordEs": "Gorrión"
         },
         {
           "key": "peacock",
           "word": "Peacock",
           "wordHe": "טווס",
-          "symbol": "🦚"
+          "symbol": "🦚",
+          "wordFr": "Paon",
+          "wordDe": "Pfau",
+          "wordEs": "Pavo real"
         },
         {
           "key": "swan",
           "word": "Swan",
           "wordHe": "ברבור",
-          "symbol": "🦢"
+          "symbol": "🦢",
+          "wordFr": "Cygne",
+          "wordDe": "Schwan",
+          "wordEs": "Cisne"
         },
         {
           "key": "crow",
           "word": "Crow",
           "wordHe": "עורב",
-          "symbol": "🐦‍⬛"
+          "symbol": "🐦‍⬛",
+          "wordFr": "Corbeau",
+          "wordDe": "Krähe",
+          "wordEs": "Cuervo"
         },
         {
           "key": "hummingbird",
           "word": "Hummingbird",
           "wordHe": "יונק דבש",
-          "symbol": "🐥"
+          "symbol": "🐥",
+          "wordFr": "Colibri",
+          "wordDe": "Kolibri",
+          "wordEs": "Colibrí"
         }
       ]
     },
@@ -392,73 +572,109 @@
           "key": "book",
           "word": "Book",
           "wordHe": "ספר",
-          "symbol": "📚"
+          "symbol": "📚",
+          "wordFr": "Livre",
+          "wordDe": "Buch",
+          "wordEs": "Libro"
         },
         {
           "key": "pencil",
           "word": "Pencil",
           "wordHe": "עיפרון",
-          "symbol": "✏️"
+          "symbol": "✏️",
+          "wordFr": "Crayon",
+          "wordDe": "Bleistift",
+          "wordEs": "Lápiz"
         },
         {
           "key": "eraser",
           "word": "Eraser",
           "wordHe": "מחק",
-          "symbol": "🧽"
+          "symbol": "🧽",
+          "wordFr": "Gomme",
+          "wordDe": "Radiergummi",
+          "wordEs": "Goma"
         },
         {
           "key": "ruler",
           "word": "Ruler",
           "wordHe": "סרגל",
-          "symbol": "📏"
+          "symbol": "📏",
+          "wordFr": "Règle",
+          "wordDe": "Lineal",
+          "wordEs": "Regla"
         },
         {
           "key": "desk",
           "word": "Desk",
           "wordHe": "שולחן",
-          "symbol": "🪑"
+          "symbol": "🪑",
+          "wordFr": "Bureau",
+          "wordDe": "Schreibtisch",
+          "wordEs": "Escritorio"
         },
         {
           "key": "chair",
           "word": "Chair",
           "wordHe": "כיסא",
-          "symbol": "💺"
+          "symbol": "💺",
+          "wordFr": "Chaise",
+          "wordDe": "Stuhl",
+          "wordEs": "Silla"
         },
         {
           "key": "backpack",
           "word": "Backpack",
           "wordHe": "תיק",
-          "symbol": "🎒"
+          "symbol": "🎒",
+          "wordFr": "Sac à dos",
+          "wordDe": "Rucksack",
+          "wordEs": "Mochila"
         },
         {
           "key": "teacher",
           "word": "Teacher",
           "wordHe": "מורה",
-          "symbol": "👩‍🏫"
+          "symbol": "👩‍🏫",
+          "wordFr": "Professeur",
+          "wordDe": "Lehrer",
+          "wordEs": "Profesor"
         },
         {
           "key": "student",
           "word": "Student",
           "wordHe": "תלמיד",
-          "symbol": "🧑‍🎓"
+          "symbol": "🧑‍🎓",
+          "wordFr": "Élève",
+          "wordDe": "Schüler",
+          "wordEs": "Alumno"
         },
         {
           "key": "bell",
           "word": "Bell",
           "wordHe": "פעמון",
-          "symbol": "🔔"
+          "symbol": "🔔",
+          "wordFr": "Cloche",
+          "wordDe": "Glocke",
+          "wordEs": "Campana"
         },
         {
           "key": "crayon",
           "word": "Crayon",
           "wordHe": "צבע",
-          "symbol": "🖍️"
+          "symbol": "🖍️",
+          "wordFr": "Crayon de couleur",
+          "wordDe": "Buntstift",
+          "wordEs": "Crayón de color"
         },
         {
           "key": "notebook",
           "word": "Notebook",
           "wordHe": "מחברת",
-          "symbol": "📓"
+          "symbol": "📓",
+          "wordFr": "Cahier",
+          "wordDe": "Heft",
+          "wordEs": "Cuaderno"
         }
       ]
     },
@@ -469,73 +685,109 @@
           "key": "road",
           "word": "Road",
           "wordHe": "כביש",
-          "symbol": "🛣️"
+          "symbol": "🛣️",
+          "wordFr": "Route",
+          "wordDe": "Straße",
+          "wordEs": "Carretera"
         },
         {
           "key": "light",
           "word": "Light",
           "wordHe": "רמזור",
-          "symbol": "🚦"
+          "symbol": "🚦",
+          "wordFr": "Feu",
+          "wordDe": "Ampel",
+          "wordEs": "Semáforo"
         },
         {
           "key": "sign",
           "word": "Sign",
           "wordHe": "שלט",
-          "symbol": "🪧"
+          "symbol": "🪧",
+          "wordFr": "Panneau",
+          "wordDe": "Schild",
+          "wordEs": "Señal"
         },
         {
           "key": "sidewalk",
           "word": "Sidewalk",
           "wordHe": "מדרכה",
-          "symbol": "🚶"
+          "symbol": "🚶",
+          "wordFr": "Trottoir",
+          "wordDe": "Gehweg",
+          "wordEs": "Acera"
         },
         {
           "key": "bridge",
           "word": "Bridge",
           "wordHe": "גשר",
-          "symbol": "🌉"
+          "symbol": "🌉",
+          "wordFr": "Pont",
+          "wordDe": "Brücke",
+          "wordEs": "Puente"
         },
         {
           "key": "park",
           "word": "Park",
           "wordHe": "פארק",
-          "symbol": "🌳"
+          "symbol": "🌳",
+          "wordFr": "Parc",
+          "wordDe": "Park",
+          "wordEs": "Parque"
         },
         {
           "key": "bench",
           "word": "Bench",
           "wordHe": "ספסל",
-          "symbol": "🪑"
+          "symbol": "🪑",
+          "wordFr": "Banc",
+          "wordDe": "Bank",
+          "wordEs": "Banco"
         },
         {
           "key": "mailbox",
           "word": "Mailbox",
           "wordHe": "תיבת דואר",
-          "symbol": "📮"
+          "symbol": "📮",
+          "wordFr": "Boîte aux lettres",
+          "wordDe": "Briefkasten",
+          "wordEs": "Buzón"
         },
         {
           "key": "trash",
           "word": "Trash",
           "wordHe": "פח",
-          "symbol": "🗑️"
+          "symbol": "🗑️",
+          "wordFr": "Poubelle",
+          "wordDe": "Mülleimer",
+          "wordEs": "Basura"
         },
         {
           "key": "crosswalk",
           "word": "Crosswalk",
           "wordHe": "מעבר חציה",
-          "symbol": "🚸"
+          "symbol": "🚸",
+          "wordFr": "Passage piéton",
+          "wordDe": "Zebrastreifen",
+          "wordEs": "Paso de cebra"
         },
         {
           "key": "fountain",
           "word": "Fountain",
           "wordHe": "מזרקה",
-          "symbol": "⛲"
+          "symbol": "⛲",
+          "wordFr": "Fontaine",
+          "wordDe": "Brunnen",
+          "wordEs": "Fuente"
         },
         {
           "key": "statue",
           "word": "Statue",
           "wordHe": "פסל",
-          "symbol": "🗿"
+          "symbol": "🗿",
+          "wordFr": "Statue",
+          "wordDe": "Statue",
+          "wordEs": "Estatua"
         }
       ]
     },
@@ -546,73 +798,109 @@
           "key": "red",
           "word": "Red",
           "wordHe": "אדום",
-          "symbol": "🔴"
+          "symbol": "🔴",
+          "wordFr": "Rouge",
+          "wordDe": "Rot",
+          "wordEs": "Rojo"
         },
         {
           "key": "blue",
           "word": "Blue",
           "wordHe": "כחול",
-          "symbol": "🔵"
+          "symbol": "🔵",
+          "wordFr": "Bleu",
+          "wordDe": "Blau",
+          "wordEs": "Azul"
         },
         {
           "key": "green",
           "word": "Green",
           "wordHe": "ירוק",
-          "symbol": "🟢"
+          "symbol": "🟢",
+          "wordFr": "Vert",
+          "wordDe": "Grün",
+          "wordEs": "Verde"
         },
         {
           "key": "yellow",
           "word": "Yellow",
           "wordHe": "צהוב",
-          "symbol": "🟡"
+          "symbol": "🟡",
+          "wordFr": "Jaune",
+          "wordDe": "Gelb",
+          "wordEs": "Amarillo"
         },
         {
           "key": "orange",
           "word": "Orange",
           "wordHe": "כתום",
-          "symbol": "🟠"
+          "symbol": "🟠",
+          "wordFr": "Orange",
+          "wordDe": "Orange",
+          "wordEs": "Naranja"
         },
         {
           "key": "purple",
           "word": "Purple",
           "wordHe": "סגול",
-          "symbol": "🟣"
+          "symbol": "🟣",
+          "wordFr": "Violet",
+          "wordDe": "Lila",
+          "wordEs": "Morado"
         },
         {
           "key": "pink",
           "word": "Pink",
           "wordHe": "ורוד",
-          "symbol": "🩷"
+          "symbol": "🩷",
+          "wordFr": "Rose",
+          "wordDe": "Rosa",
+          "wordEs": "Rosa"
         },
         {
           "key": "brown",
           "word": "Brown",
           "wordHe": "חום",
-          "symbol": "🟤"
+          "symbol": "🟤",
+          "wordFr": "Marron",
+          "wordDe": "Braun",
+          "wordEs": "Marrón"
         },
         {
           "key": "black",
           "word": "Black",
           "wordHe": "שחור",
-          "symbol": "⚫"
+          "symbol": "⚫",
+          "wordFr": "Noir",
+          "wordDe": "Schwarz",
+          "wordEs": "Negro"
         },
         {
           "key": "white",
           "word": "White",
           "wordHe": "לבן",
-          "symbol": "⚪"
+          "symbol": "⚪",
+          "wordFr": "Blanc",
+          "wordDe": "Weiß",
+          "wordEs": "Blanco"
         },
         {
           "key": "gray",
           "word": "Gray",
           "wordHe": "אפור",
-          "symbol": "⬜"
+          "symbol": "⬜",
+          "wordFr": "Gris",
+          "wordDe": "Grau",
+          "wordEs": "Gris"
         },
         {
           "key": "gold",
           "word": "Gold",
           "wordHe": "זהב",
-          "symbol": "✨"
+          "symbol": "✨",
+          "wordFr": "Or",
+          "wordDe": "Gold",
+          "wordEs": "Dorado"
         }
       ]
     },
@@ -623,73 +911,109 @@
           "key": "apple",
           "word": "Apple",
           "wordHe": "תפוח",
-          "symbol": "🍎"
+          "symbol": "🍎",
+          "wordFr": "Pomme",
+          "wordDe": "Apfel",
+          "wordEs": "Manzana"
         },
         {
           "key": "banana",
           "word": "Banana",
           "wordHe": "בננה",
-          "symbol": "🍌"
+          "symbol": "🍌",
+          "wordFr": "Banane",
+          "wordDe": "Banane",
+          "wordEs": "Plátano"
         },
         {
           "key": "orange",
           "word": "Orange",
           "wordHe": "תפוז",
-          "symbol": "🍊"
+          "symbol": "🍊",
+          "wordFr": "Orange",
+          "wordDe": "Orange",
+          "wordEs": "Naranja"
         },
         {
           "key": "grape",
           "word": "Grape",
           "wordHe": "ענבים",
-          "symbol": "🍇"
+          "symbol": "🍇",
+          "wordFr": "Raisin",
+          "wordDe": "Traube",
+          "wordEs": "Uva"
         },
         {
           "key": "strawberry",
           "word": "Strawberry",
           "wordHe": "תות",
-          "symbol": "🍓"
+          "symbol": "🍓",
+          "wordFr": "Fraise",
+          "wordDe": "Erdbeere",
+          "wordEs": "Fresa"
         },
         {
           "key": "watermelon",
           "word": "Watermelon",
           "wordHe": "אבטיח",
-          "symbol": "🍉"
+          "symbol": "🍉",
+          "wordFr": "Pastèque",
+          "wordDe": "Wassermelone",
+          "wordEs": "Sandía"
         },
         {
           "key": "peach",
           "word": "Peach",
           "wordHe": "אפרסק",
-          "symbol": "🍑"
+          "symbol": "🍑",
+          "wordFr": "Pêche",
+          "wordDe": "Pfirsich",
+          "wordEs": "Melocotón"
         },
         {
           "key": "pear",
           "word": "Pear",
           "wordHe": "אגס",
-          "symbol": "🍐"
+          "symbol": "🍐",
+          "wordFr": "Poire",
+          "wordDe": "Birne",
+          "wordEs": "Pera"
         },
         {
           "key": "lemon",
           "word": "Lemon",
           "wordHe": "לימון",
-          "symbol": "🍋"
+          "symbol": "🍋",
+          "wordFr": "Citron",
+          "wordDe": "Zitrone",
+          "wordEs": "Limón"
         },
         {
           "key": "cherry",
           "word": "Cherry",
           "wordHe": "דובדבן",
-          "symbol": "🍒"
+          "symbol": "🍒",
+          "wordFr": "Cerise",
+          "wordDe": "Kirsche",
+          "wordEs": "Cereza"
         },
         {
           "key": "pineapple",
           "word": "Pineapple",
           "wordHe": "אננס",
-          "symbol": "🍍"
+          "symbol": "🍍",
+          "wordFr": "Ananas",
+          "wordDe": "Ananas",
+          "wordEs": "Piña"
         },
         {
           "key": "mango",
           "word": "Mango",
           "wordHe": "מנגו",
-          "symbol": "🥭"
+          "symbol": "🥭",
+          "wordFr": "Mangue",
+          "wordDe": "Mango",
+          "wordEs": "Mango"
         }
       ]
     },
@@ -701,84 +1025,120 @@
           "word": "Mom",
           "wordHe": "אמא",
           "symbol": "👩",
-          "imageUrl": "/english/family/mom.svg"
+          "imageUrl": "/english/family/mom.svg",
+          "wordFr": "Maman",
+          "wordDe": "Mama",
+          "wordEs": "Mamá"
         },
         {
           "key": "dad",
           "word": "Dad",
           "wordHe": "אבא",
           "symbol": "👨",
-          "imageUrl": "/english/family/dad.svg"
+          "imageUrl": "/english/family/dad.svg",
+          "wordFr": "Papa",
+          "wordDe": "Papa",
+          "wordEs": "Papá"
         },
         {
           "key": "sister",
           "word": "Sister",
           "wordHe": "אחות",
           "symbol": "👧",
-          "imageUrl": "/english/family/sister.svg"
+          "imageUrl": "/english/family/sister.svg",
+          "wordFr": "Sœur",
+          "wordDe": "Schwester",
+          "wordEs": "Hermana"
         },
         {
           "key": "brother",
           "word": "Brother",
           "wordHe": "אח",
           "symbol": "👦",
-          "imageUrl": "/english/family/brother.svg"
+          "imageUrl": "/english/family/brother.svg",
+          "wordFr": "Frère",
+          "wordDe": "Bruder",
+          "wordEs": "Hermano"
         },
         {
           "key": "baby",
           "word": "Baby",
           "wordHe": "תינוק",
           "symbol": "👶",
-          "imageUrl": "/english/family/baby.svg"
+          "imageUrl": "/english/family/baby.svg",
+          "wordFr": "Bébé",
+          "wordDe": "Baby",
+          "wordEs": "Bebé"
         },
         {
           "key": "grandma",
           "word": "Grandma",
           "wordHe": "סבתא",
           "symbol": "👵",
-          "imageUrl": "/english/family/grandma.svg"
+          "imageUrl": "/english/family/grandma.svg",
+          "wordFr": "Mamie",
+          "wordDe": "Oma",
+          "wordEs": "Abuela"
         },
         {
           "key": "grandpa",
           "word": "Grandpa",
           "wordHe": "סבא",
           "symbol": "👴",
-          "imageUrl": "/english/family/grandpa.svg"
+          "imageUrl": "/english/family/grandpa.svg",
+          "wordFr": "Papi",
+          "wordDe": "Opa",
+          "wordEs": "Abuelo"
         },
         {
           "key": "aunt",
           "word": "Aunt",
           "wordHe": "דודה",
           "symbol": "👩‍🦰",
-          "imageUrl": "/english/family/aunt.svg"
+          "imageUrl": "/english/family/aunt.svg",
+          "wordFr": "Tante",
+          "wordDe": "Tante",
+          "wordEs": "Tía"
         },
         {
           "key": "uncle",
           "word": "Uncle",
           "wordHe": "דוד",
           "symbol": "👨‍🦱",
-          "imageUrl": "/english/family/uncle.svg"
+          "imageUrl": "/english/family/uncle.svg",
+          "wordFr": "Oncle",
+          "wordDe": "Onkel",
+          "wordEs": "Tío"
         },
         {
           "key": "cousin",
           "word": "Cousin",
           "wordHe": "בן דוד",
           "symbol": "🧒",
-          "imageUrl": "/english/family/cousin.svg"
+          "imageUrl": "/english/family/cousin.svg",
+          "wordFr": "Cousin",
+          "wordDe": "Cousin",
+          "wordEs": "Primo"
         },
         {
           "key": "parents",
           "word": "Parents",
           "wordHe": "הורים",
           "symbol": "👨‍👩‍👧",
-          "imageUrl": "/english/family/parents.svg"
+          "imageUrl": "/english/family/parents.svg",
+          "wordFr": "Parents",
+          "wordDe": "Eltern",
+          "wordEs": "Padres"
         },
         {
           "key": "family",
           "word": "Family",
           "wordHe": "משפחה",
           "symbol": "👪",
-          "imageUrl": "/english/family/family.svg"
+          "imageUrl": "/english/family/family.svg",
+          "wordFr": "Famille",
+          "wordDe": "Familie",
+          "wordEs": "Familia"
         }
       ]
     },
@@ -789,73 +1149,109 @@
           "key": "head",
           "word": "Head",
           "wordHe": "ראש",
-          "symbol": "👤"
+          "symbol": "👤",
+          "wordFr": "Tête",
+          "wordDe": "Kopf",
+          "wordEs": "Cabeza"
         },
         {
           "key": "hand",
           "word": "Hand",
           "wordHe": "יד",
-          "symbol": "✋"
+          "symbol": "✋",
+          "wordFr": "Main",
+          "wordDe": "Hand",
+          "wordEs": "Mano"
         },
         {
           "key": "foot",
           "word": "Foot",
           "wordHe": "רגל",
-          "symbol": "🦶"
+          "symbol": "🦶",
+          "wordFr": "Pied",
+          "wordDe": "Fuß",
+          "wordEs": "Pie"
         },
         {
           "key": "eye",
           "word": "Eye",
           "wordHe": "עין",
-          "symbol": "👁️"
+          "symbol": "👁️",
+          "wordFr": "Œil",
+          "wordDe": "Auge",
+          "wordEs": "Ojo"
         },
         {
           "key": "ear",
           "word": "Ear",
           "wordHe": "אוזן",
-          "symbol": "👂"
+          "symbol": "👂",
+          "wordFr": "Oreille",
+          "wordDe": "Ohr",
+          "wordEs": "Oreja"
         },
         {
           "key": "nose",
           "word": "Nose",
           "wordHe": "אף",
-          "symbol": "👃"
+          "symbol": "👃",
+          "wordFr": "Nez",
+          "wordDe": "Nase",
+          "wordEs": "Nariz"
         },
         {
           "key": "mouth",
           "word": "Mouth",
           "wordHe": "פה",
-          "symbol": "👄"
+          "symbol": "👄",
+          "wordFr": "Bouche",
+          "wordDe": "Mund",
+          "wordEs": "Boca"
         },
         {
           "key": "teeth",
           "word": "Teeth",
           "wordHe": "שיניים",
-          "symbol": "🦷"
+          "symbol": "🦷",
+          "wordFr": "Dents",
+          "wordDe": "Zähne",
+          "wordEs": "Dientes"
         },
         {
           "key": "hair",
           "word": "Hair",
           "wordHe": "שיער",
-          "symbol": "💇"
+          "symbol": "💇",
+          "wordFr": "Cheveux",
+          "wordDe": "Haare",
+          "wordEs": "Pelo"
         },
         {
           "key": "arm",
           "word": "Arm",
           "wordHe": "זרוע",
-          "symbol": "💪"
+          "symbol": "💪",
+          "wordFr": "Bras",
+          "wordDe": "Arm",
+          "wordEs": "Brazo"
         },
         {
           "key": "leg",
           "word": "Leg",
           "wordHe": "רגל",
-          "symbol": "🦵"
+          "symbol": "🦵",
+          "wordFr": "Jambe",
+          "wordDe": "Bein",
+          "wordEs": "Pierna"
         },
         {
           "key": "heart",
           "word": "Heart",
           "wordHe": "לב",
-          "symbol": "❤️"
+          "symbol": "❤️",
+          "wordFr": "Cœur",
+          "wordDe": "Herz",
+          "wordEs": "Corazón"
         }
       ]
     },
@@ -866,73 +1262,109 @@
           "key": "sun",
           "word": "Sun",
           "wordHe": "שמש",
-          "symbol": "☀️"
+          "symbol": "☀️",
+          "wordFr": "Soleil",
+          "wordDe": "Sonne",
+          "wordEs": "Sol"
         },
         {
           "key": "rain",
           "word": "Rain",
           "wordHe": "גשם",
-          "symbol": "🌧️"
+          "symbol": "🌧️",
+          "wordFr": "Pluie",
+          "wordDe": "Regen",
+          "wordEs": "Lluvia"
         },
         {
           "key": "cloud",
           "word": "Cloud",
           "wordHe": "ענן",
-          "symbol": "☁️"
+          "symbol": "☁️",
+          "wordFr": "Nuage",
+          "wordDe": "Wolke",
+          "wordEs": "Nube"
         },
         {
           "key": "snow",
           "word": "Snow",
           "wordHe": "שלג",
-          "symbol": "❄️"
+          "symbol": "❄️",
+          "wordFr": "Neige",
+          "wordDe": "Schnee",
+          "wordEs": "Nieve"
         },
         {
           "key": "wind",
           "word": "Wind",
           "wordHe": "רוח",
-          "symbol": "💨"
+          "symbol": "💨",
+          "wordFr": "Vent",
+          "wordDe": "Wind",
+          "wordEs": "Viento"
         },
         {
           "key": "storm",
           "word": "Storm",
           "wordHe": "סערה",
-          "symbol": "⛈️"
+          "symbol": "⛈️",
+          "wordFr": "Orage",
+          "wordDe": "Sturm",
+          "wordEs": "Tormenta"
         },
         {
           "key": "rainbow",
           "word": "Rainbow",
           "wordHe": "קשת",
-          "symbol": "🌈"
+          "symbol": "🌈",
+          "wordFr": "Arc-en-ciel",
+          "wordDe": "Regenbogen",
+          "wordEs": "Arcoíris"
         },
         {
           "key": "hot",
           "word": "Hot",
           "wordHe": "חם",
-          "symbol": "🥵"
+          "symbol": "🥵",
+          "wordFr": "Chaud",
+          "wordDe": "Heiß",
+          "wordEs": "Caliente"
         },
         {
           "key": "cold",
           "word": "Cold",
           "wordHe": "קר",
-          "symbol": "🥶"
+          "symbol": "🥶",
+          "wordFr": "Froid",
+          "wordDe": "Kalt",
+          "wordEs": "Frío"
         },
         {
           "key": "fog",
           "word": "Fog",
           "wordHe": "ערפל",
-          "symbol": "🌫️"
+          "symbol": "🌫️",
+          "wordFr": "Brouillard",
+          "wordDe": "Nebel",
+          "wordEs": "Niebla"
         },
         {
           "key": "lightning",
           "word": "Lightning",
           "wordHe": "ברק",
-          "symbol": "⚡"
+          "symbol": "⚡",
+          "wordFr": "Éclair",
+          "wordDe": "Blitz",
+          "wordEs": "Rayo"
         },
         {
           "key": "umbrella",
           "word": "Umbrella",
           "wordHe": "מטריה",
-          "symbol": "☂️"
+          "symbol": "☂️",
+          "wordFr": "Parapluie",
+          "wordDe": "Regenschirm",
+          "wordEs": "Paraguas"
         }
       ]
     },
@@ -943,73 +1375,109 @@
           "key": "shirt",
           "word": "Shirt",
           "wordHe": "חולצה",
-          "symbol": "👕"
+          "symbol": "👕",
+          "wordFr": "T-shirt",
+          "wordDe": "Hemd",
+          "wordEs": "Camiseta"
         },
         {
           "key": "pants",
           "word": "Pants",
           "wordHe": "מכנסיים",
-          "symbol": "👖"
+          "symbol": "👖",
+          "wordFr": "Pantalon",
+          "wordDe": "Hose",
+          "wordEs": "Pantalones"
         },
         {
           "key": "shoes",
           "word": "Shoes",
           "wordHe": "נעליים",
-          "symbol": "👟"
+          "symbol": "👟",
+          "wordFr": "Chaussures",
+          "wordDe": "Schuhe",
+          "wordEs": "Zapatos"
         },
         {
           "key": "socks",
           "word": "Socks",
           "wordHe": "גרביים",
-          "symbol": "🧦"
+          "symbol": "🧦",
+          "wordFr": "Chaussettes",
+          "wordDe": "Socken",
+          "wordEs": "Calcetines"
         },
         {
           "key": "hat",
           "word": "Hat",
           "wordHe": "כובע",
-          "symbol": "🧢"
+          "symbol": "🧢",
+          "wordFr": "Chapeau",
+          "wordDe": "Hut",
+          "wordEs": "Sombrero"
         },
         {
           "key": "coat",
           "word": "Coat",
           "wordHe": "מעיל",
-          "symbol": "🧥"
+          "symbol": "🧥",
+          "wordFr": "Manteau",
+          "wordDe": "Mantel",
+          "wordEs": "Abrigo"
         },
         {
           "key": "dress",
           "word": "Dress",
           "wordHe": "שמלה",
-          "symbol": "👗"
+          "symbol": "👗",
+          "wordFr": "Robe",
+          "wordDe": "Kleid",
+          "wordEs": "Vestido"
         },
         {
           "key": "skirt",
           "word": "Skirt",
           "wordHe": "חצאית",
-          "symbol": "👚"
+          "symbol": "👚",
+          "wordFr": "Jupe",
+          "wordDe": "Rock",
+          "wordEs": "Falda"
         },
         {
           "key": "gloves",
           "word": "Gloves",
           "wordHe": "כפפות",
-          "symbol": "🧤"
+          "symbol": "🧤",
+          "wordFr": "Gants",
+          "wordDe": "Handschuhe",
+          "wordEs": "Guantes"
         },
         {
           "key": "scarf",
           "word": "Scarf",
           "wordHe": "צעיף",
-          "symbol": "🧣"
+          "symbol": "🧣",
+          "wordFr": "Écharpe",
+          "wordDe": "Schal",
+          "wordEs": "Bufanda"
         },
         {
           "key": "jacket",
           "word": "Jacket",
           "wordHe": "ז׳קט",
-          "symbol": "🦺"
+          "symbol": "🦺",
+          "wordFr": "Veste",
+          "wordDe": "Jacke",
+          "wordEs": "Chaqueta"
         },
         {
           "key": "boots",
           "word": "Boots",
           "wordHe": "מגפיים",
-          "symbol": "👢"
+          "symbol": "👢",
+          "wordFr": "Bottes",
+          "wordDe": "Stiefel",
+          "wordEs": "Botas"
         }
       ]
     },
@@ -1020,73 +1488,109 @@
           "key": "bread",
           "word": "Bread",
           "wordHe": "לחם",
-          "symbol": "🍞"
+          "symbol": "🍞",
+          "wordFr": "Pain",
+          "wordDe": "Brot",
+          "wordEs": "Pan"
         },
         {
           "key": "milk",
           "word": "Milk",
           "wordHe": "חלב",
-          "symbol": "🥛"
+          "symbol": "🥛",
+          "wordFr": "Lait",
+          "wordDe": "Milch",
+          "wordEs": "Leche"
         },
         {
           "key": "egg",
           "word": "Egg",
           "wordHe": "ביצה",
-          "symbol": "🥚"
+          "symbol": "🥚",
+          "wordFr": "Œuf",
+          "wordDe": "Ei",
+          "wordEs": "Huevo"
         },
         {
           "key": "cheese",
           "word": "Cheese",
           "wordHe": "גבינה",
-          "symbol": "🧀"
+          "symbol": "🧀",
+          "wordFr": "Fromage",
+          "wordDe": "Käse",
+          "wordEs": "Queso"
         },
         {
           "key": "rice",
           "word": "Rice",
           "wordHe": "אורז",
-          "symbol": "🍚"
+          "symbol": "🍚",
+          "wordFr": "Riz",
+          "wordDe": "Reis",
+          "wordEs": "Arroz"
         },
         {
           "key": "soup",
           "word": "Soup",
           "wordHe": "מרק",
-          "symbol": "🍲"
+          "symbol": "🍲",
+          "wordFr": "Soupe",
+          "wordDe": "Suppe",
+          "wordEs": "Sopa"
         },
         {
           "key": "pizza",
           "word": "Pizza",
           "wordHe": "פיצה",
-          "symbol": "🍕"
+          "symbol": "🍕",
+          "wordFr": "Pizza",
+          "wordDe": "Pizza",
+          "wordEs": "Pizza"
         },
         {
           "key": "salad",
           "word": "Salad",
           "wordHe": "סלט",
-          "symbol": "🥗"
+          "symbol": "🥗",
+          "wordFr": "Salade",
+          "wordDe": "Salat",
+          "wordEs": "Ensalada"
         },
         {
           "key": "cookie",
           "word": "Cookie",
           "wordHe": "עוגיה",
-          "symbol": "🍪"
+          "symbol": "🍪",
+          "wordFr": "Biscuit",
+          "wordDe": "Keks",
+          "wordEs": "Galleta"
         },
         {
           "key": "cake",
           "word": "Cake",
           "wordHe": "עוגה",
-          "symbol": "🎂"
+          "symbol": "🎂",
+          "wordFr": "Gâteau",
+          "wordDe": "Kuchen",
+          "wordEs": "Pastel"
         },
         {
           "key": "honey",
           "word": "Honey",
           "wordHe": "דבש",
-          "symbol": "🍯"
+          "symbol": "🍯",
+          "wordFr": "Miel",
+          "wordDe": "Honig",
+          "wordEs": "Miel"
         },
         {
           "key": "butter",
           "word": "Butter",
           "wordHe": "חמאה",
-          "symbol": "🧈"
+          "symbol": "🧈",
+          "wordFr": "Beurre",
+          "wordDe": "Butter",
+          "wordEs": "Mantequilla"
         }
       ]
     },
@@ -1097,73 +1601,109 @@
           "key": "ball",
           "word": "Ball",
           "wordHe": "כדור",
-          "symbol": "🏐"
+          "symbol": "🏐",
+          "wordFr": "Balle",
+          "wordDe": "Ball",
+          "wordEs": "Pelota"
         },
         {
           "key": "soccer",
           "word": "Soccer",
           "wordHe": "כדורגל",
-          "symbol": "⚽"
+          "symbol": "⚽",
+          "wordFr": "Football",
+          "wordDe": "Fußball",
+          "wordEs": "Fútbol"
         },
         {
           "key": "basketball",
           "word": "Basketball",
           "wordHe": "כדורסל",
-          "symbol": "🏀"
+          "symbol": "🏀",
+          "wordFr": "Basketball",
+          "wordDe": "Basketball",
+          "wordEs": "Baloncesto"
         },
         {
           "key": "tennis",
           "word": "Tennis",
           "wordHe": "טניס",
-          "symbol": "🎾"
+          "symbol": "🎾",
+          "wordFr": "Tennis",
+          "wordDe": "Tennis",
+          "wordEs": "Tenis"
         },
         {
           "key": "swim",
           "word": "Swim",
           "wordHe": "שחייה",
-          "symbol": "🏊"
+          "symbol": "🏊",
+          "wordFr": "Nager",
+          "wordDe": "Schwimmen",
+          "wordEs": "Nadar"
         },
         {
           "key": "run",
           "word": "Run",
           "wordHe": "ריצה",
-          "symbol": "🏃"
+          "symbol": "🏃",
+          "wordFr": "Courir",
+          "wordDe": "Laufen",
+          "wordEs": "Correr"
         },
         {
           "key": "jump",
           "word": "Jump",
           "wordHe": "קפיצה",
-          "symbol": "🤸"
+          "symbol": "🤸",
+          "wordFr": "Sauter",
+          "wordDe": "Springen",
+          "wordEs": "Saltar"
         },
         {
           "key": "skate",
           "word": "Skate",
           "wordHe": "החלקה",
-          "symbol": "⛸️"
+          "symbol": "⛸️",
+          "wordFr": "Patiner",
+          "wordDe": "Skaten",
+          "wordEs": "Patinar"
         },
         {
           "key": "golf",
           "word": "Golf",
           "wordHe": "גולף",
-          "symbol": "⛳"
+          "symbol": "⛳",
+          "wordFr": "Golf",
+          "wordDe": "Golf",
+          "wordEs": "Golf"
         },
         {
           "key": "yoga",
           "word": "Yoga",
           "wordHe": "יוגה",
-          "symbol": "🧘"
+          "symbol": "🧘",
+          "wordFr": "Yoga",
+          "wordDe": "Yoga",
+          "wordEs": "Yoga"
         },
         {
           "key": "dance",
           "word": "Dance",
           "wordHe": "ריקוד",
-          "symbol": "💃"
+          "symbol": "💃",
+          "wordFr": "Danser",
+          "wordDe": "Tanzen",
+          "wordEs": "Bailar"
         },
         {
           "key": "baseball",
           "word": "Baseball",
           "wordHe": "בייסבול",
-          "symbol": "⚾"
+          "symbol": "⚾",
+          "wordFr": "Baseball",
+          "wordDe": "Baseball",
+          "wordEs": "Béisbol"
         }
       ]
     },
@@ -1174,73 +1714,109 @@
           "key": "bed",
           "word": "Bed",
           "wordHe": "מיטה",
-          "symbol": "🛏️"
+          "symbol": "🛏️",
+          "wordFr": "Lit",
+          "wordDe": "Bett",
+          "wordEs": "Cama"
         },
         {
           "key": "sofa",
           "word": "Sofa",
           "wordHe": "ספה",
-          "symbol": "🛋️"
+          "symbol": "🛋️",
+          "wordFr": "Canapé",
+          "wordDe": "Sofa",
+          "wordEs": "Sofá"
         },
         {
           "key": "table",
           "word": "Table",
           "wordHe": "שולחן",
-          "symbol": "🍽️"
+          "symbol": "🍽️",
+          "wordFr": "Table",
+          "wordDe": "Tisch",
+          "wordEs": "Mesa"
         },
         {
           "key": "chair",
           "word": "Chair",
           "wordHe": "כיסא",
-          "symbol": "💺"
+          "symbol": "💺",
+          "wordFr": "Chaise",
+          "wordDe": "Stuhl",
+          "wordEs": "Silla"
         },
         {
           "key": "lamp",
           "word": "Lamp",
           "wordHe": "מנורה",
-          "symbol": "💡"
+          "symbol": "💡",
+          "wordFr": "Lampe",
+          "wordDe": "Lampe",
+          "wordEs": "Lámpara"
         },
         {
           "key": "door",
           "word": "Door",
           "wordHe": "דלת",
-          "symbol": "🚪"
+          "symbol": "🚪",
+          "wordFr": "Porte",
+          "wordDe": "Tür",
+          "wordEs": "Puerta"
         },
         {
           "key": "window",
           "word": "Window",
           "wordHe": "חלון",
-          "symbol": "🪟"
+          "symbol": "🪟",
+          "wordFr": "Fenêtre",
+          "wordDe": "Fenster",
+          "wordEs": "Ventana"
         },
         {
           "key": "kitchen",
           "word": "Kitchen",
           "wordHe": "מטבח",
-          "symbol": "🍳"
+          "symbol": "🍳",
+          "wordFr": "Cuisine",
+          "wordDe": "Küche",
+          "wordEs": "Cocina"
         },
         {
           "key": "bath",
           "word": "Bath",
           "wordHe": "אמבטיה",
-          "symbol": "🛁"
+          "symbol": "🛁",
+          "wordFr": "Bain",
+          "wordDe": "Bad",
+          "wordEs": "Baño"
         },
         {
           "key": "fridge",
           "word": "Fridge",
           "wordHe": "מקרר",
-          "symbol": "🧊"
+          "symbol": "🧊",
+          "wordFr": "Frigo",
+          "wordDe": "Kühlschrank",
+          "wordEs": "Nevera"
         },
         {
           "key": "clock",
           "word": "Clock",
           "wordHe": "שעון",
-          "symbol": "⏰"
+          "symbol": "⏰",
+          "wordFr": "Horloge",
+          "wordDe": "Uhr",
+          "wordEs": "Reloj"
         },
         {
           "key": "mirror",
           "word": "Mirror",
           "wordHe": "מראה",
-          "symbol": "🪞"
+          "symbol": "🪞",
+          "wordFr": "Miroir",
+          "wordDe": "Spiegel",
+          "wordEs": "Espejo"
         }
       ]
     },
@@ -1251,73 +1827,109 @@
           "key": "doctor",
           "word": "Doctor",
           "wordHe": "רופא",
-          "symbol": "👨‍⚕️"
+          "symbol": "👨‍⚕️",
+          "wordFr": "Médecin",
+          "wordDe": "Arzt",
+          "wordEs": "Médico"
         },
         {
           "key": "teacher",
           "word": "Teacher",
           "wordHe": "מורה",
-          "symbol": "👩‍🏫"
+          "symbol": "👩‍🏫",
+          "wordFr": "Professeur",
+          "wordDe": "Lehrer",
+          "wordEs": "Profesor"
         },
         {
           "key": "firefighter",
           "word": "Firefighter",
           "wordHe": "כבאי",
-          "symbol": "👨‍🚒"
+          "symbol": "👨‍🚒",
+          "wordFr": "Pompier",
+          "wordDe": "Feuerwehrmann",
+          "wordEs": "Bombero"
         },
         {
           "key": "police",
           "word": "Police",
           "wordHe": "שוטר",
-          "symbol": "👮"
+          "symbol": "👮",
+          "wordFr": "Policier",
+          "wordDe": "Polizist",
+          "wordEs": "Policía"
         },
         {
           "key": "chef",
           "word": "Chef",
           "wordHe": "טבח",
-          "symbol": "👨‍🍳"
+          "symbol": "👨‍🍳",
+          "wordFr": "Cuisinier",
+          "wordDe": "Koch",
+          "wordEs": "Cocinero"
         },
         {
           "key": "farmer",
           "word": "Farmer",
           "wordHe": "חקלאי",
-          "symbol": "👨‍🌾"
+          "symbol": "👨‍🌾",
+          "wordFr": "Fermier",
+          "wordDe": "Bauer",
+          "wordEs": "Granjero"
         },
         {
           "key": "pilot",
           "word": "Pilot",
           "wordHe": "טייס",
-          "symbol": "👨‍✈️"
+          "symbol": "👨‍✈️",
+          "wordFr": "Pilote",
+          "wordDe": "Pilot",
+          "wordEs": "Piloto"
         },
         {
           "key": "artist",
           "word": "Artist",
           "wordHe": "אמן",
-          "symbol": "🎨"
+          "symbol": "🎨",
+          "wordFr": "Artiste",
+          "wordDe": "Künstler",
+          "wordEs": "Artista"
         },
         {
           "key": "nurse",
           "word": "Nurse",
           "wordHe": "אחות",
-          "symbol": "👩‍⚕️"
+          "symbol": "👩‍⚕️",
+          "wordFr": "Infirmière",
+          "wordDe": "Krankenschwester",
+          "wordEs": "Enfermera"
         },
         {
           "key": "builder",
           "word": "Builder",
           "wordHe": "בנאי",
-          "symbol": "👷"
+          "symbol": "👷",
+          "wordFr": "Maçon",
+          "wordDe": "Bauarbeiter",
+          "wordEs": "Constructor"
         },
         {
           "key": "vet",
           "word": "Vet",
           "wordHe": "וטרינר",
-          "symbol": "🐾"
+          "symbol": "🐾",
+          "wordFr": "Vétérinaire",
+          "wordDe": "Tierarzt",
+          "wordEs": "Veterinario"
         },
         {
           "key": "singer",
           "word": "Singer",
           "wordHe": "זמר",
-          "symbol": "🎤"
+          "symbol": "🎤",
+          "wordFr": "Chanteur",
+          "wordDe": "Sänger",
+          "wordEs": "Cantante"
         }
       ]
     },
@@ -1328,73 +1940,109 @@
           "key": "tree",
           "word": "Tree",
           "wordHe": "עץ",
-          "symbol": "🌳"
+          "symbol": "🌳",
+          "wordFr": "Arbre",
+          "wordDe": "Baum",
+          "wordEs": "Árbol"
         },
         {
           "key": "flower",
           "word": "Flower",
           "wordHe": "פרח",
-          "symbol": "🌸"
+          "symbol": "🌸",
+          "wordFr": "Fleur",
+          "wordDe": "Blume",
+          "wordEs": "Flor"
         },
         {
           "key": "grass",
           "word": "Grass",
           "wordHe": "דשא",
-          "symbol": "🌿"
+          "symbol": "🌿",
+          "wordFr": "Herbe",
+          "wordDe": "Gras",
+          "wordEs": "Césped"
         },
         {
           "key": "mountain",
           "word": "Mountain",
           "wordHe": "הר",
-          "symbol": "⛰️"
+          "symbol": "⛰️",
+          "wordFr": "Montagne",
+          "wordDe": "Berg",
+          "wordEs": "Montaña"
         },
         {
           "key": "river",
           "word": "River",
           "wordHe": "נהר",
-          "symbol": "🏞️"
+          "symbol": "🏞️",
+          "wordFr": "Rivière",
+          "wordDe": "Fluss",
+          "wordEs": "Río"
         },
         {
           "key": "lake",
           "word": "Lake",
           "wordHe": "אגם",
-          "symbol": "🌊"
+          "symbol": "🌊",
+          "wordFr": "Lac",
+          "wordDe": "See",
+          "wordEs": "Lago"
         },
         {
           "key": "forest",
           "word": "Forest",
           "wordHe": "יער",
-          "symbol": "🌲"
+          "symbol": "🌲",
+          "wordFr": "Forêt",
+          "wordDe": "Wald",
+          "wordEs": "Bosque"
         },
         {
           "key": "rock",
           "word": "Rock",
           "wordHe": "סלע",
-          "symbol": "🪨"
+          "symbol": "🪨",
+          "wordFr": "Rocher",
+          "wordDe": "Fels",
+          "wordEs": "Roca"
         },
         {
           "key": "leaf",
           "word": "Leaf",
           "wordHe": "עלה",
-          "symbol": "🍃"
+          "symbol": "🍃",
+          "wordFr": "Feuille",
+          "wordDe": "Blatt",
+          "wordEs": "Hoja"
         },
         {
           "key": "bee",
           "word": "Bee",
           "wordHe": "דבורה",
-          "symbol": "🐝"
+          "symbol": "🐝",
+          "wordFr": "Abeille",
+          "wordDe": "Biene",
+          "wordEs": "Abeja"
         },
         {
           "key": "butterfly",
           "word": "Butterfly",
           "wordHe": "פרפר",
-          "symbol": "🦋"
+          "symbol": "🦋",
+          "wordFr": "Papillon",
+          "wordDe": "Schmetterling",
+          "wordEs": "Mariposa"
         },
         {
           "key": "moon",
           "word": "Moon",
           "wordHe": "ירח",
-          "symbol": "🌙"
+          "symbol": "🌙",
+          "wordFr": "Lune",
+          "wordDe": "Mond",
+          "wordEs": "Luna"
         }
       ]
     },
@@ -1405,73 +2053,109 @@
           "key": "happy",
           "word": "Happy",
           "wordHe": "שמח",
-          "symbol": "😊"
+          "symbol": "😊",
+          "wordFr": "Heureux",
+          "wordDe": "Glücklich",
+          "wordEs": "Feliz"
         },
         {
           "key": "sad",
           "word": "Sad",
           "wordHe": "עצוב",
-          "symbol": "😢"
+          "symbol": "😢",
+          "wordFr": "Triste",
+          "wordDe": "Traurig",
+          "wordEs": "Triste"
         },
         {
           "key": "angry",
           "word": "Angry",
           "wordHe": "כועס",
-          "symbol": "😠"
+          "symbol": "😠",
+          "wordFr": "Fâché",
+          "wordDe": "Wütend",
+          "wordEs": "Enojado"
         },
         {
           "key": "scared",
           "word": "Scared",
           "wordHe": "מפחד",
-          "symbol": "😨"
+          "symbol": "😨",
+          "wordFr": "Peur",
+          "wordDe": "Angst",
+          "wordEs": "Asustado"
         },
         {
           "key": "tired",
           "word": "Tired",
           "wordHe": "עייף",
-          "symbol": "😴"
+          "symbol": "😴",
+          "wordFr": "Fatigué",
+          "wordDe": "Müde",
+          "wordEs": "Cansado"
         },
         {
           "key": "excited",
           "word": "Excited",
           "wordHe": "נרגש",
-          "symbol": "🤩"
+          "symbol": "🤩",
+          "wordFr": "Excité",
+          "wordDe": "Aufgeregt",
+          "wordEs": "Emocionado"
         },
         {
           "key": "bored",
           "word": "Bored",
           "wordHe": "משועמם",
-          "symbol": "😑"
+          "symbol": "😑",
+          "wordFr": "Ennuyé",
+          "wordDe": "Gelangweilt",
+          "wordEs": "Aburrido"
         },
         {
           "key": "proud",
           "word": "Proud",
           "wordHe": "גאה",
-          "symbol": "🏅"
+          "symbol": "🏅",
+          "wordFr": "Fier",
+          "wordDe": "Stolz",
+          "wordEs": "Orgulloso"
         },
         {
           "key": "shy",
           "word": "Shy",
           "wordHe": "ביישן",
-          "symbol": "😳"
+          "symbol": "😳",
+          "wordFr": "Timide",
+          "wordDe": "Schüchtern",
+          "wordEs": "Tímido"
         },
         {
           "key": "love",
           "word": "Love",
           "wordHe": "אהבה",
-          "symbol": "😍"
+          "symbol": "😍",
+          "wordFr": "Amour",
+          "wordDe": "Liebe",
+          "wordEs": "Amor"
         },
         {
           "key": "calm",
           "word": "Calm",
           "wordHe": "רגוע",
-          "symbol": "😌"
+          "symbol": "😌",
+          "wordFr": "Calme",
+          "wordDe": "Ruhig",
+          "wordEs": "Tranquilo"
         },
         {
           "key": "surprised",
           "word": "Surprised",
           "wordHe": "מופתע",
-          "symbol": "😲"
+          "symbol": "😲",
+          "wordFr": "Surpris",
+          "wordDe": "Überrascht",
+          "wordEs": "Sorprendido"
         }
       ]
     },
@@ -1482,73 +2166,109 @@
           "key": "one",
           "word": "One",
           "wordHe": "אחת",
-          "symbol": "1️⃣"
+          "symbol": "1️⃣",
+          "wordFr": "Un",
+          "wordDe": "Eins",
+          "wordEs": "Uno"
         },
         {
           "key": "two",
           "word": "Two",
           "wordHe": "שתיים",
-          "symbol": "2️⃣"
+          "symbol": "2️⃣",
+          "wordFr": "Deux",
+          "wordDe": "Zwei",
+          "wordEs": "Dos"
         },
         {
           "key": "three",
           "word": "Three",
           "wordHe": "שלוש",
-          "symbol": "3️⃣"
+          "symbol": "3️⃣",
+          "wordFr": "Trois",
+          "wordDe": "Drei",
+          "wordEs": "Tres"
         },
         {
           "key": "four",
           "word": "Four",
           "wordHe": "ארבע",
-          "symbol": "4️⃣"
+          "symbol": "4️⃣",
+          "wordFr": "Quatre",
+          "wordDe": "Vier",
+          "wordEs": "Cuatro"
         },
         {
           "key": "five",
           "word": "Five",
           "wordHe": "חמש",
-          "symbol": "5️⃣"
+          "symbol": "5️⃣",
+          "wordFr": "Cinq",
+          "wordDe": "Fünf",
+          "wordEs": "Cinco"
         },
         {
           "key": "six",
           "word": "Six",
           "wordHe": "שש",
-          "symbol": "6️⃣"
+          "symbol": "6️⃣",
+          "wordFr": "Six",
+          "wordDe": "Sechs",
+          "wordEs": "Seis"
         },
         {
           "key": "seven",
           "word": "Seven",
           "wordHe": "שבע",
-          "symbol": "7️⃣"
+          "symbol": "7️⃣",
+          "wordFr": "Sept",
+          "wordDe": "Sieben",
+          "wordEs": "Siete"
         },
         {
           "key": "eight",
           "word": "Eight",
           "wordHe": "שמונה",
-          "symbol": "8️⃣"
+          "symbol": "8️⃣",
+          "wordFr": "Huit",
+          "wordDe": "Acht",
+          "wordEs": "Ocho"
         },
         {
           "key": "nine",
           "word": "Nine",
           "wordHe": "תשע",
-          "symbol": "9️⃣"
+          "symbol": "9️⃣",
+          "wordFr": "Neuf",
+          "wordDe": "Neun",
+          "wordEs": "Nueve"
         },
         {
           "key": "ten",
           "word": "Ten",
           "wordHe": "עשר",
-          "symbol": "🔟"
+          "symbol": "🔟",
+          "wordFr": "Dix",
+          "wordDe": "Zehn",
+          "wordEs": "Diez"
         },
         {
           "key": "eleven",
           "word": "Eleven",
           "wordHe": "אחת עשרה",
-          "symbol": "🕚"
+          "symbol": "🕚",
+          "wordFr": "Onze",
+          "wordDe": "Elf",
+          "wordEs": "Once"
         },
         {
           "key": "twelve",
           "word": "Twelve",
           "wordHe": "שתים עשרה",
-          "symbol": "🕛"
+          "symbol": "🕛",
+          "wordFr": "Douze",
+          "wordDe": "Zwölf",
+          "wordEs": "Doce"
         }
       ]
     },
@@ -1559,73 +2279,109 @@
           "key": "circle",
           "word": "Circle",
           "wordHe": "עיגול",
-          "symbol": "⭕"
+          "symbol": "⭕",
+          "wordFr": "Cercle",
+          "wordDe": "Kreis",
+          "wordEs": "Círculo"
         },
         {
           "key": "square",
           "word": "Square",
           "wordHe": "ריבוע",
-          "symbol": "⬜"
+          "symbol": "⬜",
+          "wordFr": "Carré",
+          "wordDe": "Quadrat",
+          "wordEs": "Cuadrado"
         },
         {
           "key": "triangle",
           "word": "Triangle",
           "wordHe": "משולש",
-          "symbol": "🔺"
+          "symbol": "🔺",
+          "wordFr": "Triangle",
+          "wordDe": "Dreieck",
+          "wordEs": "Triángulo"
         },
         {
           "key": "star",
           "word": "Star",
           "wordHe": "כוכב",
-          "symbol": "⭐"
+          "symbol": "⭐",
+          "wordFr": "Étoile",
+          "wordDe": "Stern",
+          "wordEs": "Estrella"
         },
         {
           "key": "heart",
           "word": "Heart",
           "wordHe": "לב",
-          "symbol": "❤️"
+          "symbol": "❤️",
+          "wordFr": "Cœur",
+          "wordDe": "Herz",
+          "wordEs": "Corazón"
         },
         {
           "key": "oval",
           "word": "Oval",
           "wordHe": "אליפסה",
-          "symbol": "🥚"
+          "symbol": "🥚",
+          "wordFr": "Ovale",
+          "wordDe": "Oval",
+          "wordEs": "Óvalo"
         },
         {
           "key": "rectangle",
           "word": "Rectangle",
           "wordHe": "מלבן",
-          "symbol": "▭"
+          "symbol": "▭",
+          "wordFr": "Rectangle",
+          "wordDe": "Rechteck",
+          "wordEs": "Rectángulo"
         },
         {
           "key": "diamond",
           "word": "Diamond",
           "wordHe": "יהלום",
-          "symbol": "💎"
+          "symbol": "💎",
+          "wordFr": "Losange",
+          "wordDe": "Raute",
+          "wordEs": "Rombo"
         },
         {
           "key": "line",
           "word": "Line",
           "wordHe": "קו",
-          "symbol": "➖"
+          "symbol": "➖",
+          "wordFr": "Ligne",
+          "wordDe": "Linie",
+          "wordEs": "Línea"
         },
         {
           "key": "cube",
           "word": "Cube",
           "wordHe": "קובייה",
-          "symbol": "🧊"
+          "symbol": "🧊",
+          "wordFr": "Cube",
+          "wordDe": "Würfel",
+          "wordEs": "Cubo"
         },
         {
           "key": "sphere",
           "word": "Sphere",
           "wordHe": "כדור",
-          "symbol": "⚽"
+          "symbol": "⚽",
+          "wordFr": "Sphère",
+          "wordDe": "Kugel",
+          "wordEs": "Esfera"
         },
         {
           "key": "cone",
           "word": "Cone",
           "wordHe": "חרוט",
-          "symbol": "🍦"
+          "symbol": "🍦",
+          "wordFr": "Cône",
+          "wordDe": "Kegel",
+          "wordEs": "Cono"
         }
       ]
     },
@@ -1636,73 +2392,109 @@
           "key": "piano",
           "word": "Piano",
           "wordHe": "פסנתר",
-          "symbol": "🎹"
+          "symbol": "🎹",
+          "wordFr": "Piano",
+          "wordDe": "Klavier",
+          "wordEs": "Piano"
         },
         {
           "key": "guitar",
           "word": "Guitar",
           "wordHe": "גיטרה",
-          "symbol": "🎸"
+          "symbol": "🎸",
+          "wordFr": "Guitare",
+          "wordDe": "Gitarre",
+          "wordEs": "Guitarra"
         },
         {
           "key": "drum",
           "word": "Drum",
           "wordHe": "תוף",
-          "symbol": "🥁"
+          "symbol": "🥁",
+          "wordFr": "Tambour",
+          "wordDe": "Trommel",
+          "wordEs": "Tambor"
         },
         {
           "key": "violin",
           "word": "Violin",
           "wordHe": "כינור",
-          "symbol": "🎻"
+          "symbol": "🎻",
+          "wordFr": "Violon",
+          "wordDe": "Geige",
+          "wordEs": "Violín"
         },
         {
           "key": "flute",
           "word": "Flute",
           "wordHe": "חליל",
-          "symbol": "🪈"
+          "symbol": "🪈",
+          "wordFr": "Flûte",
+          "wordDe": "Flöte",
+          "wordEs": "Flauta"
         },
         {
           "key": "trumpet",
           "word": "Trumpet",
           "wordHe": "חצוצרה",
-          "symbol": "🎺"
+          "symbol": "🎺",
+          "wordFr": "Trompette",
+          "wordDe": "Trompete",
+          "wordEs": "Trompeta"
         },
         {
           "key": "microphone",
           "word": "Microphone",
           "wordHe": "מיקרופון",
-          "symbol": "🎙️"
+          "symbol": "🎙️",
+          "wordFr": "Micro",
+          "wordDe": "Mikrofon",
+          "wordEs": "Micrófono"
         },
         {
           "key": "song",
           "word": "Song",
           "wordHe": "שיר",
-          "symbol": "🎵"
+          "symbol": "🎵",
+          "wordFr": "Chanson",
+          "wordDe": "Lied",
+          "wordEs": "Canción"
         },
         {
           "key": "dance",
           "word": "Dance",
           "wordHe": "ריקוד",
-          "symbol": "💃"
+          "symbol": "💃",
+          "wordFr": "Danser",
+          "wordDe": "Tanzen",
+          "wordEs": "Bailar"
         },
         {
           "key": "radio",
           "word": "Radio",
           "wordHe": "רדיו",
-          "symbol": "📻"
+          "symbol": "📻",
+          "wordFr": "Radio",
+          "wordDe": "Radio",
+          "wordEs": "Radio"
         },
         {
           "key": "headphones",
           "word": "Headphones",
           "wordHe": "אוזניות",
-          "symbol": "🎧"
+          "symbol": "🎧",
+          "wordFr": "Casque",
+          "wordDe": "Kopfhörer",
+          "wordEs": "Auriculares"
         },
         {
           "key": "notes",
           "word": "Notes",
           "wordHe": "תווים",
-          "symbol": "🎶"
+          "symbol": "🎶",
+          "wordFr": "Notes",
+          "wordDe": "Noten",
+          "wordEs": "Notas"
         }
       ]
     },
@@ -1713,73 +2505,109 @@
           "key": "pyramid",
           "word": "Pyramid",
           "wordHe": "פירמידה",
-          "symbol": "🔺"
+          "symbol": "🔺",
+          "wordFr": "Pyramide",
+          "wordDe": "Pyramide",
+          "wordEs": "Pirámide"
         },
         {
           "key": "tower",
           "word": "Tower",
           "wordHe": "מגדל",
-          "symbol": "🗼"
+          "symbol": "🗼",
+          "wordFr": "Tour",
+          "wordDe": "Turm",
+          "wordEs": "Torre"
         },
         {
           "key": "beach",
           "word": "Beach",
           "wordHe": "חוף",
-          "symbol": "🏖️"
+          "symbol": "🏖️",
+          "wordFr": "Plage",
+          "wordDe": "Strand",
+          "wordEs": "Playa"
         },
         {
           "key": "castle",
           "word": "Castle",
           "wordHe": "טירה",
-          "symbol": "🏰"
+          "symbol": "🏰",
+          "wordFr": "Château",
+          "wordDe": "Schloss",
+          "wordEs": "Castillo"
         },
         {
           "key": "temple",
           "word": "Temple",
           "wordHe": "מקדש",
-          "symbol": "⛩️"
+          "symbol": "⛩️",
+          "wordFr": "Temple",
+          "wordDe": "Tempel",
+          "wordEs": "Templo"
         },
         {
           "key": "market",
           "word": "Market",
           "wordHe": "שוק",
-          "symbol": "🏪"
+          "symbol": "🏪",
+          "wordFr": "Marché",
+          "wordDe": "Markt",
+          "wordEs": "Mercado"
         },
         {
           "key": "museum",
           "word": "Museum",
           "wordHe": "מוזיאון",
-          "symbol": "🏛️"
+          "symbol": "🏛️",
+          "wordFr": "Musée",
+          "wordDe": "Museum",
+          "wordEs": "Museo"
         },
         {
           "key": "zoo",
           "word": "Zoo",
           "wordHe": "גן חיות",
-          "symbol": "🦁"
+          "symbol": "🦁",
+          "wordFr": "Zoo",
+          "wordDe": "Zoo",
+          "wordEs": "Zoológico"
         },
         {
           "key": "farm",
           "word": "Farm",
           "wordHe": "חווה",
-          "symbol": "🚜"
+          "symbol": "🚜",
+          "wordFr": "Ferme",
+          "wordDe": "Bauernhof",
+          "wordEs": "Granja"
         },
         {
           "key": "airport",
           "word": "Airport",
           "wordHe": "שדה תעופה",
-          "symbol": "✈️"
+          "symbol": "✈️",
+          "wordFr": "Aéroport",
+          "wordDe": "Flughafen",
+          "wordEs": "Aeropuerto"
         },
         {
           "key": "harbor",
           "word": "Harbor",
           "wordHe": "נמל",
-          "symbol": "⚓"
+          "symbol": "⚓",
+          "wordFr": "Port",
+          "wordDe": "Hafen",
+          "wordEs": "Puerto"
         },
         {
           "key": "cave",
           "word": "Cave",
           "wordHe": "מערה",
-          "symbol": "🕳️"
+          "symbol": "🕳️",
+          "wordFr": "Grotte",
+          "wordDe": "Höhle",
+          "wordEs": "Cueva"
         }
       ]
     }
