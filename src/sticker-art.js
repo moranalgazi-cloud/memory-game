@@ -22,6 +22,30 @@ import boltArt from "../docs/images/stickers/sticker-bolt.png?url";
 import heartArt from "../docs/images/stickers/sticker-heart.png?url";
 import diamondArt from "../docs/images/stickers/sticker-diamond.png?url";
 import penguinArt from "../docs/images/stickers/sticker-penguin.png?url";
+import elephantArt from "../docs/images/stickers/sticker-elephant.png?url";
+import foxArt from "../docs/images/stickers/sticker-fox.png?url";
+import owlArt from "../docs/images/stickers/sticker-owl.png?url";
+import koalaArt from "../docs/images/stickers/sticker-koala.png?url";
+import burgerArt from "../docs/images/stickers/sticker-burger.png?url";
+import cupcakeArt from "../docs/images/stickers/sticker-cupcake.png?url";
+import icecreamArt from "../docs/images/stickers/sticker-icecream.png?url";
+import appleArt from "../docs/images/stickers/sticker-apple.png?url";
+import donutArt from "../docs/images/stickers/sticker-donut.png?url";
+import tacoArt from "../docs/images/stickers/sticker-taco.png?url";
+import planetArt from "../docs/images/stickers/sticker-planet.png?url";
+import satelliteArt from "../docs/images/stickers/sticker-satellite.png?url";
+import alienArt from "../docs/images/stickers/sticker-alien.png?url";
+import wandArt from "../docs/images/stickers/sticker-wand.png?url";
+import potionArt from "../docs/images/stickers/sticker-potion.png?url";
+import treeArt from "../docs/images/stickers/sticker-tree.png?url";
+import butterflyArt from "../docs/images/stickers/sticker-butterfly.png?url";
+import mushroomArt from "../docs/images/stickers/sticker-mushroom.png?url";
+import raindropArt from "../docs/images/stickers/sticker-raindrop.png?url";
+import leafArt from "../docs/images/stickers/sticker-leaf.png?url";
+import beeArt from "../docs/images/stickers/sticker-bee.png?url";
+import capeArt from "../docs/images/stickers/sticker-cape.png?url";
+import maskArt from "../docs/images/stickers/sticker-mask.png?url";
+import swordArt from "../docs/images/stickers/sticker-sword.png?url";
 import dolphinArt from "../docs/images/stickers/sticker-dolphin.png?url";
 import whaleArt from "../docs/images/stickers/sticker-whale.png?url";
 import octopusArt from "../docs/images/stickers/sticker-octopus.png?url";
@@ -83,6 +107,30 @@ export const STICKER_ART_URLS = {
   heart: heartArt,
   diamond: diamondArt,
   penguin: penguinArt,
+  elephant: elephantArt,
+  fox: foxArt,
+  owl: owlArt,
+  koala: koalaArt,
+  burger: burgerArt,
+  cupcake: cupcakeArt,
+  icecream: icecreamArt,
+  apple: appleArt,
+  donut: donutArt,
+  taco: tacoArt,
+  planet: planetArt,
+  satellite: satelliteArt,
+  alien: alienArt,
+  wand: wandArt,
+  potion: potionArt,
+  tree: treeArt,
+  butterfly: butterflyArt,
+  mushroom: mushroomArt,
+  raindrop: raindropArt,
+  leaf: leafArt,
+  bee: beeArt,
+  cape: capeArt,
+  mask: maskArt,
+  sword: swordArt,
   dolphin: dolphinArt,
   whale: whaleArt,
   octopus: octopusArt,

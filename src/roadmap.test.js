@@ -11,6 +11,7 @@ import {
   getLevelChallenge,
   getVisibleLevelRange,
   ensureDevAlbumTrayStickers,
+  grantAllMissingAlbumStickers,
   DEV_ALBUM_TRAY_SIZE,
   devCompleteCurrentLevel,
   grantStarterStickerIfNeeded,
@@ -18,11 +19,24 @@ import {
 } from "./roadmap.js";
 import {
   getAlbumPeriodId,
+  getAlbumPeriodIndex,
+  getDaysUntilNextAlbumPeriod,
+  getAlbumDominantCategory,
+  isAlbumComplete,
+  CURATED_ALBUM_ROLLOUT,
+  ALBUM_STICKER_SETS,
+  ALBUM_SHORT_SIZE,
   ALBUM_SIZE,
+  getAlbumSlotCount,
   getWeeklyAlbum,
   listSelectableAlbumWeeks,
+  listReleasedAlbumPeriodIds,
+  listAllAlbumPeriodIds,
+  getMaxReleasedAlbumIndex,
+  getLatestReleasedAlbumPeriodId,
   DEV_ALBUM_IDS,
   findSlotForSticker,
+  pickRewardSticker,
 } from "./roadmap-albums.js";
 
 const SLUG = "test-player";
@@ -253,20 +267,115 @@ describe("devCompleteCurrentLevel", () => {
 });
 
 describe("album periods", () => {
-  it("shows only the current period album in the picker", () => {
+  it("lists every released period up to the current one (newest first)", () => {
     const period = getAlbumPeriodId();
     const weeks = listSelectableAlbumWeeks(
       [{ albumWeek: "P0", slot: 0, stickerId: "star" }],
       [{ id: "x", albumWeek: "P0", stickerId: "rocket" }],
       period,
     );
-    expect(weeks).toEqual([period]);
+    expect(weeks).toEqual(listReleasedAlbumPeriodIds(period));
+    expect(weeks[0]).toBe(period);
+    expect(weeks[weeks.length - 1]).toBe("P0");
   });
 
-  it("shows dev preview albums when devPreview is enabled", () => {
+  it("shows all nine albums when devPreview is enabled", () => {
     const period = getAlbumPeriodId();
     const weeks = listSelectableAlbumWeeks([], [], period, { devPreview: true });
-    expect(weeks).toEqual([period, ...DEV_ALBUM_IDS]);
+    expect(weeks).toEqual(listAllAlbumPeriodIds());
+    expect(weeks).toHaveLength(CURATED_ALBUM_ROLLOUT.length);
+    expect(weeks).toContain("P0");
+    expect(weeks).toContain("P8");
+  });
+
+  it("uses curated rollout themes for early periods", () => {
+    expect(getAlbumDominantCategory("P0")).toBe(CURATED_ALBUM_ROLLOUT[0].category);
+    expect(getAlbumDominantCategory("P6")).toBe("ocean");
+    expect(getWeeklyAlbum("P6").slots).toHaveLength(ALBUM_STICKER_SETS.ocean.length);
+  });
+
+  it("uses eight stickers for short albums and twelve for full albums", () => {
+    expect(getWeeklyAlbum("P0").slots).toHaveLength(ALBUM_SHORT_SIZE);
+    expect(getWeeklyAlbum("P6").slots).toHaveLength(ALBUM_SIZE);
+    expect(getWeeklyAlbum("P7").slots).toHaveLength(ALBUM_SHORT_SIZE);
+  });
+
+  it("detects a full album", () => {
+    const week = "P6";
+    const placed = getWeeklyAlbum(week).slots.map(({ slot, stickerId }) => ({
+      albumWeek: week,
+      slot,
+      stickerId,
+    }));
+    expect(isAlbumComplete(placed, week)).toBe(true);
+    expect(isAlbumComplete(placed.slice(0, 3), week)).toBe(false);
+  });
+
+  it("counts days until the next album period", () => {
+    const days = getDaysUntilNextAlbumPeriod();
+    expect(days).toBeGreaterThanOrEqual(1);
+    expect(days).toBeLessThanOrEqual(5);
+  });
+
+  it("assigns each sticker to exactly one album", () => {
+    const seen = new Set();
+    for (const ids of Object.values(ALBUM_STICKER_SETS)) {
+      expect(ids.length === ALBUM_SHORT_SIZE || ids.length === ALBUM_SIZE).toBe(true);
+      for (const id of ids) {
+        expect(seen.has(id)).toBe(false);
+        seen.add(id);
+      }
+    }
+  });
+
+  it("picks rewards from any released open album", () => {
+    const current = getAlbumPeriodId();
+    const open = listReleasedAlbumPeriodIds(current);
+    const reward = pickRewardSticker([], [], open, () => 0);
+    expect(reward).toBeTruthy();
+    expect(open).toContain(reward.albumWeek);
+  });
+
+  it("regular users only see albums released up to the current period", () => {
+    expect(listReleasedAlbumPeriodIds("P0")).toEqual(["P0"]);
+    expect(listReleasedAlbumPeriodIds("P2")).toEqual(["P2", "P1", "P0"]);
+    expect(listReleasedAlbumPeriodIds("P0", { devPreview: true })).toHaveLength(
+      CURATED_ALBUM_ROLLOUT.length,
+    );
+  });
+
+  it("caps released albums once the curated catalog is fully live", () => {
+    const weeks = listReleasedAlbumPeriodIds("P31");
+    expect(weeks).toHaveLength(CURATED_ALBUM_ROLLOUT.length);
+    expect(weeks[0]).toBe("P8");
+    expect(weeks[weeks.length - 1]).toBe("P0");
+    expect(getMaxReleasedAlbumIndex("P31")).toBe(8);
+    expect(getLatestReleasedAlbumPeriodId("P31")).toBe("P8");
+  });
+
+  it("does not mark empty albums as complete", () => {
+    expect(isAlbumComplete([], "P99")).toBe(false);
+  });
+
+  it("advances period index every 5 days from the epoch", () => {
+    const epoch = new Date(Date.UTC(2026, 5, 9));
+    expect(getAlbumPeriodIndex(epoch)).toBe(0);
+    const day5 = new Date(Date.UTC(2026, 5, 14));
+    expect(getAlbumPeriodIndex(day5)).toBe(1);
+  });
+});
+
+describe("grantAllMissingAlbumStickers", () => {
+  it("adds every missing sticker for the album to pending", () => {
+    const week = getAlbumPeriodId();
+    const album = getWeeklyAlbum(week);
+    const added = grantAllMissingAlbumStickers(SLUG, week);
+    expect(added).toBe(album.slots.length);
+
+    const state = loadRoadmap(SLUG);
+    expect(state.pendingStickers.filter((p) => p.albumWeek === week)).toHaveLength(album.slots.length);
+
+    expect(grantAllMissingAlbumStickers(SLUG, week)).toBe(0);
   });
 });
 
@@ -359,18 +468,16 @@ describe("weekly album", () => {
     }
   });
 
-  it("earns at most one copy of each sticker per week", () => {
-    const week = getAlbumPeriodId();
-    for (let i = 0; i < ALBUM_SIZE + 2; i += 1) {
+  it("earns at most one copy of each sticker globally", () => {
+    for (let i = 0; i < 20; i += 1) {
       devCompleteCurrentLevel(SLUG);
     }
     const state = loadRoadmap(SLUG);
     const earnedIds = [
-      ...state.placedStickers.filter((c) => c.albumWeek === week).map((c) => c.stickerId),
-      ...state.pendingStickers.filter((c) => c.albumWeek === week).map((c) => c.stickerId),
+      ...state.placedStickers.map((c) => c.stickerId),
+      ...state.pendingStickers.map((c) => c.stickerId),
     ];
     const unique = new Set(earnedIds);
-    expect(unique.size).toBeLessThanOrEqual(ALBUM_SIZE);
     expect(earnedIds.length).toBe(unique.size);
   });
 });

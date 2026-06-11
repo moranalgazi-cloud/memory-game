@@ -2046,6 +2046,16 @@ select:focus-visible {
   margin-bottom: 0.5rem;
 }
 
+.user-dialog__age {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.user-dialog__age select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .user-dialog__new input {
   width: 100%;
   box-sizing: border-box;
@@ -2062,7 +2072,7 @@ select:focus-visible {
   flex-wrap: wrap;
   gap: 0.55rem;
   justify-content: center;
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
 }
 
 .user-dialog__actions .btn {

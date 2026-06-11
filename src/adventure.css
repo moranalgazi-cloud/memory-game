@@ -8,6 +8,107 @@ html[lang="he"] .roadmap-reward-dialog button {
   letter-spacing: 0;
 }
 
+/* Theme-aware tokens (light / dark / fun via :root[data-theme]) */
+.adventure-dialog,
+.roadmap-reward-dialog {
+  --adventure-bg: var(--bg);
+  --adventure-header-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-alt) 36%, var(--surface)) 0%,
+    color-mix(in srgb, var(--bg-accent) 65%, var(--surface)) 100%
+  );
+  --adventure-panel-bg: color-mix(in srgb, var(--surface-raised) 50%, var(--surface));
+  --adventure-footer-bg: var(--surface);
+  --adventure-text: var(--text);
+  --adventure-text-muted: var(--muted);
+  --adventure-text-subtle: color-mix(in srgb, var(--muted) 88%, var(--text));
+  --adventure-text-faint: color-mix(in srgb, var(--muted) 72%, var(--text));
+  --adventure-divider: color-mix(in srgb, var(--text) 10%, transparent);
+  --adventure-tab-inactive-bg: color-mix(in srgb, var(--text) 6%, transparent);
+  --adventure-tab-inactive-text: color-mix(in srgb, var(--muted) 82%, var(--text));
+  --adventure-tab-active-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent-alt) 35%, transparent),
+    color-mix(in srgb, var(--accent-alt) 15%, transparent)
+  );
+  --adventure-tab-active-text: var(--text);
+  --adventure-tab-active-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 18%, transparent);
+  --adventure-slots-bg: color-mix(in srgb, var(--surface-raised) 68%, var(--bg));
+  --adventure-slots-border: color-mix(in srgb, var(--accent-soft) 32%, transparent);
+  --adventure-slot-bg: color-mix(in srgb, var(--text) 4%, transparent);
+  --adventure-slot-missing-border: color-mix(in srgb, var(--text) 16%, transparent);
+  --adventure-slot-placed-border: color-mix(in srgb, var(--accent-soft) 38%, transparent);
+  --adventure-tray-bg: color-mix(in srgb, var(--text) 5%, var(--surface));
+  --adventure-tray-border: color-mix(in srgb, var(--text) 9%, transparent);
+  --adventure-backdrop: rgba(0, 0, 0, 0.55);
+  --adventure-map-filter: saturate(1.08) contrast(1.04);
+  --adventure-reward-bg: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent-alt) 42%, var(--surface)) 0%,
+    color-mix(in srgb, var(--bg-accent) 75%, var(--surface)) 100%
+  );
+  --adventure-reward-shadow: 0 28px 70px var(--shadow);
+  --adventure-reward-body: color-mix(in srgb, var(--muted) 88%, var(--text));
+  --adventure-popover-bg: var(--surface-raised);
+  --adventure-popover-text: var(--text);
+  --adventure-popover-desc: var(--muted);
+  --adventure-popover-title: color-mix(in srgb, var(--accent-alt) 72%, var(--text));
+  --adventure-popover-border: color-mix(in srgb, var(--accent-alt) 28%, transparent);
+  --adventure-popover-shadow: 0 12px 32px var(--shadow);
+  --adventure-admin-border: color-mix(in srgb, var(--danger) 52%, transparent);
+  --adventure-admin-text: color-mix(in srgb, var(--danger) 82%, var(--text));
+}
+
+:root[data-theme="light"] .adventure-dialog,
+:root[data-theme="light"] .roadmap-reward-dialog {
+  --adventure-bg: #fff;
+  --adventure-header-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-alt) 14%, #fff) 0%,
+    color-mix(in srgb, var(--bg) 45%, #fff) 100%
+  );
+  --adventure-panel-bg: color-mix(in srgb, var(--bg) 42%, #fff);
+  --adventure-footer-bg: #fff;
+  --adventure-tab-inactive-bg: color-mix(in srgb, var(--accent-alt) 6%, #fff);
+  --adventure-tab-active-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent-alt) 18%, #fff),
+    color-mix(in srgb, var(--accent-alt) 8%, #fff)
+  );
+  --adventure-slots-bg: color-mix(in srgb, var(--surface-raised) 80%, #fff);
+  --adventure-slot-bg: color-mix(in srgb, var(--accent-alt) 5%, #fff);
+  --adventure-tray-bg: color-mix(in srgb, var(--bg) 55%, #fff);
+  --adventure-map-filter: saturate(1.05) contrast(1.02) brightness(1.04);
+  --adventure-reward-bg: #fff;
+  --adventure-backdrop: rgba(26, 40, 80, 0.42);
+}
+
+:root[data-theme="fun"] .adventure-dialog,
+:root[data-theme="fun"] .roadmap-reward-dialog {
+  --adventure-header-bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent-alt) 48%, var(--surface)) 0%,
+    color-mix(in srgb, var(--accent-strong) 22%, var(--bg-accent)) 55%,
+    color-mix(in srgb, var(--bg-accent) 80%, var(--surface)) 100%
+  );
+  --adventure-tab-active-bg: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent-soft) 48%, transparent),
+    color-mix(in srgb, var(--accent) 24%, transparent)
+  );
+  --adventure-slots-bg: color-mix(in srgb, var(--surface-raised) 55%, var(--bg-accent));
+  --adventure-slots-border: color-mix(in srgb, var(--accent-soft) 42%, transparent);
+  --adventure-reward-bg: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent-alt) 52%, var(--surface)) 0%,
+    color-mix(in srgb, var(--bg-accent) 88%, var(--surface)) 100%
+  );
+}
+
+:root[data-theme="light"] .roadmap-reward-dialog {
+  border: 4px solid color-mix(in srgb, var(--accent-alt) 38%, transparent);
+}
+
 .roadmap-progress-pill {
   flex: none;
   align-self: center;
@@ -38,15 +139,15 @@ html[lang="he"] .roadmap-reward-dialog button {
   height: 100vh;
   max-height: 100vh;
   margin: 0;
-  background: #1a1035;
-  color: #f4f0ff;
+  background: var(--adventure-bg);
+  color: var(--adventure-text);
   box-shadow: none;
   overflow: hidden;
   position: relative;
 }
 
 .adventure-dialog::backdrop {
-  background: rgba(10, 6, 24, 0.72);
+  background: var(--adventure-backdrop);
   backdrop-filter: blur(4px);
 }
 
@@ -60,7 +161,8 @@ html[lang="he"] .roadmap-reward-dialog button {
 
 .adventure-dialog__header {
   padding: max(1.1rem, env(safe-area-inset-top, 0px)) 1rem 0.65rem;
-  background: linear-gradient(135deg, #3d1f7a 0%, #1f0f42 100%);
+  background: var(--adventure-header-bg);
+  border-bottom: 1px solid var(--adventure-divider);
 }
 
 .adventure-dialog__title {
@@ -74,7 +176,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin: 0.35rem 0 0;
   font-size: 0.82rem;
   line-height: 1.45;
-  color: rgba(244, 240, 255, 0.72);
+  color: var(--adventure-text-muted);
 }
 
 .adventure-tabs {
@@ -82,7 +184,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   grid-template-columns: 1fr 1fr;
   gap: 0.35rem;
   padding: 0.55rem 0.75rem 0;
-  background: #1a1035;
+  background: var(--adventure-bg);
 }
 
 .adventure-tabs__btn {
@@ -91,16 +193,16 @@ html[lang="he"] .roadmap-reward-dialog button {
   padding: 0.55rem 0.5rem;
   font-size: 0.82rem;
   font-weight: 800;
-  color: rgba(244, 240, 255, 0.55);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--adventure-tab-inactive-text);
+  background: var(--adventure-tab-inactive-bg);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .adventure-tabs__btn.is-active {
-  color: #fff;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: var(--adventure-tab-active-text);
+  background: var(--adventure-tab-active-bg);
+  box-shadow: var(--adventure-tab-active-shadow);
 }
 
 .adventure-panel {
@@ -108,7 +210,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   min-height: 0;
   overflow: auto;
   padding: 0.65rem 0.85rem 0.5rem;
-  background: #22124a;
+  background: var(--adventure-panel-bg);
 }
 
 /* Author display rules beat UA [hidden] — panels must fully hide when inactive */
@@ -173,7 +275,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  filter: saturate(1.08) contrast(1.04);
+  filter: var(--adventure-map-filter);
 }
 
 .adventure-scene__sky {
@@ -625,24 +727,24 @@ html[lang="he"] .roadmap-reward-dialog button {
 .adventure-popover {
   padding: 0.85rem 0.95rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  color: #2a2550;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: var(--adventure-popover-bg);
+  color: var(--adventure-popover-text);
+  box-shadow: var(--adventure-popover-shadow);
+  border: 1px solid var(--adventure-popover-border);
 }
 
 .adventure-popover__title {
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
   font-weight: 800;
-  color: #3d1f7a;
+  color: var(--adventure-popover-title);
 }
 
 .adventure-popover__desc {
   margin: 0;
   font-size: 0.82rem;
   line-height: 1.45;
-  color: #5c5680;
+  color: var(--adventure-popover-desc);
 }
 
 .adventure-popover__progress {
@@ -674,7 +776,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin: 0 0 0.75rem;
   font-size: 0.95rem;
   font-weight: 800;
-  color: rgba(244, 240, 255, 0.92);
+  color: var(--adventure-text);
   text-align: center;
 }
 
@@ -722,6 +824,10 @@ html[lang="he"] .roadmap-reward-dialog button {
     0 16px 34px rgba(255, 184, 0, 0.28);
 }
 
+.album-picker__card--complete:not(.album-picker__card--current) {
+  opacity: 0.88;
+}
+
 .album-picker__card--animals {
   background: linear-gradient(155deg, #3ecf7a 0%, #1a8f4a 45%, #0d5c34 100%);
 }
@@ -761,8 +867,9 @@ html[lang="he"] .roadmap-reward-dialog button {
 .album-picker__art {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .album-picker__shine {
@@ -774,15 +881,22 @@ html[lang="he"] .roadmap-reward-dialog button {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 70%);
   pointer-events: none;
+  z-index: 1;
 }
 
 .album-picker__cover {
-  width: 72%;
-  height: auto;
-  max-height: 78%;
-  object-fit: contain;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
-  transform: translateY(-0.35rem);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.album-picker__art:has(.album-picker__emoji) {
+  display: grid;
+  place-items: center;
 }
 
 .album-picker__emoji {
@@ -790,17 +904,19 @@ html[lang="he"] .roadmap-reward-dialog button {
   line-height: 1;
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
   transform: translateY(-0.5rem);
+  z-index: 1;
 }
 
 .album-picker__content {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.85rem 0.65rem 0.75rem;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 55%);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.72) 45%);
 }
 
 .album-picker__title {
@@ -826,14 +942,23 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin: 0 0 0.25rem;
   font-size: 1rem;
   font-weight: 900;
-  color: rgba(244, 240, 255, 0.95);
+  color: var(--adventure-text);
 }
 
 .album-detail__hint {
   margin: 0 0 0.75rem;
   font-size: 0.78rem;
   line-height: 1.4;
-  color: rgba(244, 240, 255, 0.62);
+  color: var(--adventure-text-subtle);
+}
+
+.album-detail__admin {
+  width: 100%;
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  opacity: 0.85;
+  border: 1px dashed var(--adventure-admin-border) !important;
+  color: var(--adventure-admin-text) !important;
 }
 
 .album-slots__grid {
@@ -842,8 +967,8 @@ html[lang="he"] .roadmap-reward-dialog button {
   gap: 0.75rem;
   padding: 1rem;
   border-radius: 18px;
-  background: linear-gradient(160deg, #2d1858 0%, #1a0f36 100%);
-  border: 1px solid rgba(255, 215, 120, 0.2);
+  background: var(--adventure-slots-bg);
+  border: 1px solid var(--adventure-slots-border);
 }
 
 .album-slot {
@@ -852,7 +977,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   min-height: 7.5rem;
   padding: 0.5rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--adventure-slot-bg);
 }
 
 .album-slot .mm-sticker,
@@ -862,12 +987,12 @@ html[lang="he"] .roadmap-reward-dialog button {
 }
 
 .album-slot--missing {
-  border: 2px dashed rgba(255, 255, 255, 0.18);
+  border: 2px dashed var(--adventure-slot-missing-border);
   cursor: pointer;
 }
 
 .album-slot--placed {
-  border: 1px solid rgba(255, 215, 120, 0.2);
+  border: 1px solid var(--adventure-slot-placed-border);
 }
 
 .album-slot--hover {
@@ -890,22 +1015,22 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin-top: 0.85rem;
   padding: 0.75rem;
   border-radius: 18px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--adventure-tray-bg);
+  border: 1px solid var(--adventure-tray-border);
 }
 
 .album-tray__title {
   margin: 0 0 0.55rem;
   font-size: 0.82rem;
   font-weight: 800;
-  color: rgba(244, 240, 255, 0.88);
+  color: var(--adventure-text);
 }
 
 .album-tray__empty,
 .album-tray__tap-hint {
   margin: 0;
   font-size: 0.76rem;
-  color: rgba(244, 240, 255, 0.55);
+  color: var(--adventure-text-faint);
   line-height: 1.4;
 }
 
@@ -1022,20 +1147,15 @@ html[lang="he"] .roadmap-reward-dialog button {
   overflow: hidden;
 }
 
-.mm-sticker--art .mm-sticker__frame {
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
 .mm-sticker--art .mm-sticker__face {
-  background: transparent;
+  border-radius: 50%;
+  overflow: hidden;
 }
 
-.mm-sticker__art {
+.mm-sticker--art .mm-sticker__art {
+  object-fit: cover;
   width: 100%;
   height: 100%;
-  object-fit: contain;
   z-index: 1;
   -webkit-user-drag: none;
   user-select: none;
@@ -1097,8 +1217,8 @@ html[lang="he"] .roadmap-reward-dialog button {
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.65rem 0.75rem max(0.85rem, env(safe-area-inset-bottom, 0px));
-  background: #1a1035;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--adventure-footer-bg);
+  border-top: 1px solid var(--adventure-divider);
 }
 
 @media (max-width: 480px) {
@@ -1125,8 +1245,8 @@ html[lang="he"] .roadmap-reward-dialog button {
   flex: 1 1 100%;
   font-size: 0.75rem;
   opacity: 0.75;
-  border: 1px dashed rgba(255, 120, 120, 0.55) !important;
-  color: #ff9f9f !important;
+  border: 1px dashed var(--adventure-admin-border) !important;
+  color: var(--adventure-admin-text) !important;
 }
 
 .roadmap-reward-dialog {
@@ -1135,13 +1255,13 @@ html[lang="he"] .roadmap-reward-dialog button {
   padding: 0;
   max-width: 22rem;
   width: calc(100vw - 2rem);
-  background: linear-gradient(160deg, #3d1f7a, #1a0f36);
-  color: #fff;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+  background: var(--adventure-reward-bg);
+  color: var(--adventure-text);
+  box-shadow: var(--adventure-reward-shadow);
 }
 
 .roadmap-reward-dialog::backdrop {
-  background: rgba(10, 6, 24, 0.75);
+  background: var(--adventure-backdrop);
 }
 
 .roadmap-reward-dialog__inner {
@@ -1165,7 +1285,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin: 0 0 1rem;
   font-size: 0.88rem;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--adventure-reward-body);
 }
 
 .roadmap-reward-dialog__actions {

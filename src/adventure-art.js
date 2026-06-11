@@ -5,6 +5,9 @@ import albumCosmic from "../docs/images/adventure/album-cosmic.png?url";
 import albumMagic from "../docs/images/adventure/album-magic.png?url";
 import albumNature from "../docs/images/adventure/album-nature.png?url";
 import albumHero from "../docs/images/adventure/album-hero.png?url";
+import albumOcean from "../docs/images/adventure/album-ocean.png?url";
+import albumSports from "../docs/images/adventure/album-sports.png?url";
+import albumMusic from "../docs/images/adventure/album-music.png?url";
 
 export { roadmapMapArt };
 
@@ -16,6 +19,9 @@ export const ALBUM_COVER_URLS = {
   magic: albumMagic,
   nature: albumNature,
   hero: albumHero,
+  ocean: albumOcean,
+  sports: albumSports,
+  music: albumMusic,
 };
 
 /** @param {import("./roadmap-albums.js").StickerCategory} category */

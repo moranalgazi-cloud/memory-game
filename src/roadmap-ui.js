@@ -1,7 +1,9 @@
 import { isDevTesterSession } from "./auth.js";
 import { celebrateWin } from "./celebrate.js";
 import {
-  ALBUM_SIZE,
+  getAlbumSlotCount,
+  getLatestReleasedAlbumPeriodId,
+  getMaxReleasedAlbumIndex,
   getAlbumPeriodId,
   getStickerDef,
   getWeeklyAlbum,
@@ -10,6 +12,8 @@ import {
   getAlbumDominantCategory,
   listSelectableAlbumWeeks,
   countAlbumPlaced,
+  isAlbumComplete,
+  getDaysUntilNextAlbumPeriod,
   isSlotPlaced,
 } from "./roadmap-albums.js";
 import { createAvatarElement, getNextAvatarId } from "./roadmap-avatars.js";
@@ -21,6 +25,7 @@ import {
   getRoadmapSummary,
   getVisibleLevelRange,
   ensureDevAlbumTrayStickers,
+  grantAllMissingAlbumStickers,
   placePendingSticker,
   setAvatarId,
   getAvatarId,
@@ -69,6 +74,7 @@ const roadmapAlbumDetailEl = document.querySelector("#roadmapAlbumDetail");
 const roadmapAlbumBackBtn = document.querySelector("#roadmapAlbumBack");
 const roadmapAlbumDetailTitleEl = document.querySelector("#roadmapAlbumDetailTitle");
 const roadmapAlbumDetailHintEl = document.querySelector("#roadmapAlbumDetailHint");
+const roadmapAlbumGrantAllBtn = document.querySelector("#roadmapAlbumGrantAll");
 const roadmapAlbumSlotsEl = document.querySelector("#roadmapAlbumSlots");
 const roadmapAlbumTrayEl = document.querySelector("#roadmapAlbumTray");
 const roadmapTitleEl = document.querySelector("#roadmapTitle");
@@ -91,6 +97,11 @@ const roadmapRewardStickerEl = document.querySelector("#roadmapRewardSticker");
 const roadmapRewardBodyEl = document.querySelector("#roadmapRewardBody");
 const roadmapRewardStartBtn = document.querySelector("#roadmapRewardStartNext");
 const roadmapRewardCloseBtn = document.querySelector("#roadmapRewardClose");
+
+const albumCompleteDialog = document.querySelector("#albumCompleteDialog");
+const albumCompleteTitleEl = document.querySelector("#albumCompleteTitle");
+const albumCompleteBodyEl = document.querySelector("#albumCompleteBody");
+const albumCompleteCloseBtn = document.querySelector("#albumCompleteClose");
 
 /** @type {{ level: number; nextLevel: number | null; preset?: { mode: string; level?: string }; albumWeek?: string } | null} */
 let pendingReward = null;
@@ -133,6 +144,16 @@ function closeSettingsMenu() {
 function syncRoadmapDevBtn(isMap = roadmapTabMap?.classList.contains("is-active")) {
   if (!roadmapDevCompleteBtn) return;
   roadmapDevCompleteBtn.hidden = !isMap || !isDevTesterSession();
+}
+
+function isAlbumAdminTester() {
+  return isDevTesterSession();
+}
+
+function syncAlbumAdminControls() {
+  if (!roadmapAlbumGrantAllBtn) return;
+  const show = isAlbumAdminTester() && albumView === "detail";
+  roadmapAlbumGrantAllBtn.hidden = !show;
 }
 
 function syncRoadmapStartButton() {
@@ -207,6 +228,7 @@ function showAlbumPicker() {
   selectedAlbumWeek = null;
   if (roadmapAlbumPickerEl) roadmapAlbumPickerEl.hidden = false;
   if (roadmapAlbumDetailEl) roadmapAlbumDetailEl.hidden = true;
+  syncAlbumAdminControls();
   renderAlbumPicker();
 }
 
@@ -219,6 +241,7 @@ function openAlbumDetail(weekId) {
     ensureDevAlbumTrayStickers(deps.getCurrentUserSlug(), weekId);
   }
   renderAlbumDetail();
+  syncAlbumAdminControls();
 }
 
 /**
@@ -275,6 +298,14 @@ export function initRoadmapUi(d) {
     else renderRoadmapDialog();
   });
 
+  roadmapAlbumGrantAllBtn?.addEventListener("click", () => {
+    const slug = deps?.getCurrentUserSlug() ?? null;
+    if (!slug || !selectedAlbumWeek || !isAlbumAdminTester()) return;
+    grantAllMissingAlbumStickers(slug, selectedAlbumWeek);
+    renderAlbumDetail();
+    refreshRoadmapProgressPill();
+  });
+
   roadmapRewardCloseBtn?.addEventListener("click", closeRoadmapReward);
   roadmapRewardDialog?.addEventListener("click", (e) => {
     if (e.target === roadmapRewardDialog) closeRoadmapReward();
@@ -285,6 +316,11 @@ export function initRoadmapUi(d) {
     }
     closeRoadmapReward();
     closeRoadmapDialog();
+  });
+
+  albumCompleteCloseBtn?.addEventListener("click", () => albumCompleteDialog?.close());
+  albumCompleteDialog?.addEventListener("click", (e) => {
+    if (e.target === albumCompleteDialog) albumCompleteDialog.close();
   });
 
   roadmapProgressPill?.addEventListener("click", openRoadmapDialog);
@@ -393,6 +429,9 @@ export function refreshRoadmapLabels() {
   if (roadmapDevCompleteBtn) roadmapDevCompleteBtn.textContent = t("roadmapDevComplete");
   syncRoadmapDevBtn();
   if (roadmapAlbumBackBtn) roadmapAlbumBackBtn.textContent = t("roadmapAlbumBack");
+  if (roadmapAlbumGrantAllBtn) roadmapAlbumGrantAllBtn.textContent = t("roadmapAlbumGrantAll");
+  if (albumCompleteTitleEl) albumCompleteTitleEl.textContent = t("roadmapAlbumCompleteTitle");
+  if (albumCompleteCloseBtn) albumCompleteCloseBtn.textContent = t("roadmapAlbumCompleteClose");
 }
 
 export function refreshRoadmapProgressPill() {
@@ -645,6 +684,7 @@ function renderAlbumPicker() {
   const slug = deps.getCurrentUserSlug();
   const summary = getRoadmapSummary(slug);
   const currentPeriod = getAlbumPeriodId();
+  const latestReleased = getLatestReleasedAlbumPeriodId(currentPeriod);
   const weeks = listSelectableAlbumWeeks(
     summary.state.placedStickers,
     summary.state.pendingStickers,
@@ -663,15 +703,19 @@ function renderAlbumPicker() {
   grid.className = "album-picker__grid";
 
   for (const periodId of weeks) {
+    if (getAlbumSlotCount(periodId) <= 0) continue;
+
     const placed = countAlbumPlaced(summary.state.placedStickers, periodId);
     const pending = summary.state.pendingStickers.filter((p) => p.albumWeek === periodId).length;
+    const done = isAlbumComplete(summary.state.placedStickers, periodId);
     const themeName = deps.t(getAlbumThemeKey(periodId));
     const category = getAlbumDominantCategory(periodId);
 
     const card = document.createElement("button");
     card.type = "button";
     card.className = `album-picker__card album-picker__card--${category}`;
-    if (periodId === currentPeriod) card.classList.add("album-picker__card--current");
+    if (periodId === latestReleased) card.classList.add("album-picker__card--current");
+    if (done) card.classList.add("album-picker__card--complete");
 
     const art = document.createElement("span");
     art.className = "album-picker__art";
@@ -704,12 +748,16 @@ function renderAlbumPicker() {
 
     const stats = document.createElement("span");
     stats.className = "album-picker__stats";
-    stats.textContent = deps.t("roadmapAlbumCount", {
-      placed: String(placed),
-      total: String(ALBUM_SIZE),
-    });
-    if (pending > 0) {
-      stats.textContent += ` · ${deps.t("roadmapAlbumPending", { count: String(pending) })}`;
+    if (done) {
+      stats.textContent = deps.t("roadmapAlbumDone");
+    } else {
+      stats.textContent = deps.t("roadmapAlbumCount", {
+        placed: String(placed),
+        total: String(getAlbumSlotCount(periodId)),
+      });
+      if (pending > 0) {
+        stats.textContent += ` · ${deps.t("roadmapAlbumPending", { count: String(pending) })}`;
+      }
     }
 
     content.append(title, stats);
@@ -792,7 +840,15 @@ function renderAlbumDetail() {
     roadmapAlbumDetailTitleEl.textContent = themeName;
   }
   if (roadmapAlbumDetailHintEl) {
-    roadmapAlbumDetailHintEl.textContent = deps.t("roadmapAlbumDragHint");
+    const done = isAlbumComplete(summary.state.placedStickers, weekId);
+    const isCurrent = weekId === getAlbumPeriodId();
+    if (done) {
+      const days = String(getDaysUntilNextAlbumPeriod());
+      const nextKey = isCurrent ? "roadmapAlbumCompleteNext" : "roadmapAlbumCompletePast";
+      roadmapAlbumDetailHintEl.textContent = deps.t(nextKey, { days });
+    } else {
+      roadmapAlbumDetailHintEl.textContent = deps.t("roadmapAlbumDragHint");
+    }
   }
 
   roadmapAlbumSlotsEl.replaceChildren();
@@ -849,6 +905,8 @@ function renderAlbumDetail() {
     }
     roadmapAlbumTrayEl.append(row);
   }
+
+  syncAlbumAdminControls();
 }
 
 /**
@@ -865,6 +923,10 @@ function tryPlacePending(slug, pendingId, weekId, slot) {
     }
     renderAlbumDetail();
     refreshRoadmapProgressPill();
+    const summary = getRoadmapSummary(slug);
+    if (isAlbumComplete(summary.state.placedStickers, weekId)) {
+      showAlbumComplete(weekId, weekId === getAlbumPeriodId());
+    }
   } else {
     const slotEl = roadmapAlbumSlotsEl?.querySelector(`[data-slot="${slot}"]`);
     slotEl?.classList.add("album-slot--reject");
@@ -978,4 +1040,24 @@ function closeRoadmapReward() {
     setRoadmapTab("album");
     openAlbumDetail(week);
   }
+}
+
+/**
+ * @param {string} weekId
+ * @param {boolean} isCurrentPeriod
+ */
+function showAlbumComplete(weekId, isCurrentPeriod) {
+  if (!deps || !albumCompleteDialog || !albumCompleteBodyEl) return;
+
+  try {
+    celebrateWin();
+  } catch (e) {
+    console.warn("[roadmap-ui] album complete celebrate:", e);
+  }
+
+  const themeName = deps.t(getAlbumThemeKey(weekId));
+  const days = String(getDaysUntilNextAlbumPeriod());
+  const nextKey = isCurrentPeriod ? "roadmapAlbumCompleteNext" : "roadmapAlbumCompletePast";
+  albumCompleteBodyEl.textContent = `${deps.t("roadmapAlbumCompleteBody", { album: themeName })} ${deps.t(nextKey, { days })}`;
+  albumCompleteDialog.showModal();
 }

@@ -1,6 +1,7 @@
 /** @typedef {"math" | "sums" | "english1" | "english2" | "fractions"} GameMode */
 /** @typedef {"easy" | "medium" | "hard"} GameLevel */
 
+import { isDevTesterSession } from "./auth.js";
 import {
   DEV_ALBUM_IDS,
   getAlbumPeriodId,
@@ -10,6 +11,7 @@ import {
   countAlbumPlaced,
   findSlotForSticker,
   isSlotPlaced,
+  listReleasedAlbumPeriodIds,
 } from "./roadmap-albums.js";
 import { DEFAULT_AVATAR_ID } from "./roadmap-avatars.js";
 import { ROADMAP_MAX_LEVELS } from "./roadmap-map-spots.js";
@@ -80,6 +82,10 @@ import { getLocale } from "./i18n.js";
 export const ROADMAP_STORAGE_PREFIX = "memory-roadmap-v2-";
 export const VISIBLE_LEVELS_PER_SCREEN = 10;
 export const DEV_ALBUM_TRAY_SIZE = 5;
+
+function getOpenAlbumWeeksForRewards() {
+  return listReleasedAlbumPeriodIds(getAlbumPeriodId(), { devPreview: isDevTesterSession() });
+}
 export const CHALLENGE_WIN_COUNT = 3;
 
 /** @type {GameMode[]} */
@@ -442,8 +448,8 @@ export function grantStarterStickerIfNeeded(slug) {
   const state = loadRoadmap(slug);
   if (state.placedStickers.length > 0 || state.pendingStickers.length > 0) return null;
 
-  const week = getAlbumPeriodId();
-  const reward = pickRewardSticker(state.placedStickers, state.pendingStickers, week);
+  const openAlbumWeeks = getOpenAlbumWeeksForRewards();
+  const reward = pickRewardSticker(state.placedStickers, state.pendingStickers, openAlbumWeeks);
   if (!reward) return null;
 
   const pendingId = newPendingId();
@@ -472,14 +478,16 @@ export function grantStarterStickerIfNeeded(slug) {
  * @returns {number} How many pending stickers the album tray now has
  */
 export function ensureDevAlbumTrayStickers(slug, albumWeekId) {
-  if (!slug || !DEV_ALBUM_IDS.includes(albumWeekId)) return 0;
+  if (!slug) return 0;
+
+  const album = getWeeklyAlbum(albumWeekId);
+  if (!album.slots.length) return 0;
 
   const state = loadRoadmap(slug);
   const pendingForWeek = state.pendingStickers.filter((p) => p.albumWeek === albumWeekId);
   const need = DEV_ALBUM_TRAY_SIZE - pendingForWeek.length;
   if (need <= 0) return pendingForWeek.length;
 
-  const album = getWeeklyAlbum(albumWeekId);
   const placedIds = new Set(
     state.placedStickers
       .filter((p) => p.albumWeek === albumWeekId)
@@ -508,6 +516,46 @@ export function ensureDevAlbumTrayStickers(slug, albumWeekId) {
 
   saveRoadmap(slug, { ...state, pendingStickers });
   return pendingStickers.filter((p) => p.albumWeek === albumWeekId).length;
+}
+
+/**
+ * Admin testing: add every missing sticker from this album to the pending tray.
+ *
+ * @param {string | null | undefined} slug
+ * @param {string} albumWeekId
+ * @returns {number} How many stickers were added
+ */
+export function grantAllMissingAlbumStickers(slug, albumWeekId) {
+  if (!slug) return 0;
+
+  const state = loadRoadmap(slug);
+  const album = getWeeklyAlbum(albumWeekId);
+  const placedIds = new Set(
+    state.placedStickers
+      .filter((p) => p.albumWeek === albumWeekId)
+      .map((p) => p.stickerId),
+  );
+  const reservedIds = new Set(
+    state.pendingStickers
+      .filter((p) => p.albumWeek === albumWeekId)
+      .map((p) => p.stickerId),
+  );
+
+  const pendingStickers = [...state.pendingStickers];
+  let added = 0;
+  for (const slot of album.slots) {
+    if (placedIds.has(slot.stickerId) || reservedIds.has(slot.stickerId)) continue;
+    pendingStickers.push({
+      id: newPendingId(),
+      albumWeek: albumWeekId,
+      stickerId: slot.stickerId,
+    });
+    reservedIds.add(slot.stickerId);
+    added += 1;
+  }
+
+  if (added > 0) saveRoadmap(slug, { ...state, pendingStickers });
+  return added;
 }
 
 /**
@@ -628,8 +676,8 @@ function applyProgress(slug, state, challenge, forceComplete = false) {
   let pendingId;
 
   if (completed) {
-    const week = getAlbumPeriodId();
-    const reward = pickRewardSticker(placedStickers, pendingStickers, week);
+    const openAlbumWeeks = getOpenAlbumWeeksForRewards();
+    const reward = pickRewardSticker(placedStickers, pendingStickers, openAlbumWeeks);
     if (reward) {
       albumWeek = reward.albumWeek;
       stickerId = reward.stickerId;

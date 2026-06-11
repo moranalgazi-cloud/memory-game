@@ -641,6 +641,14 @@
             <button type="button" id="roadmapAlbumBack" class="album-detail__back btn btn--ghost">Back</button>
             <h3 id="roadmapAlbumDetailTitle" class="album-detail__title"></h3>
             <p id="roadmapAlbumDetailHint" class="album-detail__hint"></p>
+            <button
+              type="button"
+              id="roadmapAlbumGrantAll"
+              class="btn btn--ghost album-detail__admin"
+              hidden
+            >
+              Get all stickers
+            </button>
             <div id="roadmapAlbumSlots" class="album-slots"></div>
             <div id="roadmapAlbumTray" class="album-tray"></div>
           </div>
@@ -674,6 +682,18 @@
           </button>
           <button type="button" id="roadmapRewardClose" class="btn btn--ghost roadmap-reward-dialog__action">
             Close
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="albumCompleteDialog" class="roadmap-reward-dialog">
+      <div class="roadmap-reward-dialog__inner">
+        <h2 id="albumCompleteTitle" class="roadmap-reward-dialog__title">Album complete!</h2>
+        <p id="albumCompleteBody" class="roadmap-reward-dialog__body"></p>
+        <div class="roadmap-reward-dialog__actions">
+          <button type="button" id="albumCompleteClose" class="btn btn--primary roadmap-reward-dialog__action">
+            Great!
           </button>
         </div>
       </div>
