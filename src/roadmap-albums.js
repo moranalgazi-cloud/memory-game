@@ -6,7 +6,7 @@ export const ALBUM_PERIOD_DAYS = 5;
 /** UTC midnight 1 Jan 2026 — album periods count in 5-day blocks from here */
 const ALBUM_EPOCH_MS = Date.UTC(2026, 0, 1);
 
-/** @typedef {"animals" | "food" | "cosmic" | "magic" | "nature" | "hero"} StickerCategory */
+/** @typedef {"animals" | "food" | "cosmic" | "magic" | "nature" | "hero" | "ocean" | "sports" | "music"} StickerCategory */
 
 /** @typedef {{ id: string; emoji: string; label: string; hue: number; category: StickerCategory }} StickerDef */
 
@@ -36,7 +36,102 @@ export const STICKER_POOL = [
   { id: "heart", emoji: "💖", label: "Power heart", hue: 330, category: "magic" },
   { id: "diamond", emoji: "♦️", label: "Diamond", hue: 205, category: "magic" },
   { id: "penguin", emoji: "🐧", label: "Cool penguin", hue: 200, category: "animals" },
+  // Ocean Treasures album
+  { id: "dolphin", emoji: "", label: "Happy dolphin", hue: 198, category: "ocean" },
+  { id: "whale", emoji: "", label: "Blue whale", hue: 210, category: "ocean" },
+  { id: "octopus", emoji: "", label: "Clever octopus", hue: 285, category: "ocean" },
+  { id: "crab", emoji: "", label: "Sideways crab", hue: 12, category: "ocean" },
+  { id: "shell", emoji: "", label: "Pink shell", hue: 340, category: "ocean" },
+  { id: "pearl", emoji: "", label: "Ocean pearl", hue: 185, category: "ocean" },
+  { id: "anchor", emoji: "", label: "Strong anchor", hue: 220, category: "ocean" },
+  { id: "wave", emoji: "", label: "Big wave", hue: 205, category: "ocean" },
+  { id: "fish", emoji: "", label: "Tropical fish", hue: 175, category: "ocean" },
+  { id: "turtle", emoji: "", label: "Sea turtle", hue: 135, category: "ocean" },
+  { id: "blowfish", emoji: "", label: "Blowfish", hue: 38, category: "ocean" },
+  { id: "coral", emoji: "", label: "Coral reef", hue: 15, category: "ocean" },
+  // Sports Stars album
+  { id: "soccer", emoji: "", label: "Soccer star", hue: 140, category: "sports" },
+  { id: "basketball", emoji: "", label: "Basketball pro", hue: 24, category: "sports" },
+  { id: "tennis", emoji: "", label: "Tennis ace", hue: 88, category: "sports" },
+  { id: "runner", emoji: "", label: "Fast runner", hue: 32, category: "sports" },
+  { id: "skateboard", emoji: "", label: "Skateboard trick", hue: 260, category: "sports" },
+  { id: "bicycle", emoji: "", label: "Bike racer", hue: 210, category: "sports" },
+  { id: "baseball", emoji: "", label: "Home run", hue: 12, category: "sports" },
+  { id: "volleyball", emoji: "", label: "Volleyball spike", hue: 48, category: "sports" },
+  { id: "whistle", emoji: "", label: "Coach whistle", hue: 355, category: "sports" },
+  { id: "podium", emoji: "", label: "Champion podium", hue: 195, category: "sports" },
+  // Music Makers album
+  { id: "guitar", emoji: "", label: "Rock guitar", hue: 18, category: "music" },
+  { id: "drums", emoji: "", label: "Drum beat", hue: 8, category: "music" },
+  { id: "piano", emoji: "", label: "Piano keys", hue: 280, category: "music" },
+  { id: "microphone", emoji: "", label: "Stage mic", hue: 340, category: "music" },
+  { id: "trumpet", emoji: "", label: "Golden trumpet", hue: 42, category: "music" },
+  { id: "saxophone", emoji: "", label: "Jazz sax", hue: 28, category: "music" },
+  { id: "violin", emoji: "", label: "Sweet violin", hue: 12, category: "music" },
+  { id: "headphones", emoji: "", label: "Studio headphones", hue: 260, category: "music" },
+  { id: "notes", emoji: "", label: "Music notes", hue: 300, category: "music" },
+  { id: "disco", emoji: "", label: "Disco ball", hue: 195, category: "music" },
+  { id: "karaoke", emoji: "", label: "Karaoke night", hue: 320, category: "music" },
+  { id: "tambourine", emoji: "", label: "Tambourine shake", hue: 55, category: "music" },
 ];
+
+/** Dev-only preview albums (visible to moranalgazi@gmail.com). */
+export const DEV_ALBUM_IDS = ["DEV_OCEAN", "DEV_SPORTS", "DEV_MUSIC"];
+
+/** @type {Record<string, { category: StickerCategory; stickerIds: string[] }>} */
+const DEV_ALBUM_DEFINITIONS = {
+  DEV_OCEAN: {
+    category: "ocean",
+    stickerIds: [
+      "dolphin",
+      "whale",
+      "octopus",
+      "crab",
+      "shell",
+      "pearl",
+      "anchor",
+      "wave",
+      "fish",
+      "turtle",
+      "blowfish",
+      "coral",
+    ],
+  },
+  DEV_SPORTS: {
+    category: "sports",
+    stickerIds: [
+      "soccer",
+      "basketball",
+      "tennis",
+      "medal",
+      "runner",
+      "skateboard",
+      "bicycle",
+      "baseball",
+      "volleyball",
+      "whistle",
+      "podium",
+      "trophy",
+    ],
+  },
+  DEV_MUSIC: {
+    category: "music",
+    stickerIds: [
+      "guitar",
+      "drums",
+      "piano",
+      "microphone",
+      "trumpet",
+      "saxophone",
+      "violin",
+      "headphones",
+      "notes",
+      "disco",
+      "karaoke",
+      "tambourine",
+    ],
+  },
+};
 
 /** @type {Record<StickerCategory, string>} */
 export const ALBUM_THEME_KEYS = {
@@ -46,6 +141,9 @@ export const ALBUM_THEME_KEYS = {
   magic: "albumThemeMagic",
   nature: "albumThemeNature",
   hero: "albumThemeHero",
+  ocean: "albumThemeOcean",
+  sports: "albumThemeSports",
+  music: "albumThemeMusic",
 };
 
 /** @type {Record<StickerCategory, string>} */
@@ -56,6 +154,9 @@ export const ALBUM_THEME_EMOJI = {
   magic: "✨",
   nature: "🌿",
   hero: "🦸",
+  ocean: "🌊",
+  sports: "🏅",
+  music: "🎵",
 };
 
 /**
@@ -82,6 +183,11 @@ export function getIsoWeekId(date = new Date()) {
 }
 
 /** @param {string} weekId */
+function isDevAlbumId(weekId) {
+  return DEV_ALBUM_IDS.includes(weekId);
+}
+
+/** @param {string} weekId */
 function weekSeed(weekId) {
   let h = 0;
   for (let i = 0; i < weekId.length; i += 1) {
@@ -95,8 +201,16 @@ function weekSeed(weekId) {
  * @returns {WeeklyAlbum}
  */
 export function getWeeklyAlbum(weekId) {
+  const devAlbum = DEV_ALBUM_DEFINITIONS[weekId];
+  if (devAlbum) {
+    return {
+      weekId,
+      slots: devAlbum.stickerIds.map((stickerId, slot) => ({ slot, stickerId })),
+    };
+  }
+
   const rng = createSeededRng(weekSeed(weekId));
-  const pool = [...STICKER_POOL];
+  const pool = [...STICKER_POOL].filter((s) => !["ocean", "sports", "music"].includes(s.category));
   for (let i = pool.length - 1; i > 0; i -= 1) {
     const j = Math.floor(rng() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -118,6 +232,9 @@ export function getStickerDef(stickerId) {
  * @returns {StickerCategory}
  */
 export function getAlbumDominantCategory(weekId) {
+  const devAlbum = DEV_ALBUM_DEFINITIONS[weekId];
+  if (devAlbum) return devAlbum.category;
+
   const album = getWeeklyAlbum(weekId);
   /** @type {Record<string, number>} */
   const counts = {};
@@ -181,11 +298,13 @@ export function countAlbumPlaced(placed, weekId) {
 /**
  * @param {PlacedSticker[]} placed
  * @param {PendingSticker[]} pending
- * @param {string} currentWeekId
+ * @param {string} currentPeriodId
  * @param {() => number} [rng]
  * @returns {{ albumWeek: string; stickerId: string } | null}
  */
 export function pickRewardSticker(placed, pending, currentPeriodId, rng = Math.random) {
+  if (isDevAlbumId(currentPeriodId)) return null;
+
   const album = getWeeklyAlbum(currentPeriodId);
   /** @type {{ albumWeek: string; stickerId: string }[]} */
   const candidates = [];
@@ -208,11 +327,18 @@ export function findSlotForSticker(weekId, stickerId) {
 }
 
 /**
- * @param {PlacedSticker[]} placed
- * @param {PendingSticker[]} pending
- * @param {string} currentWeekId
+ * Regular players: current 5-day album only.
+ * Dev tester: current album plus three preview albums.
+ *
+ * @param {PlacedSticker[]} _placed
+ * @param {PendingSticker[]} _pending
+ * @param {string} currentPeriodId
+ * @param {{ devPreview?: boolean }} [options]
  * @returns {string[]}
  */
-export function listSelectableAlbumWeeks(_placed, _pending, currentPeriodId) {
+export function listSelectableAlbumWeeks(_placed, _pending, currentPeriodId, options = {}) {
+  if (options.devPreview) {
+    return [currentPeriodId, ...DEV_ALBUM_IDS];
+  }
   return [currentPeriodId];
 }

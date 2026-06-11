@@ -8,7 +8,7 @@ import albumHero from "../docs/images/adventure/album-hero.png?url";
 
 export { roadmapMapArt };
 
-/** @type {Record<import("./roadmap-albums.js").StickerCategory, string>} */
+/** @type {Partial<Record<import("./roadmap-albums.js").StickerCategory, string>>} */
 export const ALBUM_COVER_URLS = {
   animals: albumAnimals,
   food: albumFood,

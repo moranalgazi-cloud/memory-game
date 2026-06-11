@@ -573,8 +573,8 @@ html[lang="he"] .online-dialog button {
 }
 
 .online-game-mode-picker .game-mode-btn {
-  min-width: 4.4rem;
-  padding: 0.45rem 0.4rem;
+  min-width: 5.75rem;
+  padding: 0.55rem 0.5rem;
   background: var(--screen-subtle-bg);
   border-color: var(--screen-subtle-border);
   color: var(--text);
@@ -596,8 +596,9 @@ html[lang="he"] .online-dialog button {
 }
 
 .online-game-mode-picker .game-mode-btn img {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 5.75rem;
+  height: 5.75rem;
+  object-fit: contain;
 }
 
 .online-level-picker {

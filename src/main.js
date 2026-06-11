@@ -405,7 +405,9 @@ function shouldHideRestartForChallenge(deckWasRepeat = false) {
   const slug = getCurrentUserSlug();
   if (!slug) return false;
   const { current, progress, target } = getRoadmapSummary(slug);
-  if (current.goal.type !== "wins" || target <= 1) return false;
+  if ((current.goal.type !== "wins" && current.goal.type !== "fastWin") || target <= 1) {
+    return false;
+  }
   if (progress > 0 && progress < target) return true;
   if (deckWasRepeat && progress < target) return true;
   return false;
@@ -423,7 +425,8 @@ function refreshWinChallengeUi() {
   if (!winChallengeHint || !slug) return;
 
   const { current, progress, target } = getRoadmapSummary(slug);
-  const multiWin = current.goal.type === "wins" && target > 1;
+  const multiWin =
+    (current.goal.type === "wins" || current.goal.type === "fastWin") && target > 1;
   if (!multiWin) {
     winChallengeHint.hidden = true;
     winChallengeHint.textContent = "";
@@ -1849,7 +1852,9 @@ function completeGameWin() {
     const slug = getCurrentUserSlug();
     const summary = slug ? getRoadmapSummary(slug) : null;
     const multiWin = Boolean(
-      summary && summary.current.goal.type === "wins" && summary.target > 1,
+      summary &&
+        (summary.current.goal.type === "wins" || summary.current.goal.type === "fastWin") &&
+        summary.target > 1,
     );
     const canCountForChallenge = !multiWin || state.freshDeck !== false;
 
@@ -1857,6 +1862,7 @@ function completeGameWin() {
       const roadmapResult = onSoloWin(slug, {
         mode: state.mode,
         level: getLevelForMode(state.mode),
+        elapsedMs: elapsed ?? undefined,
       });
       if (roadmapResult.completed) showRoadmapReward(roadmapResult);
       else if (roadmapResult.progressed) refreshRoadmapProgressPill();
@@ -2478,23 +2484,7 @@ async function tryAddUserAsync() {
     pendingUserSlug = result.user.slug;
     if (newUserNameInput) newUserNameInput.value = "";
     renderUserPickerList();
-    if (userDialogContinue) userDialogContinue.disabled = false;
-    if (isCloudSyncEnabled()) {
-      if (addUserBtn) addUserBtn.disabled = true;
-      try {
-        const cloud = await commitPlayerListToCloud({});
-        if (!cloud.ok) {
-          const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
-          showUserAddError(t("userErrorCloudSync", { detail }));
-        }
-      } catch (e) {
-        const detail = e instanceof Error ? e.message : String(e);
-        console.warn("[app] add user cloud sync:", e);
-        showUserAddError(t("userErrorCloudSync", { detail: detail.slice(0, 220) }));
-      } finally {
-        if (addUserBtn) addUserBtn.disabled = false;
-      }
-    }
+    await confirmUserChoiceAsync();
     return;
   }
   if (result.reason === "duplicate") showUserAddError(t("userErrorDuplicateName"));
@@ -2509,59 +2499,63 @@ function confirmUserChoice() {
 async function confirmUserChoiceAsync() {
   if (!pendingUserSlug) return;
   const cont = userDialogContinue;
-  try {
-    if (isCloudSyncEnabled()) {
-      if (cont) {
-        cont.disabled = true;
-        cont.textContent = t("userCloudSaving");
-      }
-      let cloud = { ok: true, failures: /** @type {string[]} */ ([]) };
-      try {
-        cloud = await commitPlayerListToCloud({});
-      } catch (e) {
-        const detail = e instanceof Error ? e.message : String(e);
-        console.warn("[app] confirm user cloud sync:", e);
-        showUserAddError(t("userErrorCloudSync", { detail: detail.slice(0, 220) }));
-        return;
-      }
-      if (!cloud.ok) {
-        const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
-        showUserAddError(t("userErrorCloudSync", { detail }));
-        syncUserDialogButtonEmphasis();
-        return;
-      }
-      hideUserAddError();
-    }
-    clearAdminSession();
-    if (!setCurrentUserSlug(pendingUserSlug)) {
-      showUserAddError(t("userErrorStorage"));
-      return;
-    }
-    userDialog?.close();
-    document.body.classList.add("has-active-player");
-    appRoot?.classList.remove("is-hidden");
-    if (!booted) {
-      refreshChrome();
-      startGame("init");
-    } else {
-      cancelEnglishSpeech();
-      refreshChrome();
-      startGame("switch-user");
-    }
-    const tutorialUserSlug = pendingUserSlug;
-    grantStarterStickerIfNeeded(tutorialUserSlug);
-    queueMicrotask(() => {
-      requestAnimationFrame(() => {
-        openTutorialIfNeeded(tutorialUserSlug, () => openRoadmapDialog());
-      });
-    });
-  } finally {
+  const slug = pendingUserSlug;
+  const isFirstBoot = !booted;
+
+  clearAdminSession();
+  if (!setCurrentUserSlug(slug)) {
+    showUserAddError(t("userErrorStorage"));
+    return;
+  }
+
+  hideUserAddError();
+  userDialog?.close();
+  document.body.classList.add("has-active-player");
+  appRoot?.classList.remove("is-hidden");
+
+  grantStarterStickerIfNeeded(slug);
+  refreshChrome();
+  openRoadmapDialog();
+
+  if (isFirstBoot) {
+    queueMicrotask(() => startGame("init"));
+  } else {
+    cancelEnglishSpeech();
+    queueMicrotask(() => startGame("switch-user"));
+  }
+
+  queueMicrotask(() => {
+    openTutorialIfNeeded(slug, () => {});
+  });
+
+  const finishButtons = () => {
     if (cont) {
       cont.textContent = t("userContinue");
       cont.disabled = !pendingUserSlug;
     }
     syncUserDialogButtonEmphasis();
+  };
+
+  if (isCloudSyncEnabled()) {
+    if (cont) {
+      cont.disabled = true;
+      cont.textContent = t("userCloudSaving");
+    }
+    void commitPlayerListToCloud({})
+      .then((cloud) => {
+        if (!cloud.ok) {
+          const detail = cloud.failures.length ? cloud.failures.join(" · ").slice(0, 220) : "—";
+          console.warn("[app] background cloud sync after player pick:", detail);
+        }
+      })
+      .catch((e) => {
+        console.warn("[app] confirm user cloud sync:", e);
+      })
+      .finally(finishButtons);
+    return;
   }
+
+  finishButtons();
 }
 
 function updateAdminPasswordToggleLabel() {

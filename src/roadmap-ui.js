@@ -19,12 +19,18 @@ import {
   formatChallengeTitle,
   getLevelChallenge,
   getRoadmapSummary,
-  getVisibleLevelCount,
+  getVisibleLevelRange,
+  ensureDevAlbumTrayStickers,
   placePendingSticker,
   setAvatarId,
   getAvatarId,
 } from "./roadmap.js";
 import { getAlbumCoverUrl, roadmapMapArt } from "./adventure-art.js";
+import {
+  ROADMAP_LEVEL_SPOTS,
+  ROADMAP_MAP_SIZE,
+  getRoadmapDisplayPositionsForLevels,
+} from "./roadmap-map-spots.js";
 import { createStickerElement, getStickerLabel } from "./roadmap-stickers.js";
 
 /**
@@ -89,15 +95,33 @@ const roadmapRewardCloseBtn = document.querySelector("#roadmapRewardClose");
 /** @type {{ level: number; nextLevel: number | null; preset?: { mode: string; level?: string }; albumWeek?: string } | null} */
 let pendingReward = null;
 
-const TRAIL_ROWS = [
-  { levels: [1], down: "center" },
-  { levels: [2, 3], down: "end" },
-  { levels: [4, 5], down: "end" },
-  { levels: [6, 7], down: "center" },
-  { levels: [8, 9], down: "end" },
-  { levels: [10, 11], down: "end" },
-  { levels: [12], down: null },
-];
+const LEVEL_SPOTS = ROADMAP_LEVEL_SPOTS;
+
+/** @type {(() => void) | null} */
+let syncRoadmapSpotPositions = null;
+
+/** @param {HTMLElement} scene @param {{ el: HTMLElement; spot: { x: number; y: number } }[]} spotAnchors */
+function applyRoadmapSpotPositions(scene, spotAnchors) {
+  const width = scene.clientWidth;
+  const height = scene.clientHeight;
+  if (!width || !height) return;
+
+  for (const { el, spot } of spotAnchors) {
+    el.style.left = `${(spot.x / ROADMAP_MAP_SIZE.w) * width}px`;
+    el.style.top = `${(spot.y / ROADMAP_MAP_SIZE.h) * height}px`;
+  }
+}
+
+function queueRoadmapSpotRelayout() {
+  const run = () => syncRoadmapSpotPositions?.();
+  requestAnimationFrame(() => {
+    run();
+    requestAnimationFrame(run);
+  });
+  window.setTimeout(run, 0);
+  window.setTimeout(run, 80);
+  window.setTimeout(run, 240);
+}
 
 function closeSettingsMenu() {
   const menu = document.querySelector("#settingsMenu");
@@ -175,6 +199,7 @@ function setRoadmapTab(tab) {
   if (roadmapPanelAlbum) roadmapPanelAlbum.hidden = isMap;
   if (roadmapStartBtn) roadmapStartBtn.hidden = !isMap;
   syncRoadmapDevBtn(isMap);
+  if (isMap) queueRoadmapSpotRelayout();
 }
 
 function showAlbumPicker() {
@@ -190,6 +215,9 @@ function openAlbumDetail(weekId) {
   selectedAlbumWeek = weekId;
   if (roadmapAlbumPickerEl) roadmapAlbumPickerEl.hidden = true;
   if (roadmapAlbumDetailEl) roadmapAlbumDetailEl.hidden = false;
+  if (isDevTesterSession() && deps) {
+    ensureDevAlbumTrayStickers(deps.getCurrentUserSlug(), weekId);
+  }
   renderAlbumDetail();
 }
 
@@ -216,6 +244,9 @@ export function initRoadmapUi(d) {
   roadmapCloseBtn?.addEventListener("click", closeRoadmapDialog);
   roadmapDialog?.addEventListener("click", (e) => {
     if (e.target === roadmapDialog) closeRoadmapDialog();
+  });
+  roadmapDialog?.addEventListener("toggle", () => {
+    if (roadmapDialog.open) queueRoadmapSpotRelayout();
   });
 
   roadmapTabMap?.addEventListener("click", () => setRoadmapTab("map"));
@@ -402,18 +433,39 @@ function createProgressRing(progress, target) {
  * @param {import("./roadmap.js").RoadmapLevel} challenge
  * @param {{ isDone: boolean; isCurrent: boolean; isLocked: boolean; progress: number; target: number; showAvatar: boolean; avatarId: string }} meta
  */
+/** @param {number} level */
+function getLevelZone(level) {
+  if (level <= 11) return "sunset";
+  if (level <= 23) return "meadow";
+  if (level <= 35) return "forest";
+  if (level <= 47) return "river";
+  if (level <= 59) return "cave";
+  return "summit";
+}
+
 function createLevelNode(challenge, meta) {
   const { t } = /** @type {RoadmapUiDeps} */ (deps);
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "adventure-node";
   btn.dataset.level = String(challenge.level);
+  btn.dataset.zone = getLevelZone(challenge.level);
   if (meta.isDone) btn.classList.add("adventure-node--done");
   if (meta.isCurrent) btn.classList.add("adventure-node--current");
   if (meta.isLocked) btn.classList.add("adventure-node--locked");
   if (selectedLevel === challenge.level) btn.classList.add("adventure-node--selected");
 
   btn.setAttribute("aria-label", t("roadmapLevelLabel", { level: String(challenge.level) }));
+
+  const halo = document.createElement("span");
+  halo.className = "adventure-node__halo";
+  halo.setAttribute("aria-hidden", "true");
+  btn.append(halo);
+
+  const pedestal = document.createElement("span");
+  pedestal.className = "adventure-node__pedestal";
+  pedestal.setAttribute("aria-hidden", "true");
+  btn.append(pedestal);
 
   if (meta.isCurrent) btn.append(createProgressRing(meta.progress, meta.target));
 
@@ -447,23 +499,6 @@ function createLevelNode(challenge, meta) {
   });
 
   return btn;
-}
-
-function createHConnector() {
-  const el = document.createElement("div");
-  el.className = "adventure-link adventure-link--h";
-  el.setAttribute("aria-hidden", "true");
-  el.innerHTML = '<span class="adventure-link__dots"></span><span class="adventure-link__arrow">→</span>';
-  return el;
-}
-
-/** @param {"center" | "end"} anchor */
-function createVConnector(anchor) {
-  const el = document.createElement("div");
-  el.className = `adventure-link adventure-link--v adventure-link--v-${anchor}`;
-  el.setAttribute("aria-hidden", "true");
-  el.innerHTML = '<span class="adventure-link__stem"></span><span class="adventure-link__arrow-down">↓</span>';
-  return el;
 }
 
 function renderLevelPopover() {
@@ -522,7 +557,7 @@ function renderRoadmapMap() {
   const slug = deps.getCurrentUserSlug();
   const summary = getRoadmapSummary(slug);
   const { state } = summary;
-  const visibleMax = getVisibleLevelCount(slug);
+  const { start: visibleMin, end: visibleMax } = getVisibleLevelRange(slug);
   const avatarId = getAvatarId(slug);
 
   roadmapMapEl.replaceChildren();
@@ -531,53 +566,77 @@ function renderRoadmapMap() {
   scene.className = "adventure-scene";
   scene.innerHTML = `
     <div class="adventure-scene__backdrop" aria-hidden="true">
-      <img class="adventure-scene__backdrop-img" src="${roadmapMapArt}" alt="" decoding="async" />
+      <img
+        class="adventure-scene__backdrop-img"
+        src="${roadmapMapArt}"
+        alt=""
+        width="${ROADMAP_MAP_SIZE.w}"
+        height="${ROADMAP_MAP_SIZE.h}"
+        decoding="async"
+      />
     </div>
-    <div class="adventure-scene__sky" aria-hidden="true"></div>
-    <div class="adventure-scene__hills" aria-hidden="true"></div>
-    <div class="adventure-scene__cloud adventure-scene__cloud--a" aria-hidden="true"></div>
-    <div class="adventure-scene__cloud adventure-scene__cloud--b" aria-hidden="true"></div>
   `;
 
-  const trail = document.createElement("div");
-  trail.className = "adventure-trail";
+  const markers = document.createElement("div");
+  markers.className = "adventure-scene__markers";
 
-  for (const rowDef of TRAIL_ROWS) {
-    const levelsInRow = rowDef.levels.filter((l) => l <= visibleMax);
-    if (!levelsInRow.length) continue;
+  /** @type {{ el: HTMLDivElement; spot: { level: number; x: number; y: number } }[]} */
+  const spotAnchors = [];
+  /** @type {number[]} */
+  const visibleLevels = [];
+  for (let level = visibleMin; level <= visibleMax; level++) visibleLevels.push(level);
+  const displayPositions = getRoadmapDisplayPositionsForLevels(visibleLevels);
 
-    const row = document.createElement("div");
-    row.className = "adventure-row";
-    if (levelsInRow.length === 1) row.classList.add("adventure-row--solo");
+  for (const spot of LEVEL_SPOTS) {
+    if (spot.level < visibleMin || spot.level > visibleMax) continue;
 
-    for (let i = 0; i < levelsInRow.length; i += 1) {
-      const level = levelsInRow[i];
-      const challenge = getLevelChallenge(level);
-      const isDone = state.completedLevels.includes(level);
-      const isCurrent = state.currentLevel === level;
-      const isLocked = !isDone && !isCurrent;
+    const displayPos = displayPositions.get(spot.level) ?? spot;
+    const challenge = getLevelChallenge(spot.level);
+    const isDone = state.completedLevels.includes(spot.level);
+    const isCurrent = state.currentLevel === spot.level;
+    const isLocked = !isDone && !isCurrent;
 
-      row.append(
-        createLevelNode(challenge, {
-          isDone,
-          isCurrent,
-          isLocked,
-          progress: isCurrent ? summary.progress : 0,
-          target: isCurrent ? summary.target : challenge.goal.count,
-          showAvatar: isCurrent,
-          avatarId,
-        }),
-      );
-
-      if (i < levelsInRow.length - 1) row.append(createHConnector());
-    }
-
-    trail.append(row);
-    if (rowDef.down && levelsInRow.length) trail.append(createVConnector(rowDef.down));
+    const anchor = document.createElement("div");
+    anchor.className = "adventure-spot";
+    anchor.dataset.level = String(spot.level);
+    anchor.style.setProperty("--spot-x", String(displayPos.x));
+    anchor.style.setProperty("--spot-y", String(displayPos.y));
+    anchor.append(
+      createLevelNode(challenge, {
+        isDone,
+        isCurrent,
+        isLocked,
+        progress: isCurrent ? summary.progress : 0,
+        target: isCurrent ? summary.target : challenge.goal.count,
+        showAvatar: isCurrent,
+        avatarId,
+      }),
+    );
+    spotAnchors.push({ el: anchor, spot: { ...spot, x: displayPos.x, y: displayPos.y } });
+    markers.append(anchor);
   }
 
-  scene.append(trail);
+  const backdrop = scene.querySelector(".adventure-scene__backdrop");
+  if (backdrop instanceof HTMLElement) {
+    backdrop.append(markers);
+  } else {
+    scene.append(markers);
+  }
   roadmapMapEl.append(scene);
+
+  const relayout = () => applyRoadmapSpotPositions(scene, spotAnchors);
+  syncRoadmapSpotPositions = relayout;
+
+  const img = scene.querySelector(".adventure-scene__backdrop-img");
+  if (img instanceof HTMLImageElement && !img.complete) {
+    img.addEventListener("load", relayout, { once: true });
+  }
+
+  if (typeof ResizeObserver !== "undefined") {
+    const ro = new ResizeObserver(relayout);
+    ro.observe(scene);
+  }
+
   renderLevelPopover();
 }
 
@@ -590,6 +649,7 @@ function renderAlbumPicker() {
     summary.state.placedStickers,
     summary.state.pendingStickers,
     currentPeriod,
+    { devPreview: isDevTesterSession() },
   );
 
   roadmapAlbumPickerEl.replaceChildren();
@@ -800,6 +860,9 @@ function renderAlbumDetail() {
 function tryPlacePending(slug, pendingId, weekId, slot) {
   const result = placePendingSticker(slug, pendingId, weekId, slot);
   if (result.ok) {
+    if (isDevTesterSession()) {
+      ensureDevAlbumTrayStickers(slug, weekId);
+    }
     renderAlbumDetail();
     refreshRoadmapProgressPill();
   } else {
@@ -827,8 +890,9 @@ export function openRoadmapDialog() {
   albumView = "picker";
   selectedAlbumWeek = null;
   setRoadmapTab("map");
-  renderRoadmapDialog();
   roadmapDialog?.showModal();
+  renderRoadmapDialog();
+  queueRoadmapSpotRelayout();
 }
 
 export function openRoadmapAlbum() {
@@ -838,8 +902,8 @@ export function openRoadmapAlbum() {
   selectedAlbumWeek = null;
   setRoadmapTab("album");
   showAlbumPicker();
-  renderRoadmapDialog();
   roadmapDialog?.showModal();
+  renderRoadmapDialog();
 }
 
 export function closeRoadmapDialog() {

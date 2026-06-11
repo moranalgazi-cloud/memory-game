@@ -2,19 +2,23 @@
 /** @typedef {"easy" | "medium" | "hard"} GameLevel */
 
 import {
+  DEV_ALBUM_IDS,
   getAlbumPeriodId,
   pickRewardSticker,
   getStickerDef,
+  getWeeklyAlbum,
   countAlbumPlaced,
   findSlotForSticker,
   isSlotPlaced,
 } from "./roadmap-albums.js";
 import { DEFAULT_AVATAR_ID } from "./roadmap-avatars.js";
+import { ROADMAP_MAX_LEVELS } from "./roadmap-map-spots.js";
 
 /**
  * @typedef {{ type: "wins"; mode?: GameMode | null; level?: GameLevel | null; count: number }} WinsGoal
+ * @typedef {{ type: "fastWin"; mode?: GameMode | null; level?: GameLevel | null; maxSeconds: number; count: number }} FastWinGoal
  * @typedef {{ type: "testPass"; mode?: GameMode | "english" | null; count: number }} TestPassGoal
- * @typedef {WinsGoal | TestPassGoal} RoadmapGoal
+ * @typedef {WinsGoal | FastWinGoal | TestPassGoal} RoadmapGoal
  */
 
 /**
@@ -72,7 +76,8 @@ import { DEFAULT_AVATAR_ID } from "./roadmap-avatars.js";
  */
 
 export const ROADMAP_STORAGE_PREFIX = "memory-roadmap-v2-";
-export const VISIBLE_LEVELS_AHEAD = 6;
+export const VISIBLE_LEVELS_PER_SCREEN = 10;
+export const DEV_ALBUM_TRAY_SIZE = 5;
 export const CHALLENGE_WIN_COUNT = 3;
 
 /** @type {GameMode[]} */
@@ -103,23 +108,158 @@ function buildLevelTemplates() {
   const templates = [];
   let templateId = 1;
 
-  for (const difficulty of CHALLENGE_DIFFICULTIES) {
+  /** @param {RoadmapGoal} goal @param {{ mode: GameMode; level?: GameLevel }} preset */
+  const add = (goal, preset) => {
+    templates.push({ templateId: templateId++, goal, preset });
+  };
+
+  // Early levels: easy modes first, then speed challenges.
+  add(
+    { type: "wins", mode: "english1", level: "easy", count: CHALLENGE_WIN_COUNT },
+    { mode: "english1", level: "easy" },
+  );
+  add(
+    { type: "wins", mode: "math", level: "easy", count: CHALLENGE_WIN_COUNT },
+    { mode: "math", level: "easy" },
+  );
+  add(
+    { type: "wins", mode: "sums", level: "easy", count: CHALLENGE_WIN_COUNT },
+    { mode: "sums", level: "easy" },
+  );
+  add(
+    { type: "fastWin", mode: "english1", level: "easy", maxSeconds: 45, count: 1 },
+    { mode: "english1", level: "easy" },
+  );
+  add(
+    { type: "fastWin", mode: "math", level: "easy", maxSeconds: 30, count: 1 },
+    { mode: "math", level: "easy" },
+  );
+  add(
+    { type: "fastWin", mode: "sums", level: "easy", maxSeconds: 40, count: 1 },
+    { mode: "sums", level: "easy" },
+  );
+  add(
+    { type: "wins", mode: "english2", level: "easy", count: CHALLENGE_WIN_COUNT },
+    { mode: "english2", level: "easy" },
+  );
+  add(
+    { type: "wins", mode: "fractions", level: "easy", count: CHALLENGE_WIN_COUNT },
+    { mode: "fractions", level: "easy" },
+  );
+  add({ type: "testPass", mode: "english", count: 1 }, { mode: "english1", level: "easy" });
+
+  for (const difficulty of ["medium", "hard"]) {
     for (const mode of CHALLENGE_MODES) {
-      templates.push({
-        templateId: templateId++,
-        goal: { type: "wins", mode, level: difficulty, count: CHALLENGE_WIN_COUNT },
-        preset: { mode, level: difficulty },
-      });
+      add(
+        { type: "wins", mode, level: difficulty, count: CHALLENGE_WIN_COUNT },
+        { mode, level: difficulty },
+      );
     }
-    templates.push({
-      templateId: templateId++,
-      goal: {
-        type: "testPass",
-        mode: difficulty === "easy" ? "english" : null,
-        count: 1,
+    const fastSeconds = difficulty === "medium" ? 45 : 35;
+    add(
+      {
+        type: "fastWin",
+        mode: "math",
+        level: difficulty,
+        maxSeconds: fastSeconds,
+        count: difficulty === "medium" ? 2 : 1,
       },
-      preset: { mode: "math", level: difficulty },
-    });
+      { mode: "math", level: difficulty },
+    );
+    add(
+      { type: "testPass", mode: difficulty === "medium" ? null : null, count: 1 },
+      { mode: "math", level: difficulty },
+    );
+  }
+
+  // Summit stretch — extra challenges for levels 18–30.
+  add(
+    { type: "fastWin", mode: "english2", level: "hard", maxSeconds: 40, count: 2 },
+    { mode: "english2", level: "hard" },
+  );
+  add(
+    { type: "wins", mode: "fractions", level: "hard", count: CHALLENGE_WIN_COUNT },
+    { mode: "fractions", level: "hard" },
+  );
+  add(
+    { type: "fastWin", mode: "sums", level: "hard", maxSeconds: 30, count: 2 },
+    { mode: "sums", level: "hard" },
+  );
+  add(
+    { type: "wins", mode: "math", level: "hard", count: CHALLENGE_WIN_COUNT },
+    { mode: "math", level: "hard" },
+  );
+  add(
+    { type: "fastWin", mode: "english1", level: "hard", maxSeconds: 35, count: 2 },
+    { mode: "english1", level: "hard" },
+  );
+  add(
+    { type: "wins", mode: "english2", level: "hard", count: CHALLENGE_WIN_COUNT },
+    { mode: "english2", level: "hard" },
+  );
+  add(
+    { type: "fastWin", mode: "fractions", level: "hard", maxSeconds: 45, count: 2 },
+    { mode: "fractions", level: "hard" },
+  );
+  add(
+    { type: "testPass", mode: null, count: 1 },
+    { mode: "sums", level: "hard" },
+  );
+  add(
+    { type: "fastWin", mode: "math", level: "hard", maxSeconds: 25, count: 3 },
+    { mode: "math", level: "hard" },
+  );
+  add(
+    { type: "wins", mode: "sums", level: "hard", count: CHALLENGE_WIN_COUNT },
+    { mode: "sums", level: "hard" },
+  );
+  add(
+    { type: "fastWin", mode: "english2", level: "hard", maxSeconds: 30, count: 2 },
+    { mode: "english2", level: "hard" },
+  );
+  add(
+    { type: "wins", mode: "english1", level: "hard", count: CHALLENGE_WIN_COUNT },
+    { mode: "english1", level: "hard" },
+  );
+  add(
+    { type: "fastWin", mode: "sums", level: "hard", maxSeconds: 28, count: 3 },
+    { mode: "sums", level: "hard" },
+  );
+
+  // Extended journey — levels 31–70.
+  for (let i = 0; i < 40; i++) {
+    const mode = CHALLENGE_MODES[i % CHALLENGE_MODES.length];
+    const level = CHALLENGE_DIFFICULTIES[i % CHALLENGE_DIFFICULTIES.length];
+    const variant = i % 4;
+
+    if (variant === 0) {
+      add(
+        { type: "wins", mode, level, count: CHALLENGE_WIN_COUNT },
+        { mode, level },
+      );
+    } else if (variant === 1) {
+      const maxSeconds = level === "easy" ? 40 : level === "medium" ? 35 : 28;
+      add(
+        {
+          type: "fastWin",
+          mode,
+          level,
+          maxSeconds,
+          count: level === "hard" ? 2 : 1,
+        },
+        { mode, level },
+      );
+    } else if (variant === 2) {
+      add(
+        { type: "wins", mode, level, count: CHALLENGE_WIN_COUNT + 1 },
+        { mode, level },
+      );
+    } else {
+      add(
+        { type: "testPass", mode: mode.startsWith("english") ? "english" : null, count: 1 },
+        { mode, level },
+      );
+    }
   }
 
   return templates;
@@ -136,6 +276,10 @@ export function formatChallengeTitle(challenge, t) {
   const goal = challenge.goal;
   if (goal.type === "testPass") {
     return t("roadmapChallengeTestTitle", { level: String(challenge.level) });
+  }
+  if (goal.type === "fastWin") {
+    const mode = goal.mode ? t(MODE_LABEL_KEYS[goal.mode]) : t("roadmapChallengeAnyMode");
+    return t("roadmapChallengeFastTitle", { level: String(challenge.level), mode });
   }
   const mode = goal.mode ? t(MODE_LABEL_KEYS[goal.mode]) : "";
   return t("roadmapChallengeWinsTitle", { level: String(challenge.level), mode });
@@ -157,6 +301,14 @@ export function formatChallengeDesc(challenge, t) {
   }
   const mode = goal.mode ? t(MODE_LABEL_KEYS[goal.mode]) : t("roadmapChallengeAnyMode");
   const difficulty = goal.level ? t(DIFFICULTY_LABEL_KEYS[goal.level]) : "";
+  if (goal.type === "fastWin") {
+    return t("roadmapChallengeFastDesc", {
+      count: String(goal.count),
+      seconds: String(goal.maxSeconds),
+      mode,
+      difficulty,
+    });
+  }
   return t("roadmapChallengeWinsDesc", {
     count: String(goal.count),
     mode,
@@ -305,6 +457,52 @@ export function grantStarterStickerIfNeeded(slug) {
 }
 
 /**
+ * Dev preview albums: keep up to five draggable stickers in the tray.
+ *
+ * @param {string | null | undefined} slug
+ * @param {string} albumWeekId
+ * @returns {number} How many pending stickers the album tray now has
+ */
+export function ensureDevAlbumTrayStickers(slug, albumWeekId) {
+  if (!slug || !DEV_ALBUM_IDS.includes(albumWeekId)) return 0;
+
+  const state = loadRoadmap(slug);
+  const pendingForWeek = state.pendingStickers.filter((p) => p.albumWeek === albumWeekId);
+  const need = DEV_ALBUM_TRAY_SIZE - pendingForWeek.length;
+  if (need <= 0) return pendingForWeek.length;
+
+  const album = getWeeklyAlbum(albumWeekId);
+  const placedIds = new Set(
+    state.placedStickers
+      .filter((p) => p.albumWeek === albumWeekId)
+      .map((p) => p.stickerId),
+  );
+  const reservedIds = new Set(pendingForWeek.map((p) => p.stickerId));
+
+  /** @type {string[]} */
+  const candidates = [];
+  for (const slot of album.slots) {
+    if (placedIds.has(slot.stickerId) || reservedIds.has(slot.stickerId)) continue;
+    candidates.push(slot.stickerId);
+    reservedIds.add(slot.stickerId);
+  }
+
+  if (!candidates.length) return pendingForWeek.length;
+
+  const pendingStickers = [...state.pendingStickers];
+  for (const stickerId of candidates.slice(0, need)) {
+    pendingStickers.push({
+      id: newPendingId(),
+      albumWeek: albumWeekId,
+      stickerId,
+    });
+  }
+
+  saveRoadmap(slug, { ...state, pendingStickers });
+  return pendingStickers.filter((p) => p.albumWeek === albumWeekId).length;
+}
+
+/**
  * @param {string | null | undefined} slug
  * @param {RoadmapState} state
  */
@@ -366,6 +564,20 @@ function testPassGoalMatches(goal, mode) {
   if (!goal.mode) return true;
   if (goal.mode === "english") return mode === "english1" || mode === "english2";
   return goal.mode === mode;
+}
+
+/**
+ * @param {FastWinGoal} goal
+ * @param {GameMode} mode
+ * @param {GameLevel} level
+ * @param {number | null | undefined} elapsedMs
+ */
+function fastWinGoalMatches(goal, mode, level, elapsedMs) {
+  if (goal.type !== "fastWin") return false;
+  if (goal.mode && goal.mode !== mode) return false;
+  if (goal.level && goal.level !== level) return false;
+  if (elapsedMs == null || elapsedMs > goal.maxSeconds * 1000) return false;
+  return true;
 }
 
 /**
@@ -479,7 +691,7 @@ export function getAvatarId(slug) {
 
 /**
  * @param {string | null | undefined} slug
- * @param {{ mode: GameMode; level: GameLevel }} event
+ * @param {{ mode: GameMode; level: GameLevel; elapsedMs?: number }} event
  * @returns {RoadmapEventResult}
  */
 export function onSoloWin(slug, event) {
@@ -488,10 +700,18 @@ export function onSoloWin(slug, event) {
 
   const state = loadRoadmap(slug);
   const challenge = getLevelChallenge(state.currentLevel);
-  if (challenge.goal.type !== "wins") return nope;
-  if (!winsGoalMatches(challenge.goal, event.mode, event.level)) return nope;
+  const goal = challenge.goal;
 
-  return applyProgress(slug, state, challenge);
+  if (goal.type === "wins") {
+    if (!winsGoalMatches(goal, event.mode, event.level)) return nope;
+    return applyProgress(slug, state, challenge);
+  }
+  if (goal.type === "fastWin") {
+    if (!fastWinGoalMatches(goal, event.mode, event.level, event.elapsedMs)) return nope;
+    return applyProgress(slug, state, challenge);
+  }
+
+  return nope;
 }
 
 /**
@@ -526,12 +746,27 @@ export function devCompleteCurrentLevel(slug) {
 }
 
 /**
+ * Sliding window of 10 levels on the map. Levels 1–10, then 11–20, and so on.
+ *
+ * @param {string | null | undefined} slug
+ * @returns {{ start: number; end: number }}
+ */
+export function getVisibleLevelRange(slug) {
+  const state = loadRoadmap(slug);
+  const start =
+    Math.floor((Math.max(1, state.currentLevel) - 1) / VISIBLE_LEVELS_PER_SCREEN) *
+      VISIBLE_LEVELS_PER_SCREEN +
+    1;
+  const end = Math.min(ROADMAP_MAX_LEVELS, start + VISIBLE_LEVELS_PER_SCREEN - 1);
+  return { start, end };
+}
+
+/**
  * @param {string | null | undefined} slug
  * @returns {number}
  */
 export function getVisibleLevelCount(slug) {
-  const state = loadRoadmap(slug);
-  return Math.max(state.currentLevel + VISIBLE_LEVELS_AHEAD, 8);
+  return getVisibleLevelRange(slug).end;
 }
 
 /**

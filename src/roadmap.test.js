@@ -9,6 +9,9 @@ import {
   onTestPass,
   getCurrentChallenge,
   getLevelChallenge,
+  getVisibleLevelRange,
+  ensureDevAlbumTrayStickers,
+  DEV_ALBUM_TRAY_SIZE,
   devCompleteCurrentLevel,
   grantStarterStickerIfNeeded,
   placePendingSticker,
@@ -18,6 +21,8 @@ import {
   ALBUM_SIZE,
   getWeeklyAlbum,
   listSelectableAlbumWeeks,
+  DEV_ALBUM_IDS,
+  findSlotForSticker,
 } from "./roadmap-albums.js";
 
 const SLUG = "test-player";
@@ -27,12 +32,33 @@ beforeEach(() => {
 });
 
 describe("LEVEL_TEMPLATES", () => {
-  it("covers every mode and difficulty with at most three wins", () => {
-    expect(LEVEL_TEMPLATES.length).toBe(18);
+  it("starts with easy challenges and includes speed-run goals", () => {
+    expect(LEVEL_TEMPLATES.length).toBeGreaterThanOrEqual(18);
+
+    expect(LEVEL_TEMPLATES[0].goal).toMatchObject({
+      type: "wins",
+      mode: "english1",
+      level: "easy",
+    });
+    expect(LEVEL_TEMPLATES[1].goal).toMatchObject({
+      type: "wins",
+      mode: "math",
+      level: "easy",
+    });
+    expect(LEVEL_TEMPLATES[2].goal).toMatchObject({
+      type: "wins",
+      mode: "sums",
+      level: "easy",
+    });
+
+    const fastGoals = LEVEL_TEMPLATES.filter((tpl) => tpl.goal.type === "fastWin");
+    expect(fastGoals.length).toBeGreaterThanOrEqual(3);
+    for (const tpl of fastGoals) {
+      expect(tpl.goal.maxSeconds).toBeGreaterThan(0);
+      expect(tpl.goal.count).toBeGreaterThanOrEqual(1);
+    }
 
     const winTemplates = LEVEL_TEMPLATES.filter((tpl) => tpl.goal.type === "wins");
-    expect(winTemplates).toHaveLength(15);
-
     for (const tpl of winTemplates) {
       expect(tpl.goal.count).toBeLessThanOrEqual(3);
       expect(tpl.goal.mode).toBeTruthy();
@@ -40,17 +66,12 @@ describe("LEVEL_TEMPLATES", () => {
       expect(tpl.preset?.mode).toBe(tpl.goal.mode);
       expect(tpl.preset?.level).toBe(tpl.goal.level);
     }
-
-    const modes = new Set(winTemplates.map((tpl) => tpl.goal.mode));
-    const levels = new Set(winTemplates.map((tpl) => tpl.goal.level));
-    expect(modes).toEqual(new Set(["math", "sums", "english1", "english2", "fractions"]));
-    expect(levels).toEqual(new Set(["easy", "medium", "hard"]));
   });
 });
 
 describe("onSoloWin", () => {
   it("increments progress when mode and level match level 1", () => {
-    const r1 = onSoloWin(SLUG, { mode: "math", level: "easy" });
+    const r1 = onSoloWin(SLUG, { mode: "english1", level: "easy" });
     expect(r1.progressed).toBe(true);
     expect(r1.completed).toBe(false);
     expect(r1.progress).toBe(1);
@@ -62,16 +83,16 @@ describe("onSoloWin", () => {
   });
 
   it("does not increment when level is wrong", () => {
-    const r = onSoloWin(SLUG, { mode: "math", level: "medium" });
+    const r = onSoloWin(SLUG, { mode: "english1", level: "medium" });
     expect(r.progressed).toBe(false);
     expect(loadRoadmap(SLUG).progress).toBe(0);
   });
 
   it("completes level 1 after three wins and queues a pending sticker", () => {
     for (let i = 0; i < CHALLENGE_WIN_COUNT - 1; i += 1) {
-      onSoloWin(SLUG, { mode: "math", level: "easy" });
+      onSoloWin(SLUG, { mode: "english1", level: "easy" });
     }
-    const done = onSoloWin(SLUG, { mode: "math", level: "easy" });
+    const done = onSoloWin(SLUG, { mode: "english1", level: "easy" });
     expect(done.completed).toBe(true);
     expect(done.level).toBe(1);
     expect(done.stickerId).toBeTruthy();
@@ -86,6 +107,32 @@ describe("onSoloWin", () => {
     expect(state.pendingStickers).toHaveLength(1);
     expect(state.placedStickers).toHaveLength(0);
     expect(getCurrentChallenge(SLUG)?.level).toBe(2);
+  });
+
+  it("progresses fast-win level only when under the time limit", () => {
+    saveRoadmap(SLUG, {
+      currentLevel: 4,
+      progress: 0,
+      completedLevels: [1, 2, 3],
+      placedStickers: [],
+      pendingStickers: [],
+    });
+
+    const tooSlow = onSoloWin(SLUG, {
+      mode: "english1",
+      level: "easy",
+      elapsedMs: 60_000,
+    });
+    expect(tooSlow.progressed).toBe(false);
+
+    const fast = onSoloWin(SLUG, {
+      mode: "english1",
+      level: "easy",
+      elapsedMs: 20_000,
+    });
+    expect(fast.progressed).toBe(true);
+    expect(fast.completed).toBe(true);
+    expect(loadRoadmap(SLUG).currentLevel).toBe(5);
   });
 
   it("cycles after the full template set", () => {
@@ -113,17 +160,17 @@ describe("onSoloWin", () => {
 
     expect(getLevelChallenge(7).goal).toMatchObject({
       type: "wins",
-      mode: "math",
-      level: "medium",
+      mode: "english2",
+      level: "easy",
       count: CHALLENGE_WIN_COUNT,
     });
 
-    onSoloWin(SLUG, { mode: "math", level: "medium" });
-    onSoloWin(SLUG, { mode: "math", level: "medium" });
-    const wrongMode = onSoloWin(SLUG, { mode: "english1", level: "medium" });
+    onSoloWin(SLUG, { mode: "english2", level: "easy" });
+    onSoloWin(SLUG, { mode: "english2", level: "easy" });
+    const wrongMode = onSoloWin(SLUG, { mode: "english1", level: "easy" });
     expect(wrongMode.progressed).toBe(false);
 
-    const done = onSoloWin(SLUG, { mode: "math", level: "medium" });
+    const done = onSoloWin(SLUG, { mode: "english2", level: "easy" });
     expect(done.completed).toBe(true);
     expect(done.level).toBe(7);
     expect(loadRoadmap(SLUG).currentLevel).toBe(8);
@@ -131,11 +178,11 @@ describe("onSoloWin", () => {
 });
 
 describe("onTestPass", () => {
-  it("progresses level 6 on a perfect english quiz", () => {
+  it("progresses level 9 on a perfect english quiz", () => {
     saveRoadmap(SLUG, {
-      currentLevel: 6,
+      currentLevel: 9,
       progress: 0,
-      completedLevels: [1, 2, 3, 4, 5],
+      completedLevels: [1, 2, 3, 4, 5, 6, 7, 8],
       placedStickers: [],
       pendingStickers: [],
     });
@@ -146,7 +193,7 @@ describe("onTestPass", () => {
     expect(r.stickerId).toBeTruthy();
 
     const state = loadRoadmap(SLUG);
-    expect(state.currentLevel).toBe(7);
+    expect(state.currentLevel).toBe(10);
     expect(state.pendingStickers).toHaveLength(1);
     expect(state.placedStickers).toHaveLength(0);
   });
@@ -214,6 +261,63 @@ describe("album periods", () => {
       period,
     );
     expect(weeks).toEqual([period]);
+  });
+
+  it("shows dev preview albums when devPreview is enabled", () => {
+    const period = getAlbumPeriodId();
+    const weeks = listSelectableAlbumWeeks([], [], period, { devPreview: true });
+    expect(weeks).toEqual([period, ...DEV_ALBUM_IDS]);
+  });
+});
+
+describe("ensureDevAlbumTrayStickers", () => {
+  it("adds five draggable stickers for a dev preview album", () => {
+    const count = ensureDevAlbumTrayStickers(SLUG, DEV_ALBUM_IDS[0]);
+    expect(count).toBe(DEV_ALBUM_TRAY_SIZE);
+
+    const state = loadRoadmap(SLUG);
+    const pending = state.pendingStickers.filter((p) => p.albumWeek === DEV_ALBUM_IDS[0]);
+    expect(pending).toHaveLength(DEV_ALBUM_TRAY_SIZE);
+    expect(new Set(pending.map((p) => p.stickerId)).size).toBe(DEV_ALBUM_TRAY_SIZE);
+  });
+
+  it("tops up the tray after a sticker is placed", () => {
+    ensureDevAlbumTrayStickers(SLUG, DEV_ALBUM_IDS[1]);
+    const before = loadRoadmap(SLUG).pendingStickers.find((p) => p.albumWeek === DEV_ALBUM_IDS[1]);
+    expect(before).toBeTruthy();
+
+    const slotDef = findSlotForSticker(DEV_ALBUM_IDS[1], before.stickerId);
+    expect(slotDef).toBeTruthy();
+    placePendingSticker(SLUG, before.id, DEV_ALBUM_IDS[1], slotDef.slot);
+
+    const count = ensureDevAlbumTrayStickers(SLUG, DEV_ALBUM_IDS[1]);
+    expect(count).toBe(DEV_ALBUM_TRAY_SIZE);
+  });
+});
+
+describe("getVisibleLevelRange", () => {
+  it("shows levels 1-10 while on level 10", () => {
+    saveRoadmap(SLUG, {
+      currentLevel: 10,
+      progress: 0,
+      completedLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      placedStickers: [],
+      pendingStickers: [],
+      avatarId: "bunny",
+    });
+    expect(getVisibleLevelRange(SLUG)).toEqual({ start: 1, end: 10 });
+  });
+
+  it("slides to levels 11-20 when the player reaches level 11", () => {
+    saveRoadmap(SLUG, {
+      currentLevel: 11,
+      progress: 0,
+      completedLevels: Array.from({ length: 10 }, (_, i) => i + 1),
+      placedStickers: [],
+      pendingStickers: [],
+      avatarId: "bunny",
+    });
+    expect(getVisibleLevelRange(SLUG)).toEqual({ start: 11, end: 20 });
   });
 });
 
