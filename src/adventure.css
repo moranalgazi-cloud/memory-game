@@ -42,6 +42,10 @@ html[lang="he"] .roadmap-reward-dialog button {
   --adventure-tray-border: color-mix(in srgb, var(--text) 9%, transparent);
   --adventure-backdrop: rgba(0, 0, 0, 0.55);
   --adventure-map-filter: saturate(1.08) contrast(1.04);
+  --adventure-map-radius: 1.35rem;
+  --adventure-map-shadow:
+    0 0 0 1px color-mix(in srgb, var(--text) 7%, transparent),
+    0 14px 36px color-mix(in srgb, var(--shadow) 52%, transparent);
   --adventure-reward-bg: linear-gradient(
     160deg,
     color-mix(in srgb, var(--accent-alt) 42%, var(--surface)) 0%,
@@ -79,6 +83,9 @@ html[lang="he"] .roadmap-reward-dialog button {
   --adventure-slot-bg: color-mix(in srgb, var(--accent-alt) 5%, #fff);
   --adventure-tray-bg: color-mix(in srgb, var(--bg) 55%, #fff);
   --adventure-map-filter: saturate(1.05) contrast(1.02) brightness(1.04);
+  --adventure-map-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent-alt) 14%, transparent),
+    0 12px 28px color-mix(in srgb, var(--shadow) 38%, transparent);
   --adventure-reward-bg: #fff;
   --adventure-backdrop: rgba(26, 40, 80, 0.42);
 }
@@ -228,13 +235,11 @@ html[lang="he"] .roadmap-reward-dialog button {
 .adventure-map {
   flex: 1 1 auto;
   min-height: 0;
-  border-radius: 0;
   overflow: auto;
-  box-shadow: none;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.35rem 0 0.5rem;
+  padding: 0.45rem 0.75rem 0.65rem;
 }
 
 .adventure-panel--album:not([hidden]) {
@@ -260,12 +265,16 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
+  border-radius: var(--adventure-map-radius);
+  box-shadow: var(--adventure-map-shadow);
 }
 
 .adventure-scene__backdrop {
   position: absolute;
   inset: 0;
   z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .adventure-scene__backdrop-img {
@@ -276,6 +285,7 @@ html[lang="he"] .roadmap-reward-dialog button {
   height: 100%;
   object-fit: fill;
   filter: var(--adventure-map-filter);
+  border-radius: inherit;
 }
 
 .adventure-scene__sky {
