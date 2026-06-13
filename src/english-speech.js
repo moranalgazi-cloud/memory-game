@@ -29,14 +29,25 @@ export function resolveEnglishCardSpeech(card, gameMode, speechMode) {
     return null;
   }
 
-  const side = card.side ?? card.lang;
-  const lang =
-    side === "he" || side === "fr" || side === "de" || side === "es"
-      ? /** @type {SpeechLang} */ (side)
-      : "en";
+  const lang = resolveEnglish2SpeechLang(card);
   if (speechMode === "both") return { text, lang };
   if (speechMode === "text" && card.side === "en") return { text, lang: "en" };
   return null;
+}
+
+/**
+ * @param {{ side?: string; lang?: string }} card
+ * @returns {SpeechLang}
+ */
+function resolveEnglish2SpeechLang(card) {
+  if (card.lang === "he" || card.lang === "fr" || card.lang === "de" || card.lang === "es") {
+    return card.lang;
+  }
+  const side = card.side ?? card.lang;
+  if (side === "he" || side === "fr" || side === "de" || side === "es") {
+    return /** @type {SpeechLang} */ (side);
+  }
+  return "en";
 }
 
 /**
@@ -68,10 +79,12 @@ function speechLocale(lang) {
 /** @param {SpeechSynthesisVoice[]} voices @param {SpeechLang} lang */
 function pickVoice(voices, lang) {
   const locale = speechLocale(lang);
+  const prefix = locale.slice(0, 2);
   return (
     voices.find((v) => v.lang === locale) ??
-    voices.find((v) => v.lang.startsWith(locale.slice(0, 2))) ??
-    (lang === "he" ? voices.find((v) => /hebrew|עברית/i.test(v.name)) : null) ??
+    voices.find((v) => v.lang.replace("_", "-").startsWith(prefix)) ??
+    voices.find((v) => v.lang.startsWith(prefix)) ??
+    (lang === "he" ? voices.find((v) => /hebrew|עברית|he-IL/i.test(`${v.name} ${v.lang}`)) : null) ??
     (lang === "en"
       ? voices.find((v) => v.lang === "en-US") ?? voices.find((v) => v.lang.startsWith("en"))
       : null)
@@ -79,23 +92,40 @@ function pickVoice(voices, lang) {
 }
 
 /**
+ * Wait until voices are available; for Hebrew, prefer waiting until a Hebrew voice exists.
+ *
+ * @param {SpeechLang} lang
  * @param {(voices: SpeechSynthesisVoice[]) => void} run
  */
-function withVoices(run) {
+function withVoices(lang, run) {
   const synth = window.speechSynthesis;
-  const voices = synth.getVoices();
-  if (voices.length > 0) {
+  const started = Date.now();
+  const maxWaitMs = lang === "he" ? 1200 : 0;
+
+  const attempt = () => {
+    const voices = synth.getVoices();
+    if (voices.length === 0) return false;
+    if (lang === "he" && !pickVoice(voices, "he") && Date.now() - started < maxWaitMs) {
+      return false;
+    }
     run(voices);
-    return;
-  }
+    return true;
+  };
+
+  if (attempt()) return;
+
   const onVoices = () => {
-    const loaded = synth.getVoices();
-    if (loaded.length === 0) return;
-    synth.removeEventListener("voiceschanged", onVoices);
-    run(loaded);
+    if (attempt()) synth.removeEventListener("voiceschanged", onVoices);
   };
   synth.addEventListener("voiceschanged", onVoices);
   synth.getVoices();
+
+  if (lang === "he") {
+    window.setTimeout(() => {
+      synth.removeEventListener("voiceschanged", onVoices);
+      attempt();
+    }, maxWaitMs);
+  }
 }
 
 /**
@@ -105,12 +135,12 @@ function withVoices(run) {
  */
 function speakMemoryWordNow(phrase, lang) {
   return new Promise((resolve) => {
-    withVoices((voices) => {
+    withVoices(lang, (voices) => {
       const synth = window.speechSynthesis;
       if (synth.paused) synth.resume();
 
       const u = new SpeechSynthesisUtterance(phrase);
-      u.lang = lang === "he" ? "he-IL" : "en-US";
+      u.lang = speechLocale(lang);
       const voice = pickVoice(voices, lang);
       if (voice) u.voice = voice;
       u.rate = lang === "he" ? 0.85 : 0.9;
@@ -123,24 +153,9 @@ function speakMemoryWordNow(phrase, lang) {
       };
       u.onend = finish;
       u.onerror = finish;
-      setTimeout(finish, Math.max(2500, phrase.length * 100));
+      setTimeout(finish, Math.max(3000, phrase.length * 120));
 
       synth.speak(u);
-
-      if (lang === "he" && !voice) {
-        window.setTimeout(() => {
-          const retryVoices = synth.getVoices();
-          const retryVoice = pickVoice(retryVoices, "he");
-          if (!retryVoice || done) return;
-          const retry = new SpeechSynthesisUtterance(phrase);
-          retry.lang = "he-IL";
-          retry.voice = retryVoice;
-          retry.rate = 0.85;
-          retry.onend = finish;
-          retry.onerror = finish;
-          synth.speak(retry);
-        }, 250);
-      }
     });
   });
 }

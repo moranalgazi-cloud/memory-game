@@ -19,11 +19,17 @@ describe("resolveEnglishCardSpeech", () => {
 
   it("english2 medium speaks only English tiles", () => {
     expect(
-      resolveEnglishCardSpeech({ side: "he", word: "כדור" }, "english2", "text"),
+      resolveEnglishCardSpeech({ side: "he", lang: "he", word: "כדור" }, "english2", "text"),
     ).toBeNull();
     expect(
-      resolveEnglishCardSpeech({ side: "en", word: "Ball" }, "english2", "text"),
+      resolveEnglishCardSpeech({ side: "en", lang: "en", word: "Ball" }, "english2", "text"),
     ).toEqual({ text: "Ball", lang: "en" });
+  });
+
+  it("english2 easy uses card.lang for Hebrew tiles", () => {
+    expect(
+      resolveEnglishCardSpeech({ side: "he", lang: "he", word: "כדור" }, "english2", "both"),
+    ).toEqual({ text: "כדור", lang: "he" });
   });
 
   it("english1 easy speaks every tile in English", () => {

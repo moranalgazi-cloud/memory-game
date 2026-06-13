@@ -6,6 +6,7 @@ import {
   pickEnglishEntries,
   buildEnglishDeck,
 } from "../english-game.js";
+import { getEnglish2SourceLang } from "../english2-source.js";
 import {
   buildSumPool,
   pickSumEntries,
@@ -182,8 +183,8 @@ export function buildOnlineDeckFromSeed(config, seed) {
     const pool = getEnglishPool(englishTopicId);
     const maxPairs = pool.length;
     const count = Math.min(config.pairCount, maxPairs);
-    const entries = pickEnglishEntries(pool, count, mode, rng);
-    const cards = shuffle(buildEnglishDeck(entries, mode), rng);
+    const entries = pickEnglishEntries(pool, count, mode, rng, getEnglish2SourceLang());
+    const cards = shuffle(buildEnglishDeck(entries, mode, getEnglish2SourceLang()), rng);
     const englishSpeech = config.englishSpeech ?? "both";
     return packOnlineDeck(cards, {
       ...config,
