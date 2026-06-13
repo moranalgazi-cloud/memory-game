@@ -117,9 +117,79 @@ function notify() {
   }
 }
 
-/** Where the OAuth provider should send the user back to (this app's URL). */
-function redirectTarget() {
-  return window.location.origin + window.location.pathname;
+const OAUTH_PENDING_KEY = "memory-oauth-pending-v1";
+
+/**
+ * Build the canonical post-login URL. Must exactly match an entry in Supabase →
+ * Authentication → URL Configuration → Redirect URLs (e.g. https://www.playmemorygames.win/).
+ *
+ * @param {string} origin
+ * @param {string} [baseUrl]
+ * @returns {string}
+ */
+export function buildOAuthRedirectUrl(origin, baseUrl = "/") {
+  let path = baseUrl.startsWith("/") ? baseUrl : `/${baseUrl}`;
+  if (!path.endsWith("/")) path += "/";
+  return new URL(path, origin).href;
+}
+
+/** Where Google OAuth should send the user back after sign-in. */
+export function oauthRedirectUrl() {
+  const base = import.meta.env.BASE_URL || "/";
+  return buildOAuthRedirectUrl(window.location.origin, base);
+}
+
+/** @returns {boolean} */
+function hasOAuthCallbackInUrl() {
+  const { search, hash } = window.location;
+  return (
+    hash.includes("access_token") ||
+    hash.includes("error=") ||
+    search.includes("code=") ||
+    search.includes("error=") ||
+    search.includes("error_description=")
+  );
+}
+
+/**
+ * Parse the OAuth callback (PKCE code or implicit hash), restore the session,
+ * and strip auth tokens from the address bar so refresh does not replay them.
+ *
+ * @param {import("@supabase/supabase-js").SupabaseClient} c
+ */
+async function finishOAuthReturn(c) {
+  if (!hasOAuthCallbackInUrl()) return { handled: false, ok: false };
+
+  const { data, error } = await c.auth.getSession();
+  const cleanUrl = oauthRedirectUrl();
+  window.history.replaceState({}, document.title, cleanUrl);
+
+  if (error) {
+    console.warn("[auth] OAuth return failed:", error.message);
+    return { handled: true, ok: false, error: error.message };
+  }
+
+  currentUser = data.session?.user ?? null;
+  return { handled: true, ok: Boolean(data.session) };
+}
+
+/** True while returning from a Google sign-in redirect (cleared after initAuth). */
+export function consumeOAuthPending() {
+  try {
+    if (!sessionStorage.getItem(OAUTH_PENDING_KEY)) return false;
+    sessionStorage.removeItem(OAUTH_PENDING_KEY);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function markOAuthPending() {
+  try {
+    sessionStorage.setItem(OAUTH_PENDING_KEY, "1");
+  } catch {
+    // sessionStorage may be unavailable in some embedded browsers.
+  }
 }
 
 /**
@@ -141,8 +211,11 @@ export function initAuth() {
       });
 
       try {
-        const { data } = await c.auth.getSession();
-        currentUser = data.session?.user ?? null;
+        const oauthReturn = await finishOAuthReturn(c);
+        if (!oauthReturn.handled) {
+          const { data } = await c.auth.getSession();
+          currentUser = data.session?.user ?? null;
+        }
         if (!currentUser) {
           await ensureAnonymousSession(c);
         }
@@ -199,7 +272,8 @@ async function ensureAnonymousSession(c) {
 export async function signInWithGoogle() {
   const c = getSupabaseClient();
   if (!c) return { ok: false, error: "no_client" };
-  const options = { redirectTo: redirectTarget() };
+  const options = { redirectTo: oauthRedirectUrl() };
+  markOAuthPending();
   try {
     if (isAnonymousUser()) {
       const { error } = await c.auth.linkIdentity({ provider: "google", options });

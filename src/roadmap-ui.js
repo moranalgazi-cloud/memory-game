@@ -52,6 +52,9 @@ let deps = null;
 /** @type {number | null} */
 let selectedLevel = null;
 
+/** True when the player tapped a level node; false when following the active level. */
+let userPickedLevel = false;
+
 /** @type {"picker" | "detail"} */
 let albumView = "picker";
 
@@ -220,7 +223,10 @@ function setRoadmapTab(tab) {
   if (roadmapPanelAlbum) roadmapPanelAlbum.hidden = isMap;
   if (roadmapStartBtn) roadmapStartBtn.hidden = !isMap;
   syncRoadmapDevBtn(isMap);
-  if (isMap) queueRoadmapSpotRelayout();
+  if (isMap) {
+    queueRoadmapSpotRelayout();
+    renderLevelPopover();
+  }
 }
 
 function showAlbumPicker() {
@@ -432,6 +438,7 @@ export function refreshRoadmapLabels() {
   if (roadmapAlbumGrantAllBtn) roadmapAlbumGrantAllBtn.textContent = t("roadmapAlbumGrantAll");
   if (albumCompleteTitleEl) albumCompleteTitleEl.textContent = t("roadmapAlbumCompleteTitle");
   if (albumCompleteCloseBtn) albumCompleteCloseBtn.textContent = t("roadmapAlbumCompleteClose");
+  renderLevelPopover();
 }
 
 export function refreshRoadmapProgressPill() {
@@ -532,7 +539,8 @@ function createLevelNode(challenge, meta) {
       window.setTimeout(() => btn.classList.remove("adventure-node--shake"), 450);
       return;
     }
-    selectedLevel = selectedLevel === challenge.level ? null : challenge.level;
+    userPickedLevel = true;
+    selectedLevel = challenge.level;
     renderLevelPopover();
     renderRoadmapMap();
   });
@@ -545,20 +553,16 @@ function renderLevelPopover() {
   const slug = deps.getCurrentUserSlug();
   const summary = getRoadmapSummary(slug);
   const { state } = summary;
-
-  if (!selectedLevel) {
-    roadmapLevelPopover.hidden = true;
-    roadmapLevelPopover.replaceChildren();
-    return;
-  }
-
-  const challenge = getLevelChallenge(selectedLevel);
-  const isCurrent = state.currentLevel === selectedLevel;
-  const isDone = state.completedLevels.includes(selectedLevel);
-  const isLocked = !isCurrent && !isDone;
+  const level = userPickedLevel ? (selectedLevel ?? state.currentLevel) : state.currentLevel;
+  if (!userPickedLevel) selectedLevel = state.currentLevel;
 
   roadmapLevelPopover.hidden = false;
   roadmapLevelPopover.replaceChildren();
+
+  const challenge = getLevelChallenge(level);
+  const isCurrent = state.currentLevel === level;
+  const isDone = state.completedLevels.includes(level);
+  const isLocked = !isCurrent && !isDone;
 
   const title = document.createElement("h3");
   title.className = "adventure-popover__title";
@@ -948,7 +952,9 @@ export function renderRoadmapDialog() {
 
 export function openRoadmapDialog() {
   refreshRoadmapLabels();
-  selectedLevel = null;
+  const slug = deps?.getCurrentUserSlug();
+  userPickedLevel = false;
+  selectedLevel = slug ? getRoadmapSummary(slug).state.currentLevel : null;
   albumView = "picker";
   selectedAlbumWeek = null;
   setRoadmapTab("map");
@@ -960,6 +966,7 @@ export function openRoadmapDialog() {
 export function openRoadmapAlbum() {
   refreshRoadmapLabels();
   selectedLevel = null;
+  userPickedLevel = false;
   albumView = "picker";
   selectedAlbumWeek = null;
   setRoadmapTab("album");
@@ -971,6 +978,7 @@ export function openRoadmapAlbum() {
 export function closeRoadmapDialog() {
   cancelActiveDrag();
   selectedLevel = null;
+  userPickedLevel = false;
   if (roadmapLevelPopover) roadmapLevelPopover.hidden = true;
   roadmapDialog?.close();
 }
@@ -996,6 +1004,12 @@ export function showRoadmapReward(result) {
     preset: nextChallenge?.preset,
     albumWeek: result.albumWeek,
   };
+
+  const slug = deps.getCurrentUserSlug();
+  if (slug) {
+    userPickedLevel = false;
+    selectedLevel = result.nextLevel ?? getRoadmapSummary(slug).state.currentLevel;
+  }
 
   if (roadmapRewardTitleEl) {
     roadmapRewardTitleEl.textContent = deps.t("roadmapRewardTitle", {

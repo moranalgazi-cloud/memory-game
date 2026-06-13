@@ -67,10 +67,7 @@ import {
 } from "./roadmap.js";
 import {
   buildRecordsEmailContent,
-  copyRecordsTable,
-  isMobileLike,
-  openMobileGmailCompose,
-  shareRecordsForPaste,
+  copyPlainText,
 } from "./records-email.js";
 import {
   loadRecords,
@@ -118,6 +115,7 @@ import {
   getAuthAvatarUrl,
   signInWithGoogle,
   signOutAuth,
+  consumeOAuthPending,
 } from "./auth.js";
 import { armCelebrationAudio, celebrateWin } from "./celebrate.js";
 import { applySnapshotToState } from "./multiplayer/protocol.js";
@@ -206,14 +204,7 @@ const quickNavFriendBtn = document.querySelector("#quickNavFriend");
 const recordsDialog = document.querySelector("#recordsDialog");
 const closeRecordsBtn = document.querySelector("#closeRecords");
 const emailRecordsBtn = document.querySelector("#emailRecords");
-const recordsShareDialog = document.querySelector("#recordsShareDialog");
-const recordsShareTitle = document.querySelector("#recordsShareTitle");
-const recordsShareLead = document.querySelector("#recordsShareLead");
-const recordsSharePreview = document.querySelector("#recordsSharePreview");
-const recordsShareStatus = document.querySelector("#recordsShareStatus");
-const recordsShareCopyBtn = document.querySelector("#recordsShareCopy");
-const recordsShareGmailBtn = document.querySelector("#recordsShareGmail");
-const recordsShareCloseBtn = document.querySelector("#recordsShareClose");
+const recordsCopyStatus = document.querySelector("#recordsCopyStatus");
 const gameTitle = document.querySelector("#gameTitle");
 const gameTagline = document.querySelector("#gameTagline");
 const onlineTurnBanner = document.querySelector("#onlineTurnBanner");
@@ -1333,14 +1324,9 @@ function refreshRecordsLabels() {
     if (el) el.textContent = t(key);
   }
   if (emailRecordsBtn) {
-    emailRecordsBtn.textContent = t("emailRecords");
-    emailRecordsBtn.setAttribute("aria-label", t("ariaEmailRecords"));
+    emailRecordsBtn.textContent = t("recordsCopy");
+    emailRecordsBtn.setAttribute("aria-label", t("ariaRecordsCopy"));
   }
-  if (recordsShareTitle) recordsShareTitle.textContent = t("emailRecordsShareTitle");
-  if (recordsShareLead) recordsShareLead.textContent = t("emailRecordsShareLead");
-  if (recordsShareCopyBtn) recordsShareCopyBtn.textContent = t("emailRecordsShareCopy");
-  if (recordsShareGmailBtn) recordsShareGmailBtn.textContent = t("emailRecordsShareGmail");
-  if (recordsShareCloseBtn) recordsShareCloseBtn.textContent = t("emailRecordsShareClose");
 }
 
 function fillRecordsDialog() {
@@ -1399,6 +1385,7 @@ function fillRecordsDialog() {
 function openRecords() {
   closeSettingsMenu();
   refreshRecordsLabels();
+  clearRecordsCopyStatus();
   fillRecordsDialog();
   recordsDialog?.showModal();
 }
@@ -1408,7 +1395,50 @@ function closeRecords() {
 }
 
 /** @type {boolean} */
-let recordsEmailBusy = false;
+let recordsCopyBusy = false;
+
+function clearRecordsCopyStatus() {
+  if (!(recordsCopyStatus instanceof HTMLElement)) return;
+  recordsCopyStatus.hidden = true;
+  recordsCopyStatus.textContent = "";
+  recordsCopyStatus.classList.remove("is-error");
+}
+
+function showRecordsCopyStatus(message, isError = false) {
+  if (!(recordsCopyStatus instanceof HTMLElement)) return;
+  recordsCopyStatus.textContent = message;
+  recordsCopyStatus.hidden = false;
+  recordsCopyStatus.classList.toggle("is-error", isError);
+}
+
+/** One tap: copy scores as plain text so parents can paste anywhere. */
+async function copyRecordsScores() {
+  if (recordsCopyBusy) return;
+
+  const playerName = getCurrentUser()?.name || t("userPlayingAs");
+  const labels = buildRecordsEmailLabels(playerName);
+  const data = loadRecords();
+  const { plainText } = buildRecordsEmailContent(data, labels, playerName);
+
+  recordsCopyBusy = true;
+  const prevLabel = emailRecordsBtn?.textContent ?? "";
+  if (emailRecordsBtn instanceof HTMLButtonElement) {
+    emailRecordsBtn.disabled = true;
+    emailRecordsBtn.textContent = t("recordsCopying");
+  }
+
+  try {
+    const ok = await copyPlainText(plainText);
+    if (ok) showRecordsCopyStatus(t("recordsCopySuccess"));
+    else showRecordsCopyStatus(t("recordsCopyFailed"), true);
+  } finally {
+    recordsCopyBusy = false;
+    if (emailRecordsBtn instanceof HTMLButtonElement) {
+      emailRecordsBtn.disabled = false;
+      emailRecordsBtn.textContent = prevLabel || t("recordsCopy");
+    }
+  }
+}
 
 function buildRecordsEmailLabels(playerName) {
   return {
@@ -1433,124 +1463,6 @@ function buildRecordsEmailLabels(playerName) {
     },
     dir: getLocale() === "he" ? "rtl" : "ltr",
   };
-}
-
-/** @type {{ subject: string; composeBody: string; htmlFragment: string; plainText: string } | null} */
-let recordsSharePayload = null;
-
-function clearRecordsShareStatus() {
-  if (!(recordsShareStatus instanceof HTMLElement)) return;
-  recordsShareStatus.hidden = true;
-  recordsShareStatus.textContent = "";
-  recordsShareStatus.classList.remove("is-error");
-}
-
-function showRecordsShareStatus(message, isError = false) {
-  if (!(recordsShareStatus instanceof HTMLElement)) return;
-  recordsShareStatus.textContent = message;
-  recordsShareStatus.hidden = false;
-  recordsShareStatus.classList.toggle("is-error", isError);
-}
-
-function buildRecordsComposeBody(labels, playerName) {
-  return [
-    labels.intro,
-    `${labels.playerLabel}: ${playerName}`,
-    "",
-    t("emailRecordsPasteTableBelow"),
-  ].join("\n");
-}
-
-function openRecordsShareSheet() {
-  const playerName = getCurrentUser()?.name || t("userPlayingAs");
-  const labels = buildRecordsEmailLabels(playerName);
-  const data = loadRecords();
-  const { htmlFragment, plainText } = buildRecordsEmailContent(data, labels, playerName);
-
-  recordsSharePayload = {
-    subject: t("emailRecordsSubject"),
-    composeBody: buildRecordsComposeBody(labels, playerName),
-    htmlFragment,
-    plainText,
-  };
-
-  clearRecordsShareStatus();
-  if (recordsSharePreview instanceof HTMLElement) {
-    recordsSharePreview.innerHTML = htmlFragment;
-    recordsSharePreview.dir = labels.dir;
-  }
-
-  refreshRecordsLabels();
-  recordsShareDialog?.showModal();
-}
-
-function closeRecordsShareSheet() {
-  recordsShareDialog?.close();
-  recordsSharePayload = null;
-  clearRecordsShareStatus();
-}
-
-async function copyRecordsShareTable() {
-  if (!recordsSharePayload) return;
-
-  const mode = await copyRecordsTable(
-    recordsSharePreview instanceof HTMLElement ? recordsSharePreview : null,
-    recordsSharePayload.htmlFragment,
-    recordsSharePayload.plainText,
-  );
-
-  if (mode) {
-    showRecordsShareStatus(t("emailRecordsShareCopied"));
-  } else {
-    showRecordsShareStatus(t("emailRecordsShareCopyFailed"), true);
-  }
-}
-
-function openRecordsShareGmail() {
-  if (!recordsSharePayload) return;
-  openMobileGmailCompose(recordsSharePayload.subject, recordsSharePayload.composeBody);
-  showRecordsShareStatus(t("emailRecordsShareGmailOpened"));
-}
-
-/** Copies the records HTML table and opens Gmail compose for one paste. */
-async function shareRecordsByEmail() {
-  if (recordsEmailBusy) return;
-
-  if (isMobileLike()) {
-    openRecordsShareSheet();
-    return;
-  }
-
-  const playerName = getCurrentUser()?.name || t("userPlayingAs");
-  const labels = buildRecordsEmailLabels(playerName);
-  const data = loadRecords();
-  const { htmlFragment, plainText } = buildRecordsEmailContent(data, labels, playerName);
-
-  recordsEmailBusy = true;
-  const prevLabel = emailRecordsBtn?.textContent ?? "";
-  if (emailRecordsBtn instanceof HTMLButtonElement) {
-    emailRecordsBtn.disabled = true;
-    emailRecordsBtn.textContent = t("emailRecordsPreparing");
-  }
-
-  try {
-    const mode = await shareRecordsForPaste({
-      htmlFragment,
-      plainText,
-      subject: t("emailRecordsSubject"),
-      composeBody: buildRecordsComposeBody(labels, playerName),
-    });
-    window.alert(t(mode === "plain" ? "emailRecordsPasteHintPlain" : "emailRecordsPasteHint"));
-  } catch (err) {
-    console.warn("[records] copy/share failed:", err);
-    window.alert(t("emailRecordsShareFailed"));
-  } finally {
-    recordsEmailBusy = false;
-    if (emailRecordsBtn instanceof HTMLButtonElement) {
-      emailRecordsBtn.disabled = false;
-      emailRecordsBtn.textContent = prevLabel || t("emailRecords");
-    }
-  }
 }
 
 function readOptions() {
@@ -2913,6 +2825,7 @@ if (isCloudSyncEnabled()) {
   queueMicrotask(() => {
     void initAuth().then(async () => {
       refreshAuthUI();
+      showOAuthReturnStatus();
       await applyGoogleIdentityIfSignedIn();
       void syncAllLocalUsersToCloud().then((r) => {
         if (!r.ok) console.warn("[cloud-sync] boot sync:", r.failures.join(" | "));
@@ -3175,11 +3088,30 @@ async function handleAuthButton() {
       const res = await signInWithGoogle();
       if (!res.ok) {
         console.warn("[app] Google sign-in:", res.error);
+        if (userGoogleStatus) {
+          userGoogleStatus.textContent = t("authSignInFailed");
+          userGoogleStatus.classList.remove("is-hidden");
+        }
       }
     }
   } finally {
     userGoogleBtn?.removeAttribute("disabled");
   }
+}
+
+function showOAuthReturnStatus() {
+  if (!consumeOAuthPending()) return;
+  if (!userGoogleStatus) return;
+  if (isSignedIn()) {
+    const email = getAuthEmail();
+    userGoogleStatus.textContent = email
+      ? t("authSignInSuccess", { email })
+      : t("authSignInSuccessGeneric");
+    userGoogleStatus.classList.remove("is-hidden");
+    return;
+  }
+  userGoogleStatus.textContent = t("authSignInFailed");
+  userGoogleStatus.classList.remove("is-hidden");
 }
 
 let accountIdentityInFlight = false;
@@ -3291,13 +3223,7 @@ userGoogleBtn?.addEventListener("click", () => {
 quickNavRecordsBtn?.addEventListener("click", openRecords);
 quickNavFriendBtn?.addEventListener("click", () => openOnlineDialog());
 closeRecordsBtn?.addEventListener("click", closeRecords);
-emailRecordsBtn?.addEventListener("click", () => void shareRecordsByEmail());
-recordsShareCopyBtn?.addEventListener("click", () => void copyRecordsShareTable());
-recordsShareGmailBtn?.addEventListener("click", openRecordsShareGmail);
-recordsShareCloseBtn?.addEventListener("click", closeRecordsShareSheet);
-recordsShareDialog?.addEventListener("click", (e) => {
-  if (e.target === recordsShareDialog) closeRecordsShareSheet();
-});
+emailRecordsBtn?.addEventListener("click", () => void copyRecordsScores());
 recordsDialog?.addEventListener("click", (e) => {
   if (e.target === recordsDialog) closeRecords();
 });

@@ -312,85 +312,25 @@ html[lang="he"] .online-dialog button {
   border-top: 1px solid var(--screen-divider);
 }
 
+.records-dialog__copy-status {
+  flex: 1 1 100%;
+  width: 100%;
+  margin: 0 0 0.15rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--records-accent);
+}
+
+.records-dialog__copy-status.is-error {
+  color: var(--danger, #c0392b);
+}
+
 .records-dialog__action {
   flex: 1 1 10rem;
   min-width: min(100%, 10rem);
 }
 
-/* ── Share records (mobile) ── */
-
-.records-share-dialog {
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 0;
-  max-width: min(36rem, calc(100vw - 1rem));
-  width: calc(100vw - 1rem);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 18px 48px var(--shadow);
-}
-
-.records-share-dialog::backdrop {
-  background: color-mix(in srgb, var(--text) 42%, transparent);
-}
-
-.records-share-dialog__inner {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem 1rem 1.1rem;
-  max-height: calc(100vh - 2rem);
-}
-
-.records-share-dialog__title {
-  margin: 0;
-  font-size: 1.2rem;
-  text-align: center;
-}
-
-.records-share-dialog__lead {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.45;
-  text-align: center;
-}
-
-.records-share-dialog__preview {
-  overflow: auto;
-  max-height: min(52vh, 24rem);
-  padding: 0.5rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--screen-divider, color-mix(in srgb, var(--text) 14%, transparent));
-  background: #fff;
-  color: #1a2850;
-  -webkit-overflow-scrolling: touch;
-}
-
-.records-share-dialog__status {
-  margin: 0;
-  font-size: 0.88rem;
-  line-height: 1.4;
-  text-align: center;
-  color: var(--success, #00b87a);
-}
-
-.records-share-dialog__status.is-error {
-  color: #d94f02;
-}
-
-.records-share-dialog__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.records-share-dialog__action {
-  flex: 1 1 8rem;
-  min-width: min(100%, 8rem);
-}
-
-/* ── Play with a friend ── */
+/* ── Online play ── */
 
 .online-dialog {
   border: none;
