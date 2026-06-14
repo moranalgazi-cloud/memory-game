@@ -80,22 +80,6 @@
       <div class="app__main">
       <header class="header">
         <div class="header__top">
-          <div class="header__brand">
-            <div class="header__brand-row">
-              <img
-                id="appLogo"
-                class="header__logo"
-                width="48"
-                height="48"
-                decoding="async"
-                alt=""
-              />
-              <div class="header__titles">
-                <h1 id="gameTitle">Memory games</h1>
-                <p id="gameTagline" class="tagline"></p>
-              </div>
-            </div>
-          </div>
           <button
             type="button"
             id="accountBadge"
@@ -149,15 +133,77 @@
             </div>
           </div>
         </div>
+        <div class="app-brand">
+          <img
+            id="appBrandLogo"
+            class="app-brand__logo"
+            width="80"
+            height="80"
+            decoding="async"
+            alt=""
+          />
+          <div
+            id="appBrandTitle"
+            class="app-brand-title"
+            lang="en"
+            dir="ltr"
+            role="img"
+            aria-label="Match, Play & Learn"
+          >
+            <svg
+              class="app-brand-title__svg"
+              viewBox="0 0 580 108"
+              overflow="visible"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <defs>
+                <path id="appBrandTitleCurve" d="M 32 88 Q 290 10 548 88" />
+              </defs>
+              <text class="app-brand-title__text">
+                <textPath href="#appBrandTitleCurve" startOffset="50%" text-anchor="middle">
+                  Match, Play &amp; Learn
+                </textPath>
+              </text>
+            </svg>
+          </div>
+        </div>
+        <nav class="app-quick-nav" aria-label="Quick actions">
+          <button type="button" id="quickNavAdventure" class="quick-nav__btn">
+            <span class="quick-nav__icon" aria-hidden="true">
+              <img data-nav-icon="adventure" width="100" height="100" decoding="async" alt="" />
+            </span>
+            <span class="quick-nav__label">Adventure</span>
+          </button>
+          <button type="button" id="quickNavAlbum" class="quick-nav__btn">
+            <span class="quick-nav__icon" aria-hidden="true">
+              <img data-nav-icon="album" width="100" height="100" decoding="async" alt="" />
+            </span>
+            <span class="quick-nav__label">Album</span>
+          </button>
+          <button type="button" id="quickNavRecords" class="quick-nav__btn">
+            <span class="quick-nav__icon" aria-hidden="true">
+              <img data-nav-icon="records" width="100" height="100" decoding="async" alt="" />
+            </span>
+            <span class="quick-nav__label">Records</span>
+          </button>
+          <button type="button" id="quickNavFriend" class="quick-nav__btn">
+            <span class="quick-nav__icon" aria-hidden="true">
+              <img data-nav-icon="friend" width="100" height="100" decoding="async" alt="" />
+            </span>
+            <span class="quick-nav__label">Friend</span>
+          </button>
+        </nav>
         <div class="toolbar toolbar--game">
           <div class="field field--game-mode">
             <span id="labelGameMode" class="field__label">Game</span>
             <div id="gameModePicker" class="game-mode-picker" role="radiogroup" aria-labelledby="labelGameMode">
               <button
                 type="button"
-                class="game-mode-btn is-selected"
+                class="game-mode-btn"
                 data-mode="english1"
-                aria-pressed="true"
+                aria-pressed="false"
               >
                 <img data-mode-icon="english1" width="116" height="116" decoding="async" alt="" />
                 <span class="game-mode-btn__label">English 1</span>
@@ -277,6 +323,22 @@
             DEV: Win game
           </button>
         </div>
+        <div class="header__brand game-mode-info">
+          <div class="header__brand-row">
+            <img
+              id="appLogo"
+              class="header__logo"
+              width="48"
+              height="48"
+              decoding="async"
+              alt=""
+            />
+            <div class="header__titles">
+              <h1 id="gameTitle">Memory games</h1>
+              <p id="gameTagline" class="tagline"></p>
+            </div>
+          </div>
+        </div>
         <button type="button" id="onlineQuit" class="btn btn--ghost online-quit is-hidden">
           Quit game
         </button>
@@ -295,36 +357,6 @@
           </div>
         </dl>
       </header>
-      <div class="app-quick-nav">
-        <nav class="side-dock side-dock--start" aria-label="Quick actions">
-          <button type="button" id="quickNavAdventure" class="quick-nav__btn">
-            <span class="quick-nav__icon" aria-hidden="true">
-              <img data-nav-icon="adventure" width="100" height="100" decoding="async" alt="" />
-            </span>
-            <span class="quick-nav__label">Adventure</span>
-          </button>
-          <button type="button" id="quickNavAlbum" class="quick-nav__btn">
-            <span class="quick-nav__icon" aria-hidden="true">
-              <img data-nav-icon="album" width="100" height="100" decoding="async" alt="" />
-            </span>
-            <span class="quick-nav__label">Album</span>
-          </button>
-        </nav>
-        <nav class="side-dock side-dock--end" aria-label="Quick actions">
-          <button type="button" id="quickNavRecords" class="quick-nav__btn">
-            <span class="quick-nav__icon" aria-hidden="true">
-              <img data-nav-icon="records" width="100" height="100" decoding="async" alt="" />
-            </span>
-            <span class="quick-nav__label">Records</span>
-          </button>
-          <button type="button" id="quickNavFriend" class="quick-nav__btn">
-            <span class="quick-nav__icon" aria-hidden="true">
-              <img data-nav-icon="friend" width="100" height="100" decoding="async" alt="" />
-            </span>
-            <span class="quick-nav__label">Friend</span>
-          </button>
-        </nav>
-      </div>
       <main>
         <div
           id="onlineTurnBanner"

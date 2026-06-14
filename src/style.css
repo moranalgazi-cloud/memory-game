@@ -154,7 +154,7 @@ body {
   position: relative;
   max-width: 1060px;
   margin: 0 auto;
-  padding: 1.25rem 5.35rem 2rem;
+  padding: 1.25rem 1rem 2rem;
 }
 
 .app__main {
@@ -162,7 +162,18 @@ body {
 }
 
 .app-quick-nav {
-  display: contents;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.5rem;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px var(--shadow-soft);
 }
 
 .public-meta {
@@ -274,25 +285,50 @@ body.has-active-player .public-meta {
 
 .header__top {
   position: relative;
-  margin-bottom: 1rem;
+  min-height: 2.85rem;
+  margin-bottom: 0.35rem;
 }
 
-.side-dock {
+.app-brand {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  position: absolute;
-  top: 1.25rem;
-  z-index: 4;
-  width: 6.5rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+  padding-inline: 0.5rem;
+  width: 100%;
 }
 
-.side-dock--start {
-  inset-inline-start: 0;
+.app-brand__logo {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1.1rem;
+  box-shadow: 0 8px 24px var(--shadow-soft);
 }
 
-.side-dock--end {
-  inset-inline-end: 0;
+.app-brand-title {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding-inline: 0;
+  width: 100%;
+  overflow: visible;
+}
+
+.app-brand-title__svg {
+  display: block;
+  width: min(100%, 40rem);
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 3px 10px color-mix(in srgb, var(--accent-strong) 22%, transparent));
+}
+
+.app-brand-title__text {
+  fill: var(--accent-strong);
+  font-family: "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .quick-nav__btn {
@@ -300,8 +336,9 @@ body.has-active-player .public-meta {
   flex-direction: column;
   align-items: center;
   gap: 0.28rem;
-  width: 100%;
-  padding: 0.2rem 0.1rem;
+  width: auto;
+  min-width: 4.75rem;
+  padding: 0.15rem 0.1rem;
   border: none;
   border-radius: 14px;
   background: transparent;
@@ -321,8 +358,8 @@ body.has-active-player .public-meta {
 
 .quick-nav__icon {
   display: block;
-  width: 6.25rem;
-  height: 6.25rem;
+  width: 4.75rem;
+  height: 4.75rem;
   border-radius: 50%;
   overflow: hidden;
   box-shadow: 0 8px 24px var(--shadow-soft);
@@ -365,12 +402,11 @@ html[lang="he"] .quick-nav__label {
 }
 
 .header__brand {
-  /* Symmetric inset so title/cards stay visually centered (LTR + RTL). */
-  padding-inline: 3.35rem;
+  padding-inline: 0.25rem;
 }
 
 .has-account-badge .header__brand {
-  padding-inline: 6.3rem;
+  padding-inline: 0.25rem;
 }
 
 .header__brand-row {
@@ -709,7 +745,12 @@ h1 {
 }
 
 .toolbar--game {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.game-mode-info {
+  margin-top: 0.15rem;
+  margin-bottom: 0.85rem;
 }
 
 .toolbar--game.is-locked {
@@ -891,48 +932,25 @@ select:focus-visible {
 /* Phones: header sits on a solid panel so title / controls / stats aren’t lost
    against a very light gradient (common with system light theme + sun glare). */
 @media (max-width: 720px) {
-  .app {
-    padding: 1.25rem 1rem 2rem;
-  }
-
   .app-quick-nav {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 0.5rem 0.65rem;
-    margin: 0 0 0.85rem;
-    padding: 0.55rem 0.4rem;
-    border-radius: var(--radius-lg);
-    background: color-mix(in srgb, var(--surface) 90%, transparent);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 16px var(--shadow-soft);
-  }
-
-  .side-dock {
-    position: static;
-    width: auto;
-    flex-direction: row;
-    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+    gap: 0.45rem 0.55rem;
+    padding: 0.5rem 0.35rem;
   }
 
   .quick-nav__btn {
-    width: auto;
-    min-width: 5.25rem;
-    padding: 0;
-    gap: 0.25rem;
+    min-width: 4.5rem;
+    gap: 0.22rem;
   }
 
   .quick-nav__icon {
-    width: 5.5rem;
-    height: 5.5rem;
-    border-radius: 50%;
+    width: 4.35rem;
+    height: 4.35rem;
   }
 
   .quick-nav__label {
     font-size: 0.62rem;
-    max-width: 5.25rem;
+    max-width: 4.5rem;
   }
 
   html[lang="he"] .quick-nav__label {
@@ -951,9 +969,28 @@ select:focus-visible {
     box-shadow: 0 8px 28px var(--shadow);
   }
 
-  /* Controls stay top-right; brand gets the full width below (no side squeeze). */
+  /* Settings/account stay top-right; shortcuts and title stack below. */
   .header__top {
-    padding-top: 3.15rem;
+    min-height: 2.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .app-brand {
+    margin-bottom: 0.7rem;
+    gap: 0.35rem;
+  }
+
+  .app-brand__logo {
+    width: 4.25rem;
+    height: 4.25rem;
+  }
+
+  .app-brand-title__svg {
+    width: min(100%, 34rem);
+  }
+
+  .app-brand-title__text {
+    font-size: 36px;
   }
 
   .header__brand {
@@ -993,6 +1030,14 @@ select:focus-visible {
     background: linear-gradient(180deg, #ffffff 0%, #fff8ee 100%);
     border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   }
+}
+
+.game-mode-info .header__logo {
+  display: none;
+}
+
+.board.board--empty {
+  display: none;
 }
 
 .board {

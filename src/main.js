@@ -326,17 +326,65 @@ function clearQuizAdvance() {
   }
 }
 
-/** @returns {import("./records.js").GameMode} */
+/** @returns {import("./records.js").GameMode | null} */
 function getSelectedGameModeFromPicker() {
   const selected = gameModePicker?.querySelector(
     ".game-mode-btn.is-selected:not(.is-hidden)",
   );
   const v = selected?.getAttribute("data-mode");
-  if (v === "english2" && !isEnglish2ModeAvailable(getLocale())) return "english1";
+  if (v === "english2" && !isEnglish2ModeAvailable(getLocale())) return null;
   if (v === "english1" || v === "english2" || v === "fractions" || v === "sums" || v === "math") {
     return v;
   }
-  return "english1";
+  return null;
+}
+
+function clearGameModeSelection() {
+  if (!gameModePicker) return;
+  for (const btn of gameModePicker.querySelectorAll(".game-mode-btn")) {
+    btn.classList.remove("is-selected");
+    btn.setAttribute("aria-pressed", "false");
+  }
+}
+
+function resetStatsDisplay() {
+  if (movesEl) movesEl.textContent = "0";
+  if (matchesEl) matchesEl.textContent = "0 / 0";
+  if (elapsedEl) elapsedEl.textContent = "0:00";
+}
+
+function renderEmptyBoard() {
+  if (!board) return;
+  board.replaceChildren();
+  board.classList.add("board--empty");
+  board.classList.remove("board--waiting-turn");
+  board.style.gridTemplateColumns = "";
+}
+
+function focusBoard() {
+  const target = board?.closest("main") ?? board;
+  if (!target) return;
+  requestAnimationFrame(() => {
+    target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+}
+
+function showAwaitingGamePick() {
+  if (isOnlineGameActive()) {
+    void leaveOnlineSession();
+    appRoot?.classList.remove("is-online-active");
+  }
+  cancelEnglishSpeech();
+  clearWinAutoRestart();
+  clearQuizAdvance();
+  hideWinActions();
+  lastWinForQuiz = null;
+  if (quizDialog?.open) quizDialog.close();
+  quizSession = null;
+  state = null;
+  renderEmptyBoard();
+  resetStatsDisplay();
+  refreshChrome();
 }
 
 function syncEnglish2ModeVisibility() {
@@ -350,7 +398,10 @@ function syncEnglish2ModeVisibility() {
   }
   if (!show) {
     const wasEng2 = gameModePicker?.querySelector('.game-mode-btn[data-mode="english2"].is-selected');
-    if (wasEng2) setGameMode("english1");
+    if (wasEng2) {
+      clearGameModeSelection();
+      if (state?.mode === "english2") showAwaitingGamePick();
+    }
   }
 }
 
@@ -666,13 +717,75 @@ function refreshChrome() {
   applyNavIcons();
   refreshGameModePicker();
   const mode = getMode();
-  setPageTitleForMode(mode);
-  if (gameTitle) {
-    if (mode === "english1") gameTitle.textContent = t(english1LabelKey(getLocale(), "title"));
-    else if (mode === "english2") gameTitle.textContent = t("titleEnglish2");
-    else if (mode === "fractions") gameTitle.textContent = t("titleFractions");
-    else if (mode === "sums") gameTitle.textContent = t("titleSums");
-    else gameTitle.textContent = t("titleMath");
+  if (!mode) {
+    document.title = t("pageTitleDefault");
+    if (gameTitle) gameTitle.textContent = t("pickGameTitle");
+    if (gameTagline) gameTagline.textContent = t("pickGameTagline");
+    if (labelGameMode) labelGameMode.textContent = t("gameType");
+    if (gameActionsEl) gameActionsEl.classList.add("is-hidden");
+    for (const field of [
+      pairsField,
+      englishLevelField,
+      english2SourceField,
+      sumsLevelField,
+      mathLevelField,
+      fractionLevelField,
+      tablesField,
+    ]) {
+      field?.classList.add("is-hidden");
+    }
+  } else {
+    setPageTitleForMode(mode);
+    if (gameTitle) {
+      if (mode === "english1") gameTitle.textContent = t(english1LabelKey(getLocale(), "title"));
+      else if (mode === "english2") gameTitle.textContent = t("titleEnglish2");
+      else if (mode === "fractions") gameTitle.textContent = t("titleFractions");
+      else if (mode === "sums") gameTitle.textContent = t("titleSums");
+      else gameTitle.textContent = t("titleMath");
+    }
+    if (gameTagline) {
+      if (
+        state &&
+        isEnglishMode(state.mode) &&
+        state.englishTopicId
+      ) {
+        const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
+        gameTagline.textContent = t(
+          tagKey,
+          state.mode === "english2"
+            ? english2TaglineVars({ topic: t(englishTopicMessageKey(state.englishTopicId)) })
+            : { topic: t(englishTopicMessageKey(state.englishTopicId)) },
+        );
+      } else if (mode === "english1") gameTagline.textContent = t("taglineEnglish1Generic");
+      else if (mode === "english2") gameTagline.textContent = t("taglineEnglish2Generic", english2TaglineVars());
+      else if (mode === "fractions") gameTagline.textContent = t("taglineFractions");
+      else if (mode === "sums") gameTagline.textContent = t("taglineSums");
+      else gameTagline.textContent = t("taglineMath");
+    }
+    if (gameActionsEl) gameActionsEl.classList.toggle("is-hidden", !state);
+    if (labelGameMode) labelGameMode.textContent = t("gameType");
+    if (labelPairs) labelPairs.textContent = t("pairs");
+    if (labelTables) {
+      labelTables.textContent =
+        mode === "fractions" ? t("tablesAsDenominator") : t("tables");
+    }
+    if (pairsField) {
+      pairsField.classList.toggle(
+        "is-hidden",
+        isEnglishMode(mode) || mode === "sums" || mode === "math" || mode === "fractions",
+      );
+    }
+    if (englishLevelField) englishLevelField.classList.toggle("is-hidden", !isEnglishMode(mode));
+    if (english2SourceField) english2SourceField.classList.toggle("is-hidden", mode !== "english2");
+    if (sumsLevelField) sumsLevelField.classList.toggle("is-hidden", mode !== "sums");
+    if (mathLevelField) mathLevelField.classList.toggle("is-hidden", mode !== "math");
+    if (fractionLevelField) fractionLevelField.classList.toggle("is-hidden", mode !== "fractions");
+    if (tablesField) {
+      tablesField.classList.toggle(
+        "is-hidden",
+        isEnglishMode(mode) || mode === "sums" || mode === "math" || mode === "fractions",
+      );
+    }
   }
   if (appPurposeEl) appPurposeEl.textContent = t("appPurpose");
   if (publicAppTitleEl) publicAppTitleEl.textContent = t("publicAppTitle");
@@ -682,31 +795,6 @@ function refreshChrome() {
   if (publicWhat3El) publicWhat3El.textContent = t("publicWhat3");
   if (publicGoogleTitleEl) publicGoogleTitleEl.textContent = t("publicGoogleTitle");
   if (publicGooglePurposeEl) publicGooglePurposeEl.textContent = t("publicGooglePurpose");
-  if (gameTagline) {
-    if (
-      state &&
-      isEnglishMode(state.mode) &&
-      state.englishTopicId
-    ) {
-      const tagKey = state.mode === "english2" ? "taglineEnglish2" : "taglineEnglish1";
-      gameTagline.textContent = t(
-        tagKey,
-        state.mode === "english2"
-          ? english2TaglineVars({ topic: t(englishTopicMessageKey(state.englishTopicId)) })
-          : { topic: t(englishTopicMessageKey(state.englishTopicId)) },
-      );
-    } else if (mode === "english1") gameTagline.textContent = t("taglineEnglish1Generic");
-    else if (mode === "english2") gameTagline.textContent = t("taglineEnglish2Generic", english2TaglineVars());
-    else if (mode === "fractions") gameTagline.textContent = t("taglineFractions");
-    else if (mode === "sums") gameTagline.textContent = t("taglineSums");
-    else gameTagline.textContent = t("taglineMath");
-  }
-  if (labelGameMode) labelGameMode.textContent = t("gameType");
-  if (labelPairs) labelPairs.textContent = t("pairs");
-  if (labelTables) {
-    labelTables.textContent =
-      mode === "fractions" ? t("tablesAsDenominator") : t("tables");
-  }
   if (labelLanguage) labelLanguage.textContent = t("language");
   updateThemeToggleLabel();
   refreshAuthUI();
@@ -858,14 +946,6 @@ function refreshChrome() {
   if (labelSumsLevel) labelSumsLevel.textContent = t("sumsLevel");
   if (labelMathLevel) labelMathLevel.textContent = t("mathLevel");
   if (labelFractionLevel) labelFractionLevel.textContent = t("fractionLevel");
-  if (pairsField) {
-    pairsField.classList.toggle(
-      "is-hidden",
-      isEnglishMode(mode) || mode === "sums" || mode === "math" || mode === "fractions",
-    );
-  }
-  if (englishLevelField) englishLevelField.classList.toggle("is-hidden", !isEnglishMode(mode));
-  if (english2SourceField) english2SourceField.classList.toggle("is-hidden", mode !== "english2");
   if (labelEnglish2Source) labelEnglish2Source.textContent = t("english2SourceLabel");
   if (english2SourceSelect) {
     english2SourceSelect.value = getEnglish2SourceLang();
@@ -877,9 +957,6 @@ function refreshChrome() {
       }
     }
   }
-  if (sumsLevelField) sumsLevelField.classList.toggle("is-hidden", mode !== "sums");
-  if (mathLevelField) mathLevelField.classList.toggle("is-hidden", mode !== "math");
-  if (fractionLevelField) fractionLevelField.classList.toggle("is-hidden", mode !== "fractions");
 
   if (tableMaxSelect) {
     tableMaxSelect.setAttribute(
@@ -903,13 +980,6 @@ function refreshChrome() {
     userDialogLocale.value = getLocale();
   }
   if (board) board.setAttribute("aria-label", t("ariaBoard"));
-
-  if (tablesField) {
-    tablesField.classList.toggle(
-      "is-hidden",
-      isEnglishMode(mode) || mode === "sums" || mode === "math" || mode === "fractions",
-    );
-  }
 
   refreshRecordsLabels();
   refreshRoadmapLabels();
@@ -1586,6 +1656,11 @@ function restartSameDeck() {
  * @param {"init" | "restart" | "options" | "switch-user"} source
  */
 function startGame(source) {
+  const pickedMode = getMode();
+  if (!pickedMode) {
+    showAwaitingGamePick();
+    return;
+  }
   if (isOnlineGameActive()) {
     void leaveOnlineSession();
     appRoot?.classList.remove("is-online-active");
@@ -1597,7 +1672,7 @@ function startGame(source) {
   lastWinForQuiz = null;
   if (quizDialog?.open) quizDialog.close();
   quizSession = null;
-  let mode = getMode();
+  let mode = pickedMode;
 
   maybeRecordAbandoned(source);
 
@@ -1804,6 +1879,7 @@ function startGame(source) {
   renderBoard();
   updateStats();
   booted = true;
+  focusBoard();
 }
 
 function formatElapsed(ms) {
@@ -1939,7 +2015,10 @@ function speedFinishGame() {
 }
 
 function updateStats() {
-  if (!state) return;
+  if (!state) {
+    resetStatsDisplay();
+    return;
+  }
 
   if (state.online) {
     const session = getActiveOnlineSession();
@@ -1995,6 +2074,7 @@ function updateStats() {
 
 function renderBoard() {
   if (!board || !state) return;
+  board.classList.remove("board--empty");
   if (state.online) {
     const session = getActiveOnlineSession();
     const myTurn = session?.role != null && state.turn === session.role;
@@ -2444,8 +2524,8 @@ async function removeUserFromPicker(slug) {
   renderUserPickerList();
   if (booted && prevCurrent === slug) {
     cancelEnglishSpeech();
-    refreshChrome();
-    startGame("switch-user");
+    clearGameModeSelection();
+    showAwaitingGamePick();
   } else {
     refreshChrome();
   }
@@ -2572,8 +2652,6 @@ async function confirmUserChoiceAsync() {
   if (!pendingUserSlug) return;
   const cont = userDialogContinue;
   const slug = pendingUserSlug;
-  const isFirstBoot = !booted;
-
   const ageOk = await ensurePlayerAgeRange(slug);
   if (!ageOk) return;
 
@@ -2591,13 +2669,8 @@ async function confirmUserChoiceAsync() {
   grantStarterStickerIfNeeded(slug);
   refreshChrome();
   openRoadmapDialog();
-
-  if (isFirstBoot) {
-    queueMicrotask(() => startGame("init"));
-  } else {
-    cancelEnglishSpeech();
-    queueMicrotask(() => startGame("switch-user"));
-  }
+  clearGameModeSelection();
+  showAwaitingGamePick();
 
   queueMicrotask(() => {
     openTutorialIfNeeded(slug, () => {});
@@ -2811,7 +2884,7 @@ onAuthChange(() => {
 if (getCurrentUser()) {
   document.body.classList.add("has-active-player");
   refreshChrome();
-  startGame("init");
+  showAwaitingGamePick();
 } else {
   document.body.classList.remove("has-active-player");
   appRoot?.classList.add("is-hidden");
@@ -2927,15 +3000,28 @@ adminDialog?.addEventListener("click", (e) => {
   if (e.target === adminDialog) adminDialog.close();
 });
 
-newGameBtn?.addEventListener("click", () => startGame("restart"));
-restartDeckBtn?.addEventListener("click", () => restartSameDeck());
-winNewGameBtn?.addEventListener("click", () => {
-  if (state?.online && state.winHandled) void playOnlineAgain();
+newGameBtn?.addEventListener("click", () => {
+  if (!getMode()) return;
+  startGame("restart");
+});
+restartDeckBtn?.addEventListener("click", () => {
+  if (!getMode()) return;
+  if (lastDeckSource) restartSameDeck();
   else startGame("restart");
 });
+winNewGameBtn?.addEventListener("click", () => {
+  if (state?.online && state.winHandled) void playOnlineAgain();
+  else if (getMode()) startGame("restart");
+});
 winRestartDeckBtn?.addEventListener("click", () => restartSameDeck());
-pairCountSelect?.addEventListener("change", () => startGame("options"));
-englishLevelSelect?.addEventListener("change", () => startGame("options"));
+pairCountSelect?.addEventListener("change", () => {
+  if (!getMode() || !state) return;
+  startGame("options");
+});
+englishLevelSelect?.addEventListener("change", () => {
+  if (!getMode() || !state) return;
+  startGame("options");
+});
 testMeBtn?.addEventListener("click", () => openQuiz());
 closeQuizBtn?.addEventListener("click", () => closeQuiz());
 dismissQuizBtn?.addEventListener("click", () => closeQuiz());
@@ -2948,10 +3034,22 @@ quizDialog?.addEventListener("close", () => {
   clearQuizAdvance();
   quizSession = null;
 });
-sumsLevelSelect?.addEventListener("change", () => startGame("options"));
-mathLevelSelect?.addEventListener("change", () => startGame("options"));
-fractionLevelSelect?.addEventListener("change", () => startGame("options"));
-tableMaxSelect?.addEventListener("change", () => startGame("options"));
+sumsLevelSelect?.addEventListener("change", () => {
+  if (!getMode() || !state) return;
+  startGame("options");
+});
+mathLevelSelect?.addEventListener("change", () => {
+  if (!getMode() || !state) return;
+  startGame("options");
+});
+fractionLevelSelect?.addEventListener("change", () => {
+  if (!getMode() || !state) return;
+  startGame("options");
+});
+tableMaxSelect?.addEventListener("change", () => {
+  if (!getMode() || !state) return;
+  startGame("options");
+});
 gameModePicker?.addEventListener("click", (e) => {
   const btn = e.target instanceof Element ? e.target.closest(".game-mode-btn") : null;
   if (!btn || btn.classList.contains("is-selected") || btn.classList.contains("is-hidden")) return;
@@ -3162,7 +3260,8 @@ async function applyGoogleIdentityIfSignedIn() {
     // Switch the board to the account player if we changed who is active.
     if (booted && prevSlug !== acct.slug && !isOnlineBoardActive()) {
       cancelEnglishSpeech();
-      startGame("switch-user");
+      clearGameModeSelection();
+      showAwaitingGamePick();
     }
     void syncAllLocalUsersToCloud();
   } finally {
@@ -3180,10 +3279,12 @@ function applyGameLocaleFromSelect(source) {
     const wasEng2 = booted && getMode() === "english2";
     setLocale(v);
     setEnglish2SourceLang(defaultEnglish2SourceForLocale(v));
-    if (v === "en" && wasEng2) setGameMode("english1");
+    if (v === "en" && wasEng2) {
+      clearGameModeSelection();
+      showAwaitingGamePick();
+    }
     refreshChrome();
-    if (booted) {
-      // English 2 deck is tied to source language — rebuild when locale (and source) changes.
+    if (booted && state) {
       if (wasEng2) startGame("options");
       else renderBoard();
     }
@@ -3196,7 +3297,7 @@ english2SourceSelect?.addEventListener("change", () => {
     setEnglish2SourceLang(v);
     applyModeIcons();
     refreshChrome();
-    if (booted && getMode() === "english2") startGame("options");
+    if (booted && getMode() === "english2" && state) startGame("options");
   }
 });
 

@@ -24,7 +24,7 @@ export function applyAppBranding(t) {
   apple.href = appLogoUrl;
 
   const alt = t("appLogoAlt");
-  for (const id of ["#appLogo", "#aboutLogo"]) {
+  for (const id of ["#appLogo", "#aboutLogo", "#appBrandLogo"]) {
     const img = document.querySelector(id);
     if (img instanceof HTMLImageElement) {
       img.src = appLogoUrl;
