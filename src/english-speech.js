@@ -10,8 +10,10 @@
  * @property {SpeechLang} lang
  */
 
-/** @type {Promise<void>} */
-let speakChain = Promise.resolve();
+/** @type {SpeechSynthesisVoice[]} */
+let cachedVoices = [];
+
+let voicesPrimed = false;
 
 /**
  * @param {{ side?: string; lang?: string; word?: string; label?: string }} card
@@ -50,6 +52,19 @@ function resolveEnglish2SpeechLang(card) {
   return "en";
 }
 
+function refreshVoices() {
+  if (typeof window === "undefined" || !window.speechSynthesis) return [];
+  cachedVoices = window.speechSynthesis.getVoices();
+  return cachedVoices;
+}
+
+/** Load voice list during a user gesture (mobile browsers need this). */
+export function warmupEnglishSpeech() {
+  if (typeof window === "undefined" || !window.speechSynthesis || voicesPrimed) return;
+  voicesPrimed = true;
+  refreshVoices();
+}
+
 /**
  * @param {{ side?: string; lang?: string; word?: string; label?: string }} card
  * @param {"english1" | "english2"} gameMode
@@ -58,13 +73,13 @@ function resolveEnglish2SpeechLang(card) {
 export function speakEnglishCard(card, gameMode, speechMode) {
   const target = resolveEnglishCardSpeech(card, gameMode, speechMode);
   if (!target) return;
+  warmupEnglishSpeech();
   speakMemoryWord(target.text, target.lang);
 }
 
 export function cancelEnglishSpeech() {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  speakChain = Promise.resolve();
 }
 
 /** @param {SpeechLang} lang */
@@ -76,88 +91,49 @@ function speechLocale(lang) {
   return "en-US";
 }
 
+/** @param {string} langTag */
+function langPrefix(langTag) {
+  return langTag.replace("_", "-").slice(0, 2).toLowerCase();
+}
+
 /** @param {SpeechSynthesisVoice[]} voices @param {SpeechLang} lang */
 function pickVoice(voices, lang) {
   const locale = speechLocale(lang);
   const prefix = locale.slice(0, 2);
+  const legacyPrefix = lang === "he" ? "iw" : prefix;
   return (
     voices.find((v) => v.lang === locale) ??
-    voices.find((v) => v.lang.replace("_", "-").startsWith(prefix)) ??
-    voices.find((v) => v.lang.startsWith(prefix)) ??
-    (lang === "he" ? voices.find((v) => /hebrew|עברית|he-IL/i.test(`${v.name} ${v.lang}`)) : null) ??
+    voices.find((v) => langPrefix(v.lang) === prefix) ??
+    voices.find((v) => langPrefix(v.lang) === legacyPrefix) ??
+    (lang === "he"
+      ? voices.find((v) => /hebrew|עברית|he-IL|iw-IL/i.test(`${v.name} ${v.lang}`))
+      : null) ??
     (lang === "en"
-      ? voices.find((v) => v.lang === "en-US") ?? voices.find((v) => v.lang.startsWith("en"))
+      ? voices.find((v) => v.lang === "en-US") ?? voices.find((v) => langPrefix(v.lang) === "en")
       : null)
   );
 }
 
 /**
- * Wait until voices are available; for Hebrew, prefer waiting until a Hebrew voice exists.
- *
- * @param {SpeechLang} lang
- * @param {(voices: SpeechSynthesisVoice[]) => void} run
- */
-function withVoices(lang, run) {
-  const synth = window.speechSynthesis;
-  const started = Date.now();
-  const maxWaitMs = lang === "he" ? 1200 : 0;
-
-  const attempt = () => {
-    const voices = synth.getVoices();
-    if (voices.length === 0) return false;
-    if (lang === "he" && !pickVoice(voices, "he") && Date.now() - started < maxWaitMs) {
-      return false;
-    }
-    run(voices);
-    return true;
-  };
-
-  if (attempt()) return;
-
-  const onVoices = () => {
-    if (attempt()) synth.removeEventListener("voiceschanged", onVoices);
-  };
-  synth.addEventListener("voiceschanged", onVoices);
-  synth.getVoices();
-
-  if (lang === "he") {
-    window.setTimeout(() => {
-      synth.removeEventListener("voiceschanged", onVoices);
-      attempt();
-    }, maxWaitMs);
-  }
-}
-
-/**
  * @param {string} phrase
  * @param {SpeechLang} lang
- * @returns {Promise<void>}
  */
-function speakMemoryWordNow(phrase, lang) {
-  return new Promise((resolve) => {
-    withVoices(lang, (voices) => {
-      const synth = window.speechSynthesis;
-      if (synth.paused) synth.resume();
+function speakNow(phrase, lang) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
 
-      const u = new SpeechSynthesisUtterance(phrase);
-      u.lang = speechLocale(lang);
-      const voice = pickVoice(voices, lang);
-      if (voice) u.voice = voice;
-      u.rate = lang === "he" ? 0.85 : 0.9;
+  if (synth.paused) synth.resume();
+  if (cachedVoices.length === 0) refreshVoices();
 
-      let done = false;
-      const finish = () => {
-        if (done) return;
-        done = true;
-        resolve();
-      };
-      u.onend = finish;
-      u.onerror = finish;
-      setTimeout(finish, Math.max(3000, phrase.length * 120));
+  const u = new SpeechSynthesisUtterance(phrase);
+  u.lang = speechLocale(lang);
+  const voice = pickVoice(cachedVoices, lang);
+  if (voice) u.voice = voice;
+  u.rate = lang === "he" ? 0.85 : 0.9;
 
-      synth.speak(u);
-    });
-  });
+  // iOS Safari: speak must run synchronously in the tap handler — no async queue.
+  if (synth.speaking || synth.pending) synth.cancel();
+  synth.speak(u);
 }
 
 /**
@@ -169,11 +145,7 @@ export function speakMemoryWord(text, lang = "en") {
   const phrase = String(text ?? "").trim();
   if (!phrase) return;
   try {
-    speakChain = speakChain
-      .then(() => speakMemoryWordNow(phrase, lang))
-      .catch((e) => {
-        console.warn("[english-speech] speak failed:", e);
-      });
+    speakNow(phrase, lang);
   } catch (e) {
     console.warn("[english-speech] speak failed:", e);
   }
@@ -185,8 +157,6 @@ export function speakEnglishMemoryWord(text) {
 }
 
 if (typeof window !== "undefined" && window.speechSynthesis) {
-  window.speechSynthesis.getVoices();
-  window.speechSynthesis.addEventListener("voiceschanged", () => {
-    window.speechSynthesis.getVoices();
-  });
+  refreshVoices();
+  window.speechSynthesis.addEventListener("voiceschanged", refreshVoices);
 }
