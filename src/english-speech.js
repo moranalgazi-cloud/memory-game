@@ -123,6 +123,13 @@ function isMobileSpeechBrowser() {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
 }
 
+function isAndroidWebView() {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  if (!/Android/i.test(ua)) return false;
+  return /\bwv\b|; wv\)|Version\/\d+\.\d+/i.test(ua);
+}
+
 /** @param {SpeechLang} lang */
 function fallbackLocale(lang) {
   if (lang === "he") return "iw";
@@ -155,7 +162,7 @@ function playFallbackTtsAudio(phrase, lang) {
   const clipped = text.slice(0, 180);
   const tl = fallbackLocale(lang);
   const url =
-    "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob" +
+    "https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx" +
     `&tl=${encodeURIComponent(tl)}&q=${encodeURIComponent(clipped)}`;
   stopFallbackTtsAudio();
   const audio = new Audio(url);
@@ -170,6 +177,10 @@ function playFallbackTtsAudio(phrase, lang) {
  */
 function speakNow(phrase, lang) {
   const synth = window.speechSynthesis;
+  if (isAndroidWebView()) {
+    playFallbackTtsAudio(phrase, lang);
+    return;
+  }
   if (!synth) {
     playFallbackTtsAudio(phrase, lang);
     return;
@@ -220,6 +231,7 @@ export function speakMemoryWord(text, lang = "en") {
     speakNow(phrase, lang);
   } catch (e) {
     console.warn("[english-speech] speak failed:", e);
+    playFallbackTtsAudio(phrase, lang);
   }
 }
 
