@@ -130,6 +130,16 @@ function isAndroidWebView() {
   return /\bwv\b|; wv\)|Version\/\d+\.\d+/i.test(ua);
 }
 
+function isAndroidDevice() {
+  if (typeof navigator === "undefined") return false;
+  return /Android/i.test(navigator.userAgent || "");
+}
+
+function isLocalhostHost() {
+  if (typeof location === "undefined") return false;
+  return location.hostname === "localhost" || location.hostname === "127.0.0.1";
+}
+
 /** @param {SpeechLang} lang */
 function fallbackLocale(lang) {
   if (lang === "he") return "iw";
@@ -177,9 +187,12 @@ function playFallbackTtsAudio(phrase, lang) {
  */
 function speakNow(phrase, lang) {
   const synth = window.speechSynthesis;
-  if (isAndroidWebView()) {
+  const forceAndroidFallback = isAndroidDevice() && !isLocalhostHost();
+  if (forceAndroidFallback) {
     playFallbackTtsAudio(phrase, lang);
-    return;
+  }
+  if (isAndroidWebView()) {
+    if (!synth) return;
   }
   if (!synth) {
     playFallbackTtsAudio(phrase, lang);
