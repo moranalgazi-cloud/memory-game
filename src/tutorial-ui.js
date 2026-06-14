@@ -1,6 +1,7 @@
 import roadmapMapImg from "../docs/images/adventure/roadmap-map.png?url";
 import albumCoverImg from "../docs/images/adventure/album-animals.png?url";
-import stickerLion from "../docs/images/stickers/sticker-lion.png?url";
+import stickerStar from "../docs/images/stickers/sticker-star.png?url";
+import stickerRainbow from "../docs/images/stickers/sticker-rainbow.png?url";
 import stickerPenguin from "../docs/images/stickers/sticker-penguin.png?url";
 import { GAME_MODE_ORDER, getModeIconUrl } from "./mode-icons.js";
 import { NAV_ICON_URLS } from "./nav-icons.js";
@@ -12,7 +13,7 @@ import { getCurrentUserSlug } from "./user-store.js";
  * @property {(key: string, vars?: Record<string, string>) => string} t
  */
 
-/** @typedef {'match' | 'modes' | 'adventure' | 'album' | 'shortcuts'} TutorialSlideId */
+/** @typedef {'match' | 'modes' | 'teach' | 'adventure' | 'album' | 'shortcuts' | 'friend'} TutorialSlideId */
 
 /** @type {TutorialUiDeps | null} */
 let deps = null;
@@ -27,7 +28,22 @@ let activeUserSlug = null;
 let slideIndex = 0;
 
 /** @type {readonly TutorialSlideId[]} */
-const SLIDE_IDS = ["match", "modes", "adventure", "album", "shortcuts"];
+const SLIDE_IDS = ["modes", "match", "teach", "shortcuts", "friend", "adventure", "album"];
+
+/**
+ * Maps a slide id to the i18n step key suffix used for its title/body, so the
+ * on-screen order (SLIDE_IDS) is decoupled from the message numbering.
+ * @type {Record<TutorialSlideId, number>}
+ */
+const SLIDE_STEP = {
+  match: 1,
+  modes: 2,
+  adventure: 3,
+  album: 4,
+  shortcuts: 5,
+  teach: 6,
+  friend: 7,
+};
 
 const tutorialDialog = document.querySelector("#tutorialDialog");
 const tutorialArt = document.querySelector("#tutorialArt");
@@ -97,14 +113,7 @@ function renderArt(id) {
       return el;
     };
 
-    board.append(
-      card("?"),
-      card("7×8", true),
-      card("?"),
-      card("56", true),
-      card("?"),
-      card("Dog"),
-    );
+    board.append(card("?"), card("7×8", true), card("?"), card("56", true));
 
     const spark = document.createElement("span");
     spark.className = "tutorial-art-cards__spark";
@@ -114,6 +123,39 @@ function renderArt(id) {
     const wrap = document.createElement("div");
     wrap.className = "tutorial-art-cards__wrap";
     wrap.append(board, spark);
+    tutorialArt.append(wrap);
+    return;
+  }
+
+  if (id === "teach") {
+    const board = document.createElement("div");
+    board.className = "tutorial-art-cards tutorial-art-cards--teach";
+    board.setAttribute("aria-hidden", "true");
+
+    /** @param {string} text */
+    const card = (text) => {
+      const el = document.createElement("div");
+      el.className = "tutorial-art-card tutorial-art-card--matched";
+      el.textContent = text;
+      return el;
+    };
+
+    board.append(card("7×8"), card("56"), card("9×3"), card("27"));
+
+    const teach = document.createElement("div");
+    teach.className = "tutorial-art-teach-button";
+    teach.setAttribute("aria-hidden", "true");
+    const teachMark = document.createElement("span");
+    teachMark.className = "tutorial-art-teach-button__mark";
+    teachMark.textContent = "?";
+    const teachLabel = document.createElement("span");
+    teachLabel.className = "tutorial-art-teach-button__label";
+    teachLabel.textContent = deps?.t("tutorialTeachButton") ?? "Teach me";
+    teach.append(teachMark, teachLabel);
+
+    const wrap = document.createElement("div");
+    wrap.className = "tutorial-art-cards__wrap";
+    wrap.append(board, teach);
     tutorialArt.append(wrap);
     return;
   }
@@ -151,7 +193,7 @@ function renderArt(id) {
     map.decoding = "async";
     const sticker = document.createElement("img");
     sticker.className = "tutorial-art-adventure__sticker";
-    sticker.src = stickerLion;
+    sticker.src = stickerStar;
     sticker.alt = "";
     sticker.decoding = "async";
     scene.append(map, sticker);
@@ -182,7 +224,7 @@ function renderArt(id) {
       if (i === 1) {
         slot.classList.add("tutorial-art-album__slot--placed");
         const placed = document.createElement("img");
-        placed.src = stickerLion;
+        placed.src = stickerRainbow;
         placed.alt = "";
         placed.decoding = "async";
         slot.append(placed);
@@ -210,24 +252,74 @@ function renderArt(id) {
     return;
   }
 
-  const row = document.createElement("div");
-  row.className = "tutorial-art-nav";
-  row.setAttribute("aria-hidden", "true");
-  for (const key of ["adventure", "album", "records", "friend"]) {
-    const url = NAV_ICON_URLS[key];
-    if (!url) continue;
-    const btn = document.createElement("div");
-    btn.className = "tutorial-art-nav__item";
-    const img = document.createElement("img");
-    img.src = url;
-    img.alt = "";
-    img.width = 52;
-    img.height = 52;
-    img.decoding = "async";
-    btn.append(img);
-    row.append(btn);
+  if (id === "friend") {
+    const scene = document.createElement("div");
+    scene.className = "tutorial-art-friend";
+    scene.setAttribute("aria-hidden", "true");
+
+    const iconWrap = document.createElement("div");
+    iconWrap.className = "tutorial-art-friend__icon";
+    const icon = document.createElement("img");
+    icon.src = NAV_ICON_URLS.friend ?? "";
+    icon.alt = "";
+    icon.width = 72;
+    icon.height = 72;
+    icon.decoding = "async";
+    iconWrap.append(icon);
+
+    const players = document.createElement("div");
+    players.className = "tutorial-art-friend__players";
+
+    /** @param {string} avatar */
+    const playerBoard = (avatar) => {
+      const board = document.createElement("div");
+      board.className = "tutorial-art-friend__board";
+      const name = document.createElement("span");
+      name.className = "tutorial-art-friend__label";
+      name.textContent = avatar;
+      const cards = document.createElement("div");
+      cards.className = "tutorial-art-friend__cards";
+      for (const text of ["?", "7×8"]) {
+        const card = document.createElement("div");
+        card.className = "tutorial-art-card tutorial-art-card--matched";
+        card.textContent = text === "?" ? "?" : text;
+        if (text === "?") card.classList.remove("tutorial-art-card--matched");
+        cards.append(card);
+      }
+      board.append(name, cards);
+      return board;
+    };
+
+    const link = document.createElement("span");
+    link.className = "tutorial-art-friend__link";
+    link.textContent = "🤝";
+
+    players.append(playerBoard("🙂"), link, playerBoard("😊"));
+    scene.append(iconWrap, players);
+    tutorialArt.append(scene);
+    return;
   }
-  tutorialArt.append(row);
+
+  if (id === "shortcuts") {
+    const row = document.createElement("div");
+    row.className = "tutorial-art-nav";
+    row.setAttribute("aria-hidden", "true");
+    for (const key of ["adventure", "album", "records", "friend"]) {
+      const url = NAV_ICON_URLS[key];
+      if (!url) continue;
+      const btn = document.createElement("div");
+      btn.className = "tutorial-art-nav__item";
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "";
+      img.width = 52;
+      img.height = 52;
+      img.decoding = "async";
+      btn.append(img);
+      row.append(btn);
+    }
+    tutorialArt.append(row);
+  }
 }
 
 function renderDots() {
@@ -246,7 +338,7 @@ function renderSlide() {
   if (!deps) return;
   const t = deps.t;
   const id = SLIDE_IDS[slideIndex];
-  const step = slideIndex + 1;
+  const step = SLIDE_STEP[id];
 
   if (tutorialTitle) tutorialTitle.textContent = t(`tutorialStep${step}Title`);
   if (tutorialBody) tutorialBody.textContent = t(`tutorialStep${step}Body`);
@@ -284,6 +376,14 @@ export function openTutorialIfNeeded(userSlug, onDone) {
   }
   activeUserSlug = userSlug ?? null;
   pendingDone = onDone ?? null;
+  slideIndex = 0;
+  renderSlide();
+  tutorialDialog?.showModal();
+}
+
+export function openTutorial() {
+  activeUserSlug = getCurrentUserSlug();
+  pendingDone = null;
   slideIndex = 0;
   renderSlide();
   tutorialDialog?.showModal();

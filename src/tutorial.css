@@ -153,9 +153,9 @@ html[lang="he"] .tutorial-dialog button {
 
 .tutorial-art-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.45rem;
-  max-width: 12.5rem;
+  max-width: 8.5rem;
   margin: 0 auto;
 }
 
@@ -187,6 +187,43 @@ html[lang="he"] .tutorial-dialog button {
   inset-inline-end: 0.65rem;
   font-size: 1.45rem;
   animation: tutorial-spark 1.8s ease-in-out infinite;
+}
+
+.tutorial-art-teach-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 7.4rem;
+  min-height: 2.35rem;
+  padding: 0.18rem 0.7rem 0.18rem 0.3rem;
+  margin: 0.65rem auto 0;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 28%, #fff 0 15%, #ffd166 16% 42%, #f5740b 76%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 4px 0 rgba(89, 36, 12, 0.5),
+    0 10px 22px rgba(0, 0, 0, 0.34);
+  color: #1a2850;
+  font-weight: 900;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  animation: tutorial-teach-pop 1.8s ease-in-out infinite;
+}
+
+.tutorial-art-teach-button__mark {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.76);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.tutorial-art-teach-button__label {
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
 }
 
 /* Slide art — game modes */
@@ -366,6 +403,89 @@ html[lang="he"] .tutorial-dialog button {
   }
 }
 
+/* Slide art — play with a friend */
+.tutorial-art-friend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.5rem 0.7rem;
+}
+
+.tutorial-art-friend__icon {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.28),
+    0 10px 24px rgba(0, 0, 0, 0.36);
+  animation: tutorial-friend-pop 1.6s ease-in-out infinite;
+}
+
+.tutorial-art-friend__icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tutorial-art-friend__players {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.tutorial-art-friend__board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tutorial-art-friend__label {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.tutorial-art-friend__cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.28rem;
+  width: 3.6rem;
+}
+
+.tutorial-art-friend__cards .tutorial-art-card {
+  font-size: 0.58rem;
+  border-radius: 7px;
+}
+
+.tutorial-art-friend__link {
+  font-size: 1.35rem;
+  animation: tutorial-friend-wiggle 1.4s ease-in-out infinite;
+}
+
+@keyframes tutorial-friend-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes tutorial-friend-wiggle {
+  0%,
+  100% {
+    transform: rotate(-6deg) scale(1);
+  }
+  50% {
+    transform: rotate(6deg) scale(1.08);
+  }
+}
+
 /* Slide art — quick nav */
 .tutorial-art-nav {
   display: flex;
@@ -422,6 +542,16 @@ html[lang="he"] .tutorial-dialog button {
   50% {
     transform: scale(1.15) rotate(12deg);
     opacity: 1;
+  }
+}
+
+@keyframes tutorial-teach-pop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.06);
   }
 }
 

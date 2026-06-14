@@ -121,6 +121,9 @@
               <button type="button" id="themeToggle" class="btn btn--ghost settings-menu__btn">
                 <span id="themeToggleLabel">Dark mode</span>
               </button>
+              <button type="button" id="openTutorial" class="btn btn--ghost settings-menu__btn">
+                Tutorial
+              </button>
               <button type="button" id="openAbout" class="btn btn--ghost settings-menu__btn">
                 About
               </button>
@@ -242,15 +245,6 @@
               <option value="hard">Hard</option>
             </select>
           </label>
-          <label id="english2SourceField" class="field is-hidden">
-            <span id="labelEnglish2Source" class="field__label">Translate from</span>
-            <select id="english2Source" aria-label="English 2 source language">
-              <option value="he">Hebrew</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="es">Spanish</option>
-            </select>
-          </label>
           <label id="sumsLevelField" class="field is-hidden">
             <span id="labelSumsLevel" class="field__label">Level</span>
             <select id="sumsLevel" aria-label="Plus and minus level">
@@ -305,6 +299,9 @@
                 <span class="mem-icon__card mem-icon__card--left"></span>
                 <span class="mem-icon__card mem-icon__card--right"></span>
               </span>
+            </button>
+            <button type="button" id="teachMe" class="btn btn--icon btn--ghost game-actions__btn">
+              <span class="mem-icon mem-icon--teach" aria-hidden="true">?</span>
             </button>
           </div>
           <button
@@ -938,19 +935,6 @@
       <div class="user-dialog__inner">
         <h2 id="userDialogTitle" class="user-dialog__title">Who is playing?</h2>
         <p id="userDialogLead" class="user-dialog__lead"></p>
-
-        <div class="user-dialog__section user-dialog__section--locale">
-          <label class="field user-dialog__locale-field">
-            <span id="labelUserDialogLanguage" class="field__label">Language</span>
-            <select id="userDialogLocale" aria-label="Language">
-              <option value="en">English</option>
-              <option value="he">עברית</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="es">Español</option>
-            </select>
-          </label>
-        </div>
 
         <div id="userGoogleSection" class="user-dialog__section user-dialog__google is-hidden">
           <p id="userGoogleHint" class="user-dialog__step-hint"></p>

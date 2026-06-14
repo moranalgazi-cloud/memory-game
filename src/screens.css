@@ -538,6 +538,7 @@ html[lang="he"] .online-dialog button {
 .online-game-mode-picker .game-mode-btn img {
   width: 5.75rem;
   height: 5.75rem;
+  border-radius: 50%;
   object-fit: contain;
 }
 

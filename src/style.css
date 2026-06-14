@@ -596,6 +596,23 @@ html[lang="he"] .quick-nav__label {
   color: #fff;
 }
 
+.mem-icon--teach {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #fff 0 16%, #ffd166 17% 40%, #f5740b 72%);
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--accent-strong) 60%, #000),
+    0 7px 16px rgba(0, 0, 0, 0.2);
+  color: #1a2850;
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
 .game-actions {
   display: inline-flex;
   align-items: center;
@@ -1050,6 +1067,10 @@ select:focus-visible {
   overflow-anchor: none;
 }
 
+.board--teach {
+  max-width: min(26rem, 100%);
+}
+
 @media (min-width: 480px) {
   .board {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1143,6 +1164,27 @@ select:focus-visible {
 .card.is-matched .card-face--front {
   border-color: hsl(var(--match-hue, 150) 58% 38%);
   box-shadow: inset 0 0 0 2px hsl(var(--match-hue, 150) 58% 38% / 0.48);
+}
+
+.card--teach-target .card-face--front,
+.card--teach-dragging .card-face--front {
+  border-color: hsl(var(--match-hue, 150) 82% 48%);
+  box-shadow:
+    inset 0 0 0 2px hsl(var(--match-hue, 150) 82% 48% / 0.55),
+    0 0 0 5px hsl(var(--match-hue, 150) 92% 68% / 0.22);
+}
+
+.card--teach-ghost {
+  opacity: 0.24;
+}
+
+.card--teach-clone {
+  position: fixed;
+  z-index: 10000;
+  margin: 0;
+  pointer-events: none;
+  transform: rotateY(180deg);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
 }
 
 :root[data-theme="light"] .card.is-matched .card-face--front {
@@ -1380,7 +1422,7 @@ select:focus-visible {
 .game-mode-btn img {
   width: 7.25rem;
   height: 7.25rem;
-  border-radius: 0.85rem;
+  border-radius: 50%;
   object-fit: contain;
 }
 
@@ -1724,7 +1766,7 @@ select:focus-visible {
   flex: none;
   width: 1.75rem;
   height: 1.75rem;
-  border-radius: 0.4rem;
+  border-radius: 50%;
   object-fit: cover;
 }
 

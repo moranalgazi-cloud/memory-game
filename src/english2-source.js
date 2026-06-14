@@ -1,9 +1,10 @@
 /** @typedef {'he' | 'fr' | 'de' | 'es'} English2SourceLang */
 
-const STORAGE_KEY = "memory-english2-source-v1";
-
 /** @type {readonly English2SourceLang[]} */
 export const ENGLISH2_SOURCE_LANGS = ["he", "fr", "de", "es"];
+
+/** @type {import("./i18n.js").Locale} */
+let english2UiLocale = "en";
 
 /** @param {unknown} value */
 export function isEnglish2SourceLang(value) {
@@ -45,35 +46,15 @@ export function defaultEnglish2SourceForLocale(uiLocale) {
   return "he";
 }
 
+/** Keep English 2 source language aligned with UI locale (Settings is the only language control). */
+/** @param {import("./i18n.js").Locale} uiLocale */
+export function syncEnglish2SourceUiLocale(uiLocale) {
+  english2UiLocale = uiLocale;
+}
+
 /** @returns {English2SourceLang} */
 export function getEnglish2SourceLang() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (isEnglish2SourceLang(stored)) return stored;
-  } catch {
-    /* ignore */
-  }
-  return "he";
-}
-
-/** Set default source language from UI locale when the user has not chosen one yet. */
-export function initEnglish2SourceFromLocale(uiLocale) {
-  try {
-    if (localStorage.getItem(STORAGE_KEY)) return;
-  } catch {
-    /* ignore */
-  }
-  setEnglish2SourceLang(defaultEnglish2SourceForLocale(uiLocale));
-}
-
-/** @param {English2SourceLang} lang */
-export function setEnglish2SourceLang(lang) {
-  if (!isEnglish2SourceLang(lang)) return;
-  try {
-    localStorage.setItem(STORAGE_KEY, lang);
-  } catch {
-    /* ignore */
-  }
+  return defaultEnglish2SourceForLocale(english2UiLocale);
 }
 
 /** @param {English2SourceLang} lang @param {(key: string) => string} t */

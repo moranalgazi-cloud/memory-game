@@ -36,11 +36,9 @@ import {
 import { initLocale, setLocale, getLocale, t, setPageTitleForMode } from "./i18n.js";
 import {
   getEnglish2SourceLang,
-  setEnglish2SourceLang,
   english2SourceLangName,
   english2SourceIsRtl,
-  defaultEnglish2SourceForLocale,
-  initEnglish2SourceFromLocale,
+  syncEnglish2SourceUiLocale,
   isEnglish2ModeAvailable,
   english1LabelKey,
 } from "./english2-source.js";
@@ -51,10 +49,9 @@ import {
   hasAcceptedDisclaimer,
 } from "./disclaimer-ui.js";
 import { initAboutUi, refreshAboutLabels } from "./about-ui.js";
-import { initTutorialUi, openTutorialIfNeeded, refreshTutorialLabels } from "./tutorial-ui.js";
+import { initTutorialUi, openTutorial, openTutorialIfNeeded, refreshTutorialLabels } from "./tutorial-ui.js";
 import {
   initRoadmapUi,
-  openRoadmapDialog,
   refreshRoadmapLabels,
   refreshRoadmapProgressPill,
   showRoadmapReward,
@@ -171,9 +168,6 @@ const mathLevelSelect = document.querySelector("#mathLevel");
 const fractionLevelSelect = document.querySelector("#fractionLevel");
 const pairsField = document.querySelector("#pairsField");
 const englishLevelField = document.querySelector("#englishLevelField");
-const english2SourceField = document.querySelector("#english2SourceField");
-const english2SourceSelect = document.querySelector("#english2Source");
-const labelEnglish2Source = document.querySelector("#labelEnglish2Source");
 const sumsLevelField = document.querySelector("#sumsLevelField");
 const mathLevelField = document.querySelector("#mathLevelField");
 const fractionLevelField = document.querySelector("#fractionLevelField");
@@ -183,8 +177,6 @@ const labelFractionLevel = document.querySelector("#labelFractionLevel");
 const tableMaxSelect = document.querySelector("#tableMax");
 const tablesField = document.querySelector("#tablesField");
 const localeSelect = document.querySelector("#locale");
-const userDialogLocale = document.querySelector("#userDialogLocale");
-const labelUserDialogLanguage = document.querySelector("#labelUserDialogLanguage");
 const newUserAgeSelect = document.querySelector("#newUserAge");
 const agePromptDialog = document.querySelector("#agePromptDialog");
 const agePromptSelect = document.querySelector("#agePromptSelect");
@@ -192,6 +184,8 @@ const agePromptSave = document.querySelector("#agePromptSave");
 const agePromptError = document.querySelector("#agePromptError");
 const newGameBtn = document.querySelector("#newGame");
 const restartDeckBtn = document.querySelector("#restartDeck");
+const teachMeBtn = document.querySelector("#teachMe");
+const openTutorialBtn = document.querySelector("#openTutorial");
 const winNewGameBtn = document.querySelector("#winNewGame");
 const winRestartDeckBtn = document.querySelector("#winRestartDeck");
 const onlineQuitBtn = document.querySelector("#onlineQuit");
@@ -268,7 +262,7 @@ const settingsMenu = document.querySelector("#settingsMenu");
 /** @typedef {"easy" | "medium" | "hard"} MathLevel */
 /** @typedef {"easy" | "medium" | "hard"} FractionLevel */
 
-/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; freshDeck?: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string; online?: boolean; turn?: 'host' | 'guest'; hostScore?: number; guestScore?: number; winner?: 'host' | 'guest' | null } | null} */
+/** @type {{ mode: GameMode; cards: any[]; flipped: string[]; matched: Set<string>; matchPairByCardId: Map<string, number>; moves: number; lock: boolean; clockStart: number | null; winHandled: boolean; freshDeck?: boolean; teaching?: boolean; englishSpeech?: "both" | "text" | "none"; englishTopicId?: string; online?: boolean; turn?: 'host' | 'guest'; hostScore?: number; guestScore?: number; winner?: 'host' | 'guest' | null } | null} */
 let state = null;
 
 /** @type {string | null} */
@@ -301,6 +295,9 @@ let lastOnlineFlippedIds = [];
 
 /** @type {{ mode: GameMode; cards: unknown[] } | null} */
 let lastWinForQuiz = null;
+
+/** Incremented to cancel an in-flight teach animation when the board changes. */
+let teachRunId = 0;
 
 /**
  * @type {{
@@ -358,6 +355,7 @@ function renderEmptyBoard() {
   board.replaceChildren();
   board.classList.add("board--empty");
   board.classList.remove("board--waiting-turn");
+  board.classList.remove("board--teach");
   board.style.gridTemplateColumns = "";
 }
 
@@ -726,7 +724,6 @@ function refreshChrome() {
     for (const field of [
       pairsField,
       englishLevelField,
-      english2SourceField,
       sumsLevelField,
       mathLevelField,
       fractionLevelField,
@@ -776,7 +773,6 @@ function refreshChrome() {
       );
     }
     if (englishLevelField) englishLevelField.classList.toggle("is-hidden", !isEnglishMode(mode));
-    if (english2SourceField) english2SourceField.classList.toggle("is-hidden", mode !== "english2");
     if (sumsLevelField) sumsLevelField.classList.toggle("is-hidden", mode !== "sums");
     if (mathLevelField) mathLevelField.classList.toggle("is-hidden", mode !== "math");
     if (fractionLevelField) fractionLevelField.classList.toggle("is-hidden", mode !== "fractions");
@@ -796,6 +792,7 @@ function refreshChrome() {
   if (publicGoogleTitleEl) publicGoogleTitleEl.textContent = t("publicGoogleTitle");
   if (publicGooglePurposeEl) publicGooglePurposeEl.textContent = t("publicGooglePurpose");
   if (labelLanguage) labelLanguage.textContent = t("language");
+  if (openTutorialBtn) openTutorialBtn.textContent = t("tutorialMenu");
   updateThemeToggleLabel();
   refreshAuthUI();
   if (labelMoves) labelMoves.textContent = t("moves");
@@ -806,6 +803,7 @@ function refreshChrome() {
   for (const [btn, key] of [
     [newGameBtn, "ariaNewGame"],
     [restartDeckBtn, "ariaRestartDeck"],
+    [teachMeBtn, "ariaTeachMe"],
     [winNewGameBtn, "ariaNewGame"],
     [winRestartDeckBtn, "ariaRestartDeck"],
   ]) {
@@ -946,17 +944,6 @@ function refreshChrome() {
   if (labelSumsLevel) labelSumsLevel.textContent = t("sumsLevel");
   if (labelMathLevel) labelMathLevel.textContent = t("mathLevel");
   if (labelFractionLevel) labelFractionLevel.textContent = t("fractionLevel");
-  if (labelEnglish2Source) labelEnglish2Source.textContent = t("english2SourceLabel");
-  if (english2SourceSelect) {
-    english2SourceSelect.value = getEnglish2SourceLang();
-    english2SourceSelect.setAttribute("aria-label", t("ariaEnglish2Source"));
-    for (const opt of english2SourceSelect.querySelectorAll("option")) {
-      const v = opt.getAttribute("value");
-      if (v === "he" || v === "fr" || v === "de" || v === "es") {
-        opt.textContent = t(`langName_${v}`);
-      }
-    }
-  }
 
   if (tableMaxSelect) {
     tableMaxSelect.setAttribute(
@@ -973,11 +960,6 @@ function refreshChrome() {
   if (localeSelect) {
     localeSelect.setAttribute("aria-label", t("language"));
     localeSelect.value = getLocale();
-  }
-  if (labelUserDialogLanguage) labelUserDialogLanguage.textContent = t("language");
-  if (userDialogLocale) {
-    userDialogLocale.setAttribute("aria-label", t("language"));
-    userDialogLocale.value = getLocale();
   }
   if (board) board.setAttribute("aria-label", t("ariaBoard"));
 
@@ -1567,6 +1549,7 @@ function readOptions() {
 function maybeRecordAbandoned(source) {
   const prev = state;
   if (!booted || !prev || prev.matched.size >= prev.cards.length) return;
+  if (prev.teaching) return;
   const touched =
     prev.moves > 0 || prev.matched.size > 0 || prev.clockStart !== null;
   if (touched && source !== "init" && source !== "switch-user") {
@@ -1598,6 +1581,7 @@ function buildCardsFromDeckSource(src, rng) {
 }
 
 function restartSameDeck() {
+  teachRunId += 1;
   cancelEnglishSpeech();
   clearWinAutoRestart();
   clearQuizAdvance();
@@ -1656,6 +1640,7 @@ function restartSameDeck() {
  * @param {"init" | "restart" | "options" | "switch-user"} source
  */
 function startGame(source) {
+  teachRunId += 1;
   const pickedMode = getMode();
   if (!pickedMode) {
     showAwaitingGamePick();
@@ -1900,6 +1885,7 @@ function refreshAdminSpeedFinish() {
     cur &&
       isAdminUser(cur) &&
       state &&
+      !state.teaching &&
       !state.winHandled &&
       state.cards.length > 0 &&
       (!state.online || onlineHost),
@@ -1912,7 +1898,7 @@ function refreshDevWinGameBtn() {
   if (!devWinGameBtn) return;
   const show =
     isDevTesterSession() &&
-    Boolean(state && !state.winHandled && state.cards.length > 0 && !state.online);
+    Boolean(state && !state.teaching && !state.winHandled && state.cards.length > 0 && !state.online);
   devWinGameBtn.classList.toggle("is-hidden", !show);
 }
 
@@ -1930,7 +1916,7 @@ function devWinGame() {
 }
 
 function completeGameWin() {
-  if (!state || state.winHandled) return;
+  if (!state || state.winHandled || state.teaching) return;
   state.winHandled = true;
   celebrateWin();
   const elapsed =
@@ -1990,6 +1976,158 @@ function markAllCardsMatched() {
     }
     pairIdx += 1;
   }
+}
+
+/** @param {number} ms */
+function sleep(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/** @param {string} id */
+function getCardButton(id) {
+  if (!board) return null;
+  const btn = board.querySelector(`button[data-id="${CSS.escape(id)}"]`);
+  return btn instanceof HTMLButtonElement ? btn : null;
+}
+
+/** @returns {string[][]} */
+function getTeachPairs() {
+  if (!state) return [];
+  /** @type {Map<string, string[]>} */
+  const byKey = new Map();
+  for (const card of state.cards) {
+    const key =
+      typeof card.factKey === "string" && card.factKey.length
+        ? card.factKey
+        : card.id;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(card.id);
+  }
+  return [...byKey.values()].filter((ids) => ids.length >= 2);
+}
+
+/** @returns {any[]} */
+function getTeachPairOrderedCards() {
+  if (!state) return [];
+  const byId = new Map(state.cards.map((card) => [card.id, card]));
+  return getTeachPairs().flatMap((ids) =>
+    ids.map((id) => byId.get(id)).filter(Boolean),
+  );
+}
+
+/** @param {number} runId */
+async function animateTeachLayoutToPairRows(runId) {
+  if (!state || !board || runId !== teachRunId) return;
+  /** @type {Map<string, DOMRect>} */
+  const before = new Map();
+  for (const card of state.cards) {
+    const btn = getCardButton(card.id);
+    if (btn) before.set(card.id, btn.getBoundingClientRect());
+  }
+
+  const ordered = getTeachPairOrderedCards();
+  if (ordered.length !== state.cards.length) return;
+  state.cards = ordered;
+  renderBoard();
+
+  const animations = [];
+  for (const card of state.cards) {
+    const btn = getCardButton(card.id);
+    const from = before.get(card.id);
+    if (!btn || !from) continue;
+    const to = btn.getBoundingClientRect();
+    const dx = from.left - to.left;
+    const dy = from.top - to.top;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
+    animations.push(
+      btn.animate(
+        [
+          { transform: `translate(${dx}px, ${dy}px) rotateY(180deg)` },
+          { transform: "translate(0, 0) rotateY(180deg)" },
+        ],
+        { duration: 720, easing: "cubic-bezier(.2,.8,.2,1)" },
+      ).finished.catch(() => {}),
+    );
+  }
+
+  await Promise.all(animations);
+}
+
+/**
+ * Animates one card moving toward its pair before marking both as matched.
+ * @param {string[]} ids
+ * @param {number} pairIdx
+ * @param {number} runId
+ */
+async function animateTeachPair(ids, pairIdx, runId) {
+  if (!state || runId !== teachRunId) return;
+  const [firstId, secondId] = ids;
+  const first = getCardButton(firstId);
+  const second = getCardButton(secondId);
+  if (!first || !second) return;
+
+  const hue = MATCH_PAIR_HUES[pairIdx % MATCH_PAIR_HUES.length];
+  first.style.setProperty("--match-hue", String(hue));
+  second.style.setProperty("--match-hue", String(hue));
+  first.classList.add("card--teach-target");
+  second.classList.add("card--teach-dragging");
+  await sleep(420);
+  second.classList.remove("card--teach-dragging");
+  first.classList.remove("card--teach-target");
+
+  if (!state || runId !== teachRunId) return;
+  for (const id of ids) {
+    state.matched.add(id);
+    state.matchPairByCardId.set(id, pairIdx);
+    syncCardDom(id);
+  }
+  updateStats();
+  await sleep(170);
+}
+
+async function startTeachMe() {
+  if (state?.online) return;
+  if (!state) {
+    if (!getMode()) return;
+    startGame("restart");
+  }
+  if (!state || state.online) return;
+
+  const runId = ++teachRunId;
+  cancelEnglishSpeech();
+  hideWinActions();
+  lastWinForQuiz = null;
+  if (quizDialog?.open) quizDialog.close();
+  quizSession = null;
+
+  state.teaching = true;
+  state.winHandled = false;
+  state.clockStart = null;
+  state.moves = 0;
+  state.lock = true;
+  state.matched.clear();
+  state.matchPairByCardId.clear();
+  state.flipped = state.cards.map((card) => card.id);
+
+  renderBoard();
+  updateStats();
+  await sleep(520);
+
+  await animateTeachLayoutToPairRows(runId);
+  await sleep(220);
+
+  const pairs = getTeachPairs();
+  for (let i = 0; i < pairs.length; i += 1) {
+    await animateTeachPair(pairs[i], i, runId);
+  }
+
+  if (!state || runId !== teachRunId) return;
+  state.lock = false;
+  state.flipped = state.cards.map((card) => card.id);
+  renderBoard();
+  updateStats();
+  refreshAdminSpeedFinish();
+  refreshDevWinGameBtn();
 }
 
 function speedFinishGame() {
@@ -2067,7 +2205,7 @@ function updateStats() {
     onlineTurnBanner.classList.remove("online-turn-banner--yours", "online-turn-banner--theirs");
   }
 
-  if (matchedPairs === totalPairs && winActions) {
+  if (!state.teaching && matchedPairs === totalPairs && winActions) {
     completeGameWin();
   }
 }
@@ -2083,7 +2221,8 @@ function renderBoard() {
   }
   board.replaceChildren();
 
-  const cols = Math.ceil(Math.sqrt(state.cards.length));
+  board.classList.toggle("board--teach", Boolean(state.teaching));
+  const cols = state.teaching ? 2 : Math.ceil(Math.sqrt(state.cards.length));
   board.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
 
   for (const card of state.cards) {
@@ -2162,7 +2301,7 @@ function renderBoard() {
       } else {
         btn.style.removeProperty("--match-hue");
       }
-      btn.disabled = true;
+      btn.disabled = !state.teaching;
       const label =
         card.word ?? (card.label && card.label.trim() ? card.label : card.factKey);
       btn.setAttribute("aria-label", t("ariaMatched", { label }));
@@ -2188,7 +2327,12 @@ function renderBoard() {
  * @param {string} id
  */
 function onCardClick(id) {
-  if (!state || state.lock) return;
+  if (!state) return;
+  if (state.teaching) {
+    if (isEnglishMode(state.mode)) speakEnglishCardIfNeeded(id);
+    return;
+  }
+  if (state.lock) return;
   if (state.matched.has(id)) return;
   if (state.flipped.includes(id)) return;
 
@@ -2266,7 +2410,7 @@ function syncCardDom(id) {
     } else {
       btn.style.removeProperty("--match-hue");
     }
-    btn.disabled = true;
+    btn.disabled = !state.teaching;
     const label =
       card?.word ??
       (card?.label && String(card.label).trim()
@@ -2671,7 +2815,6 @@ async function confirmUserChoiceAsync() {
 
   grantStarterStickerIfNeeded(slug);
   refreshChrome();
-  openRoadmapDialog();
   clearGameModeSelection();
   showAwaitingGamePick();
 
@@ -2827,7 +2970,7 @@ async function openAdminOverview() {
 }
 
 initLocale();
-initEnglish2SourceFromLocale(getLocale());
+syncEnglish2SourceUiLocale(getLocale());
 applyAppBranding(t);
 applyModeIcons();
 applyNavIcons();
@@ -3012,6 +3155,7 @@ restartDeckBtn?.addEventListener("click", () => {
   if (lastDeckSource) restartSameDeck();
   else startGame("restart");
 });
+teachMeBtn?.addEventListener("click", () => void startTeachMe());
 winNewGameBtn?.addEventListener("click", () => {
   if (state?.online && state.winHandled) void playOnlineAgain();
   else if (getMode()) startGame("restart");
@@ -3281,7 +3425,7 @@ function applyGameLocaleFromSelect(source) {
 
     const wasEng2 = booted && getMode() === "english2";
     setLocale(v);
-    setEnglish2SourceLang(defaultEnglish2SourceForLocale(v));
+    syncEnglish2SourceUiLocale(v);
     if (v === "en" && wasEng2) {
       clearGameModeSelection();
       showAwaitingGamePick();
@@ -3294,24 +3438,17 @@ function applyGameLocaleFromSelect(source) {
   }
 }
 
-english2SourceSelect?.addEventListener("change", () => {
-  const v = english2SourceSelect.value;
-  if (v === "he" || v === "fr" || v === "de" || v === "es") {
-    setEnglish2SourceLang(v);
-    applyModeIcons();
-    refreshChrome();
-    if (booted && getMode() === "english2" && state) startGame("options");
-  }
-});
-
 localeSelect?.addEventListener("change", () => {
   applyGameLocaleFromSelect(localeSelect);
   closeSettingsMenu();
 });
-userDialogLocale?.addEventListener("change", () => applyGameLocaleFromSelect(userDialogLocale));
 
 themeToggleBtn?.addEventListener("click", () => {
   toggleTheme();
+});
+openTutorialBtn?.addEventListener("click", () => {
+  closeSettingsMenu();
+  openTutorial();
 });
 
 accountBadge?.addEventListener("click", (e) => {
