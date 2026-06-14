@@ -139,10 +139,27 @@ function speakNow(phrase, lang) {
     if (voice) u.voice = voice;
   }
   u.rate = lang === "he" ? 0.85 : 0.9;
+  const isMobile = isMobileSpeechBrowser();
+  let started = false;
+  u.onstart = () => {
+    started = true;
+  };
 
-  // iOS Safari: speak must run synchronously in the tap handler — no async queue.
-  if (synth.speaking) synth.cancel();
+  // iOS Safari: speak must run synchronously in the tap handler.
+  // On mobile browsers we avoid cancel() because some WebViews drop the next utterance.
+  if (!isMobile && synth.speaking) synth.cancel();
   synth.speak(u);
+
+  // Some installed mobile app shells silently drop the first utterance.
+  // Retry once with browser defaults if speech never started.
+  if (isMobile) {
+    window.setTimeout(() => {
+      if (started || synth.speaking || synth.pending) return;
+      const fallback = new SpeechSynthesisUtterance(phrase);
+      if (lang === "en") fallback.lang = "en-US";
+      synth.speak(fallback);
+    }, 180);
+  }
 }
 
 /**
