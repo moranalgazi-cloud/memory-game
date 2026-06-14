@@ -14,6 +14,8 @@
 let cachedVoices = [];
 
 let voicesPrimed = false;
+/** @type {HTMLAudioElement | null} */
+let fallbackTtsAudio = null;
 
 /**
  * @param {{ side?: string; lang?: string; word?: string; label?: string }} card
@@ -78,8 +80,10 @@ export function speakEnglishCard(card, gameMode, speechMode) {
 }
 
 export function cancelEnglishSpeech() {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  stopFallbackTtsAudio();
 }
 
 /** @param {SpeechLang} lang */
@@ -119,13 +123,57 @@ function isMobileSpeechBrowser() {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
 }
 
+/** @param {SpeechLang} lang */
+function fallbackLocale(lang) {
+  if (lang === "he") return "iw";
+  if (lang === "fr") return "fr";
+  if (lang === "de") return "de";
+  if (lang === "es") return "es";
+  return "en";
+}
+
+function stopFallbackTtsAudio() {
+  if (!fallbackTtsAudio) return;
+  try {
+    fallbackTtsAudio.pause();
+    fallbackTtsAudio.src = "";
+  } catch {
+    // Ignore cleanup failures from browser media stack.
+  }
+  fallbackTtsAudio = null;
+}
+
+/**
+ * Fallback for Android WebViews where speechSynthesis is missing or silent.
+ * @param {string} phrase
+ * @param {SpeechLang} lang
+ */
+function playFallbackTtsAudio(phrase, lang) {
+  if (typeof Audio === "undefined") return;
+  const text = String(phrase ?? "").trim();
+  if (!text) return;
+  const clipped = text.slice(0, 180);
+  const tl = fallbackLocale(lang);
+  const url =
+    "https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob" +
+    `&tl=${encodeURIComponent(tl)}&q=${encodeURIComponent(clipped)}`;
+  stopFallbackTtsAudio();
+  const audio = new Audio(url);
+  audio.preload = "auto";
+  fallbackTtsAudio = audio;
+  void audio.play().catch(() => {});
+}
+
 /**
  * @param {string} phrase
  * @param {SpeechLang} lang
  */
 function speakNow(phrase, lang) {
   const synth = window.speechSynthesis;
-  if (!synth) return;
+  if (!synth) {
+    playFallbackTtsAudio(phrase, lang);
+    return;
+  }
 
   if (synth.paused) synth.resume();
   if (cachedVoices.length === 0) refreshVoices();
@@ -155,9 +203,7 @@ function speakNow(phrase, lang) {
   if (isMobile) {
     window.setTimeout(() => {
       if (started || synth.speaking || synth.pending) return;
-      const fallback = new SpeechSynthesisUtterance(phrase);
-      if (lang === "en") fallback.lang = "en-US";
-      synth.speak(fallback);
+      playFallbackTtsAudio(phrase, lang);
     }, 180);
   }
 }
@@ -167,7 +213,7 @@ function speakNow(phrase, lang) {
  * @param {SpeechLang} [lang]
  */
 export function speakMemoryWord(text, lang = "en") {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  if (typeof window === "undefined") return;
   const phrase = String(text ?? "").trim();
   if (!phrase) return;
   try {
