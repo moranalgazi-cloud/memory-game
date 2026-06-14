@@ -114,6 +114,11 @@ function pickVoice(voices, lang) {
   );
 }
 
+function isMobileSpeechBrowser() {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+}
+
 /**
  * @param {string} phrase
  * @param {SpeechLang} lang
@@ -127,12 +132,16 @@ function speakNow(phrase, lang) {
 
   const u = new SpeechSynthesisUtterance(phrase);
   u.lang = speechLocale(lang);
-  const voice = pickVoice(cachedVoices, lang);
-  if (voice) u.voice = voice;
+  // Mobile browsers can go silent when a specific voice object is forced.
+  // Prefer locale-only speech there and let the browser choose the active voice.
+  if (!isMobileSpeechBrowser()) {
+    const voice = pickVoice(cachedVoices, lang);
+    if (voice) u.voice = voice;
+  }
   u.rate = lang === "he" ? 0.85 : 0.9;
 
   // iOS Safari: speak must run synchronously in the tap handler — no async queue.
-  if (synth.speaking || synth.pending) synth.cancel();
+  if (synth.speaking) synth.cancel();
   synth.speak(u);
 }
 
