@@ -16,6 +16,12 @@ export const ENGLISH_TOPICS = /** @type {EnglishTopic[]} */ (vocabulary.topics);
 /** @type {string[]} */
 export const ENGLISH_TOPIC_IDS = ENGLISH_TOPICS.map((t) => t.id);
 
+/** Topics excluded from English 1 random rotation (still available in English 2). */
+const ENGLISH1_EXCLUDED_TOPIC_IDS = new Set(["days"]);
+
+/** Entry keys excluded from English 1 (still available in English 2). */
+const ENGLISH1_EXCLUDED_ENTRY_KEYS = new Set(["aunt", "uncle", "cousin", "temple"]);
+
 /**
  * @param {string} topicId
  * @returns {EnglishTopic | undefined}
@@ -34,12 +40,25 @@ export function getEnglishPool(topicId) {
 }
 
 /**
+ * @param {EnglishDeckKind} [deckKind]
+ * @returns {string[]}
+ */
+export function getEnglishTopicIdsForDeck(deckKind = "english1") {
+  if (deckKind === "english1") {
+    return ENGLISH_TOPIC_IDS.filter((id) => !ENGLISH1_EXCLUDED_TOPIC_IDS.has(id));
+  }
+  return ENGLISH_TOPIC_IDS;
+}
+
+/**
  * @param {() => number} [rng]
+ * @param {EnglishDeckKind} [deckKind]
  * @returns {string}
  */
-export function pickEnglishTopicId(rng = Math.random) {
-  const i = Math.floor(rngUnit(rng) * ENGLISH_TOPIC_IDS.length);
-  return ENGLISH_TOPIC_IDS[i] ?? ENGLISH_TOPIC_IDS[0];
+export function pickEnglishTopicId(rng = Math.random, deckKind = "english1") {
+  const pool = getEnglishTopicIdsForDeck(deckKind);
+  const i = Math.floor(rngUnit(rng) * pool.length);
+  return pool[i] ?? pool[0];
 }
 
 /** @param {EnglishLexEntry} e @param {EnglishDeckLang} lang */
@@ -107,9 +126,10 @@ export function isValidBilingualEntry(e, sourceLang = getEnglish2SourceLang()) {
  * @returns {EnglishLexEntry[]}
  */
 export function pickEnglishEntries(pool, count, deckKind = "english1", rng = Math.random, sourceLang = getEnglish2SourceLang()) {
-  const bag = pool.filter((e) =>
-    deckKind === "english2" ? isValidBilingualEntry(e, sourceLang) : isValidEnglishEntry(e, "en"),
-  );
+  const bag = pool.filter((e) => {
+    if (deckKind === "english1" && ENGLISH1_EXCLUDED_ENTRY_KEYS.has(e.key)) return false;
+    return deckKind === "english2" ? isValidBilingualEntry(e, sourceLang) : isValidEnglishEntry(e, "en");
+  });
   const chosen = [];
   const n = Math.min(count, bag.length);
   while (chosen.length < n && bag.length) {

@@ -179,7 +179,7 @@ export function buildOnlineDeckFromSeed(config, seed) {
   }
 
   if (mode === "english1" || mode === "english2") {
-    const englishTopicId = config.englishTopicId ?? pickEnglishTopicId(rng);
+    const englishTopicId = config.englishTopicId ?? pickEnglishTopicId(rng, mode);
     const pool = getEnglishPool(englishTopicId);
     const maxPairs = pool.length;
     const count = Math.min(config.pairCount, maxPairs);

@@ -3,6 +3,7 @@ import {
   ENGLISH_TOPIC_IDS,
   ENGLISH_TOPICS,
   getEnglishPool,
+  getEnglishTopicIdsForDeck,
   pickEnglishTopicId,
   pickEnglishEntries,
   buildEnglishDeck,
@@ -90,6 +91,40 @@ describe("buildEnglishDeck", () => {
 });
 
 describe("pickEnglishEntries", () => {
+  it("excludes aunt, uncle, and cousin from english1 family picks", () => {
+    const pool = getEnglishPool("family");
+    const picked = pickEnglishEntries(pool, 20, "english1", seeded(42));
+    const keys = picked.map((e) => e.key);
+    expect(keys).not.toContain("aunt");
+    expect(keys).not.toContain("uncle");
+    expect(keys).not.toContain("cousin");
+    expect(keys).toContain("mom");
+  });
+
+  it("keeps aunt, uncle, and cousin available for english2", () => {
+    const pool = getEnglishPool("family");
+    const picked = pickEnglishEntries(pool, 20, "english2", seeded(42));
+    const keys = picked.map((e) => e.key);
+    expect(keys).toContain("aunt");
+    expect(keys).toContain("uncle");
+    expect(keys).toContain("cousin");
+  });
+
+  it("excludes temple from english1 places picks", () => {
+    const pool = getEnglishPool("places");
+    const picked = pickEnglishEntries(pool, 20, "english1", seeded(42));
+    const keys = picked.map((e) => e.key);
+    expect(keys).not.toContain("temple");
+    expect(keys).toContain("castle");
+  });
+
+  it("keeps temple available for english2", () => {
+    const pool = getEnglishPool("places");
+    const picked = pickEnglishEntries(pool, 20, "english2", seeded(42));
+    const keys = picked.map((e) => e.key);
+    expect(keys).toContain("temple");
+  });
+
   it("filters bilingual entries for english2", () => {
     const pool = getEnglishPool("colors");
     const picked = pickEnglishEntries(pool, 6, "english2", seeded(42));
@@ -99,9 +134,27 @@ describe("pickEnglishEntries", () => {
 });
 
 describe("pickEnglishTopicId", () => {
-  it("returns a known topic id", () => {
-    const id = pickEnglishTopicId(seeded(1));
-    expect(ENGLISH_TOPIC_IDS).toContain(id);
+  it("returns a known topic id for english1", () => {
+    const id = pickEnglishTopicId(seeded(1), "english1");
+    expect(getEnglishTopicIdsForDeck("english1")).toContain(id);
+  });
+
+  it("excludes days from english1", () => {
+    for (let seed = 0; seed < 200; seed += 1) {
+      const id = pickEnglishTopicId(seeded(seed), "english1");
+      expect(id).not.toBe("days");
+    }
+  });
+
+  it("can return days for english2", () => {
+    let sawDays = false;
+    for (let seed = 0; seed < 200; seed += 1) {
+      if (pickEnglishTopicId(seeded(seed), "english2") === "days") {
+        sawDays = true;
+        break;
+      }
+    }
+    expect(sawDays).toBe(true);
   });
 });
 

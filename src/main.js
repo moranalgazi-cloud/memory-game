@@ -1736,7 +1736,7 @@ function startGame(source) {
     } else if (isEnglishMode(mode)) {
       const { pairCount, englishLevel, englishSpeech: es } = readOptions();
       englishSpeech = es;
-      const topicId = pickEnglishTopicId(rng);
+      const topicId = pickEnglishTopicId(rng, mode);
       const pool = getEnglishPool(topicId);
       const maxPairs = pool.length;
       const count = Math.min(pairCount, maxPairs);
@@ -1814,7 +1814,7 @@ function startGame(source) {
   if (cards.length === 0) {
     console.warn("[app] Empty deck after build; applying mode-specific fallback.");
     if (isEnglishMode(mode) && ENGLISH_TOPIC_IDS.length > 0) {
-      const topicId = pickEnglishTopicId(rng);
+      const topicId = pickEnglishTopicId(rng, mode);
       const pool = getEnglishPool(topicId);
       const picked = pool.length ? pickEnglishEntries(pool, 1, mode, rng) : [];
       if (picked.length) {
@@ -2118,6 +2118,9 @@ function renderBoard() {
       }
     } else if (card.imageUrl && card.side === "picture") {
       front.classList.add("card-face--picture");
+      const bg = document.createElement("span");
+      bg.className = "card-picture-bg";
+      bg.style.backgroundImage = `url(${JSON.stringify(card.imageUrl)})`;
       const img = document.createElement("img");
       img.className = "card-picture";
       img.src = card.imageUrl;
@@ -2125,7 +2128,7 @@ function renderBoard() {
       img.decoding = "async";
       img.loading = "lazy";
       img.referrerPolicy = "no-referrer";
-      front.append(img);
+      front.append(bg, img);
     } else if (card.symbol && card.side === "picture") {
       front.classList.add("card-face--picture");
       const sym = document.createElement("span");

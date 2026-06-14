@@ -123,7 +123,8 @@
           "symbol": "🚗",
           "wordFr": "Voiture",
           "wordDe": "Auto",
-          "wordEs": "Coche"
+          "wordEs": "Coche",
+          "imageUrl": "/english/transport/car.png"
         },
         {
           "key": "bus",
@@ -132,7 +133,8 @@
           "symbol": "🚌",
           "wordFr": "Bus",
           "wordDe": "Bus",
-          "wordEs": "Autobús"
+          "wordEs": "Autobús",
+          "imageUrl": "/english/transport/bus.png"
         },
         {
           "key": "train",
@@ -141,7 +143,8 @@
           "symbol": "🚆",
           "wordFr": "Train",
           "wordDe": "Zug",
-          "wordEs": "Tren"
+          "wordEs": "Tren",
+          "imageUrl": "/english/transport/train.png"
         },
         {
           "key": "bike",
@@ -150,7 +153,8 @@
           "symbol": "🚲",
           "wordFr": "Vélo",
           "wordDe": "Fahrrad",
-          "wordEs": "Bicicleta"
+          "wordEs": "Bicicleta",
+          "imageUrl": "/english/transport/bike.png"
         },
         {
           "key": "plane",
@@ -159,7 +163,8 @@
           "symbol": "✈️",
           "wordFr": "Avion",
           "wordDe": "Flugzeug",
-          "wordEs": "Avión"
+          "wordEs": "Avión",
+          "imageUrl": "/english/transport/plane.png"
         },
         {
           "key": "boat",
@@ -168,7 +173,8 @@
           "symbol": "⛵",
           "wordFr": "Bateau",
           "wordDe": "Boot",
-          "wordEs": "Barco"
+          "wordEs": "Barco",
+          "imageUrl": "/english/transport/boat.png"
         },
         {
           "key": "truck",
@@ -177,7 +183,8 @@
           "symbol": "🚚",
           "wordFr": "Camion",
           "wordDe": "Lastwagen",
-          "wordEs": "Camión"
+          "wordEs": "Camión",
+          "imageUrl": "/english/transport/truck.png"
         },
         {
           "key": "taxi",
@@ -186,7 +193,8 @@
           "symbol": "🚕",
           "wordFr": "Taxi",
           "wordDe": "Taxi",
-          "wordEs": "Taxi"
+          "wordEs": "Taxi",
+          "imageUrl": "/english/transport/taxi.png"
         },
         {
           "key": "subway",
@@ -195,7 +203,8 @@
           "symbol": "🚇",
           "wordFr": "Métro",
           "wordDe": "U-Bahn",
-          "wordEs": "Metro"
+          "wordEs": "Metro",
+          "imageUrl": "/english/transport/subway.png"
         },
         {
           "key": "helicopter",
@@ -204,7 +213,8 @@
           "symbol": "🚁",
           "wordFr": "Hélicoptère",
           "wordDe": "Hubschrauber",
-          "wordEs": "Helicóptero"
+          "wordEs": "Helicóptero",
+          "imageUrl": "/english/transport/helicopter.png"
         },
         {
           "key": "scooter",
@@ -213,7 +223,8 @@
           "symbol": "🛴",
           "wordFr": "Trottinette",
           "wordDe": "Roller",
-          "wordEs": "Patinete"
+          "wordEs": "Patinete",
+          "imageUrl": "/english/transport/scooter.png"
         },
         {
           "key": "ship",
@@ -222,7 +233,8 @@
           "symbol": "🚢",
           "wordFr": "Navire",
           "wordDe": "Schiff",
-          "wordEs": "Barco"
+          "wordEs": "Barco",
+          "imageUrl": "/english/transport/ship.png"
         }
       ]
     },
@@ -236,7 +248,8 @@
           "symbol": "🐕",
           "wordFr": "Chien",
           "wordDe": "Hund",
-          "wordEs": "Perro"
+          "wordEs": "Perro",
+          "imageUrl": "/english/land-animals/dog.png"
         },
         {
           "key": "cat",
@@ -245,7 +258,8 @@
           "symbol": "🐈",
           "wordFr": "Chat",
           "wordDe": "Katze",
-          "wordEs": "Gato"
+          "wordEs": "Gato",
+          "imageUrl": "/english/land-animals/cat.png"
         },
         {
           "key": "lion",
@@ -254,7 +268,8 @@
           "symbol": "🦁",
           "wordFr": "Lion",
           "wordDe": "Löwe",
-          "wordEs": "León"
+          "wordEs": "León",
+          "imageUrl": "/english/land-animals/lion.png"
         },
         {
           "key": "tiger",
@@ -263,7 +278,8 @@
           "symbol": "🐯",
           "wordFr": "Tigre",
           "wordDe": "Tiger",
-          "wordEs": "Tigre"
+          "wordEs": "Tigre",
+          "imageUrl": "/english/land-animals/tiger.png"
         },
         {
           "key": "elephant",
@@ -272,7 +288,8 @@
           "symbol": "🐘",
           "wordFr": "Éléphant",
           "wordDe": "Elefant",
-          "wordEs": "Elefante"
+          "wordEs": "Elefante",
+          "imageUrl": "/english/land-animals/elephant.png"
         },
         {
           "key": "bear",
@@ -281,7 +298,8 @@
           "symbol": "🐻",
           "wordFr": "Ours",
           "wordDe": "Bär",
-          "wordEs": "Oso"
+          "wordEs": "Oso",
+          "imageUrl": "/english/land-animals/bear.png"
         },
         {
           "key": "rabbit",
@@ -290,7 +308,8 @@
           "symbol": "🐰",
           "wordFr": "Lapin",
           "wordDe": "Hase",
-          "wordEs": "Conejo"
+          "wordEs": "Conejo",
+          "imageUrl": "/english/land-animals/rabbit.png"
         },
         {
           "key": "horse",
@@ -299,7 +318,8 @@
           "symbol": "🐴",
           "wordFr": "Cheval",
           "wordDe": "Pferd",
-          "wordEs": "Caballo"
+          "wordEs": "Caballo",
+          "imageUrl": "/english/land-animals/horse.png"
         },
         {
           "key": "cow",
@@ -308,7 +328,8 @@
           "symbol": "🐄",
           "wordFr": "Vache",
           "wordDe": "Kuh",
-          "wordEs": "Vaca"
+          "wordEs": "Vaca",
+          "imageUrl": "/english/land-animals/cow.png"
         },
         {
           "key": "pig",
@@ -317,7 +338,8 @@
           "symbol": "🐷",
           "wordFr": "Cochon",
           "wordDe": "Schwein",
-          "wordEs": "Cerdo"
+          "wordEs": "Cerdo",
+          "imageUrl": "/english/land-animals/pig.png"
         },
         {
           "key": "sheep",
@@ -326,7 +348,8 @@
           "symbol": "🐑",
           "wordFr": "Mouton",
           "wordDe": "Schaf",
-          "wordEs": "Oveja"
+          "wordEs": "Oveja",
+          "imageUrl": "/english/land-animals/sheep.png"
         },
         {
           "key": "monkey",
@@ -335,7 +358,8 @@
           "symbol": "🐒",
           "wordFr": "Singe",
           "wordDe": "Affe",
-          "wordEs": "Mono"
+          "wordEs": "Mono",
+          "imageUrl": "/english/land-animals/monkey.png"
         }
       ]
     },
@@ -349,7 +373,8 @@
           "symbol": "🐟",
           "wordFr": "Poisson",
           "wordDe": "Fisch",
-          "wordEs": "Pez"
+          "wordEs": "Pez",
+          "imageUrl": "/english/sea-animals/fish.png"
         },
         {
           "key": "whale",
@@ -358,7 +383,8 @@
           "symbol": "🐋",
           "wordFr": "Baleine",
           "wordDe": "Wal",
-          "wordEs": "Ballena"
+          "wordEs": "Ballena",
+          "imageUrl": "/english/sea-animals/whale.png"
         },
         {
           "key": "dolphin",
@@ -367,7 +393,8 @@
           "symbol": "🐬",
           "wordFr": "Dauphin",
           "wordDe": "Delfin",
-          "wordEs": "Delfín"
+          "wordEs": "Delfín",
+          "imageUrl": "/english/sea-animals/dolphin.png"
         },
         {
           "key": "shark",
@@ -376,7 +403,8 @@
           "symbol": "🦈",
           "wordFr": "Requin",
           "wordDe": "Hai",
-          "wordEs": "Tiburón"
+          "wordEs": "Tiburón",
+          "imageUrl": "/english/sea-animals/shark.png"
         },
         {
           "key": "octopus",
@@ -385,7 +413,8 @@
           "symbol": "🐙",
           "wordFr": "Pieuvre",
           "wordDe": "Krake",
-          "wordEs": "Pulpo"
+          "wordEs": "Pulpo",
+          "imageUrl": "/english/sea-animals/octopus.png"
         },
         {
           "key": "crab",
@@ -394,7 +423,8 @@
           "symbol": "🦀",
           "wordFr": "Crabe",
           "wordDe": "Krabbe",
-          "wordEs": "Cangrejo"
+          "wordEs": "Cangrejo",
+          "imageUrl": "/english/sea-animals/crab.png"
         },
         {
           "key": "jellyfish",
@@ -403,7 +433,8 @@
           "symbol": "🪼",
           "wordFr": "Méduse",
           "wordDe": "Qualle",
-          "wordEs": "Medusa"
+          "wordEs": "Medusa",
+          "imageUrl": "/english/sea-animals/jellyfish.png"
         },
         {
           "key": "turtle",
@@ -412,7 +443,8 @@
           "symbol": "🐢",
           "wordFr": "Tortue",
           "wordDe": "Schildkröte",
-          "wordEs": "Tortuga"
+          "wordEs": "Tortuga",
+          "imageUrl": "/english/sea-animals/turtle.png"
         },
         {
           "key": "seal",
@@ -421,7 +453,8 @@
           "symbol": "🦭",
           "wordFr": "Phoque",
           "wordDe": "Robbe",
-          "wordEs": "Foca"
+          "wordEs": "Foca",
+          "imageUrl": "/english/sea-animals/seal.png"
         },
         {
           "key": "starfish",
@@ -430,7 +463,8 @@
           "symbol": "⭐",
           "wordFr": "Étoile de mer",
           "wordDe": "Seestern",
-          "wordEs": "Estrella de mar"
+          "wordEs": "Estrella de mar",
+          "imageUrl": "/english/sea-animals/starfish.png"
         },
         {
           "key": "lobster",
@@ -439,7 +473,8 @@
           "symbol": "🦞",
           "wordFr": "Homard",
           "wordDe": "Hummer",
-          "wordEs": "Langosta"
+          "wordEs": "Langosta",
+          "imageUrl": "/english/sea-animals/lobster.png"
         },
         {
           "key": "seahorse",
@@ -448,7 +483,8 @@
           "symbol": "🐡",
           "wordFr": "Hippocampe",
           "wordDe": "Seepferdchen",
-          "wordEs": "Caballito de mar"
+          "wordEs": "Caballito de mar",
+          "imageUrl": "/english/sea-animals/seahorse.png"
         }
       ]
     },
@@ -462,7 +498,8 @@
           "symbol": "🦅",
           "wordFr": "Aigle",
           "wordDe": "Adler",
-          "wordEs": "Águila"
+          "wordEs": "Águila",
+          "imageUrl": "/english/birds/eagle.png"
         },
         {
           "key": "owl",
@@ -471,7 +508,8 @@
           "symbol": "🦉",
           "wordFr": "Hibou",
           "wordDe": "Eule",
-          "wordEs": "Búho"
+          "wordEs": "Búho",
+          "imageUrl": "/english/birds/owl.png"
         },
         {
           "key": "parrot",
@@ -480,7 +518,8 @@
           "symbol": "🦜",
           "wordFr": "Perroquet",
           "wordDe": "Papagei",
-          "wordEs": "Loro"
+          "wordEs": "Loro",
+          "imageUrl": "/english/birds/parrot.png"
         },
         {
           "key": "duck",
@@ -489,7 +528,8 @@
           "symbol": "🦆",
           "wordFr": "Canard",
           "wordDe": "Ente",
-          "wordEs": "Pato"
+          "wordEs": "Pato",
+          "imageUrl": "/english/birds/duck.png"
         },
         {
           "key": "chicken",
@@ -498,7 +538,8 @@
           "symbol": "🐔",
           "wordFr": "Poule",
           "wordDe": "Huhn",
-          "wordEs": "Gallina"
+          "wordEs": "Gallina",
+          "imageUrl": "/english/birds/chicken.png"
         },
         {
           "key": "penguin",
@@ -507,7 +548,8 @@
           "symbol": "🐧",
           "wordFr": "Pingouin",
           "wordDe": "Pinguin",
-          "wordEs": "Pingüino"
+          "wordEs": "Pingüino",
+          "imageUrl": "/english/birds/penguin.png"
         },
         {
           "key": "flamingo",
@@ -516,7 +558,8 @@
           "symbol": "🦩",
           "wordFr": "Flamant",
           "wordDe": "Flamingo",
-          "wordEs": "Flamenco"
+          "wordEs": "Flamenco",
+          "imageUrl": "/english/birds/flamingo.png"
         },
         {
           "key": "sparrow",
@@ -525,7 +568,8 @@
           "symbol": "🐦",
           "wordFr": "Moineau",
           "wordDe": "Spatz",
-          "wordEs": "Gorrión"
+          "wordEs": "Gorrión",
+          "imageUrl": "/english/birds/sparrow.png"
         },
         {
           "key": "peacock",
@@ -534,7 +578,8 @@
           "symbol": "🦚",
           "wordFr": "Paon",
           "wordDe": "Pfau",
-          "wordEs": "Pavo real"
+          "wordEs": "Pavo real",
+          "imageUrl": "/english/birds/peacock.png"
         },
         {
           "key": "swan",
@@ -543,7 +588,8 @@
           "symbol": "🦢",
           "wordFr": "Cygne",
           "wordDe": "Schwan",
-          "wordEs": "Cisne"
+          "wordEs": "Cisne",
+          "imageUrl": "/english/birds/swan.png"
         },
         {
           "key": "crow",
@@ -552,7 +598,8 @@
           "symbol": "🐦‍⬛",
           "wordFr": "Corbeau",
           "wordDe": "Krähe",
-          "wordEs": "Cuervo"
+          "wordEs": "Cuervo",
+          "imageUrl": "/english/birds/crow.png"
         },
         {
           "key": "hummingbird",
@@ -561,7 +608,8 @@
           "symbol": "🐥",
           "wordFr": "Colibri",
           "wordDe": "Kolibri",
-          "wordEs": "Colibrí"
+          "wordEs": "Colibrí",
+          "imageUrl": "/english/birds/hummingbird.png"
         }
       ]
     },
@@ -575,7 +623,8 @@
           "symbol": "📚",
           "wordFr": "Livre",
           "wordDe": "Buch",
-          "wordEs": "Libro"
+          "wordEs": "Libro",
+          "imageUrl": "/english/school/book.png"
         },
         {
           "key": "pencil",
@@ -584,7 +633,8 @@
           "symbol": "✏️",
           "wordFr": "Crayon",
           "wordDe": "Bleistift",
-          "wordEs": "Lápiz"
+          "wordEs": "Lápiz",
+          "imageUrl": "/english/school/pencil.png"
         },
         {
           "key": "eraser",
@@ -593,7 +643,8 @@
           "symbol": "🧽",
           "wordFr": "Gomme",
           "wordDe": "Radiergummi",
-          "wordEs": "Goma"
+          "wordEs": "Goma",
+          "imageUrl": "/english/school/eraser.png"
         },
         {
           "key": "ruler",
@@ -602,7 +653,8 @@
           "symbol": "📏",
           "wordFr": "Règle",
           "wordDe": "Lineal",
-          "wordEs": "Regla"
+          "wordEs": "Regla",
+          "imageUrl": "/english/school/ruler.png"
         },
         {
           "key": "desk",
@@ -611,7 +663,8 @@
           "symbol": "🪑",
           "wordFr": "Bureau",
           "wordDe": "Schreibtisch",
-          "wordEs": "Escritorio"
+          "wordEs": "Escritorio",
+          "imageUrl": "/english/school/desk.png"
         },
         {
           "key": "chair",
@@ -620,7 +673,8 @@
           "symbol": "💺",
           "wordFr": "Chaise",
           "wordDe": "Stuhl",
-          "wordEs": "Silla"
+          "wordEs": "Silla",
+          "imageUrl": "/english/school/chair.png"
         },
         {
           "key": "backpack",
@@ -629,7 +683,8 @@
           "symbol": "🎒",
           "wordFr": "Sac à dos",
           "wordDe": "Rucksack",
-          "wordEs": "Mochila"
+          "wordEs": "Mochila",
+          "imageUrl": "/english/school/backpack.png"
         },
         {
           "key": "teacher",
@@ -638,7 +693,8 @@
           "symbol": "👩‍🏫",
           "wordFr": "Professeur",
           "wordDe": "Lehrer",
-          "wordEs": "Profesor"
+          "wordEs": "Profesor",
+          "imageUrl": "/english/school/teacher.png"
         },
         {
           "key": "student",
@@ -647,7 +703,8 @@
           "symbol": "🧑‍🎓",
           "wordFr": "Élève",
           "wordDe": "Schüler",
-          "wordEs": "Alumno"
+          "wordEs": "Alumno",
+          "imageUrl": "/english/school/student.png"
         },
         {
           "key": "bell",
@@ -656,7 +713,8 @@
           "symbol": "🔔",
           "wordFr": "Cloche",
           "wordDe": "Glocke",
-          "wordEs": "Campana"
+          "wordEs": "Campana",
+          "imageUrl": "/english/school/bell.png"
         },
         {
           "key": "crayon",
@@ -665,7 +723,8 @@
           "symbol": "🖍️",
           "wordFr": "Crayon de couleur",
           "wordDe": "Buntstift",
-          "wordEs": "Crayón de color"
+          "wordEs": "Crayón de color",
+          "imageUrl": "/english/school/crayon.png"
         },
         {
           "key": "notebook",
@@ -674,7 +733,8 @@
           "symbol": "📓",
           "wordFr": "Cahier",
           "wordDe": "Heft",
-          "wordEs": "Cuaderno"
+          "wordEs": "Cuaderno",
+          "imageUrl": "/english/school/notebook.png"
         }
       ]
     },
@@ -688,7 +748,8 @@
           "symbol": "🛣️",
           "wordFr": "Route",
           "wordDe": "Straße",
-          "wordEs": "Carretera"
+          "wordEs": "Carretera",
+          "imageUrl": "/english/street/road.png"
         },
         {
           "key": "light",
@@ -697,7 +758,8 @@
           "symbol": "🚦",
           "wordFr": "Feu",
           "wordDe": "Ampel",
-          "wordEs": "Semáforo"
+          "wordEs": "Semáforo",
+          "imageUrl": "/english/street/light.png"
         },
         {
           "key": "sign",
@@ -706,7 +768,8 @@
           "symbol": "🪧",
           "wordFr": "Panneau",
           "wordDe": "Schild",
-          "wordEs": "Señal"
+          "wordEs": "Señal",
+          "imageUrl": "/english/street/sign.png"
         },
         {
           "key": "sidewalk",
@@ -715,7 +778,8 @@
           "symbol": "🚶",
           "wordFr": "Trottoir",
           "wordDe": "Gehweg",
-          "wordEs": "Acera"
+          "wordEs": "Acera",
+          "imageUrl": "/english/street/sidewalk.png"
         },
         {
           "key": "bridge",
@@ -724,7 +788,8 @@
           "symbol": "🌉",
           "wordFr": "Pont",
           "wordDe": "Brücke",
-          "wordEs": "Puente"
+          "wordEs": "Puente",
+          "imageUrl": "/english/street/bridge.png"
         },
         {
           "key": "park",
@@ -733,7 +798,8 @@
           "symbol": "🌳",
           "wordFr": "Parc",
           "wordDe": "Park",
-          "wordEs": "Parque"
+          "wordEs": "Parque",
+          "imageUrl": "/english/street/park.png"
         },
         {
           "key": "bench",
@@ -742,7 +808,8 @@
           "symbol": "🪑",
           "wordFr": "Banc",
           "wordDe": "Bank",
-          "wordEs": "Banco"
+          "wordEs": "Banco",
+          "imageUrl": "/english/street/bench.png"
         },
         {
           "key": "mailbox",
@@ -751,7 +818,8 @@
           "symbol": "📮",
           "wordFr": "Boîte aux lettres",
           "wordDe": "Briefkasten",
-          "wordEs": "Buzón"
+          "wordEs": "Buzón",
+          "imageUrl": "/english/street/mailbox.png"
         },
         {
           "key": "trash",
@@ -760,7 +828,8 @@
           "symbol": "🗑️",
           "wordFr": "Poubelle",
           "wordDe": "Mülleimer",
-          "wordEs": "Basura"
+          "wordEs": "Basura",
+          "imageUrl": "/english/street/trash.png"
         },
         {
           "key": "crosswalk",
@@ -769,7 +838,8 @@
           "symbol": "🚸",
           "wordFr": "Passage piéton",
           "wordDe": "Zebrastreifen",
-          "wordEs": "Paso de cebra"
+          "wordEs": "Paso de cebra",
+          "imageUrl": "/english/street/crosswalk.png"
         },
         {
           "key": "fountain",
@@ -778,7 +848,8 @@
           "symbol": "⛲",
           "wordFr": "Fontaine",
           "wordDe": "Brunnen",
-          "wordEs": "Fuente"
+          "wordEs": "Fuente",
+          "imageUrl": "/english/street/fountain.png"
         },
         {
           "key": "statue",
@@ -787,7 +858,8 @@
           "symbol": "🗿",
           "wordFr": "Statue",
           "wordDe": "Statue",
-          "wordEs": "Estatua"
+          "wordEs": "Estatua",
+          "imageUrl": "/english/street/statue.png"
         }
       ]
     },
@@ -801,7 +873,8 @@
           "symbol": "🔴",
           "wordFr": "Rouge",
           "wordDe": "Rot",
-          "wordEs": "Rojo"
+          "wordEs": "Rojo",
+          "imageUrl": "/english/colors/red.png"
         },
         {
           "key": "blue",
@@ -810,7 +883,8 @@
           "symbol": "🔵",
           "wordFr": "Bleu",
           "wordDe": "Blau",
-          "wordEs": "Azul"
+          "wordEs": "Azul",
+          "imageUrl": "/english/colors/blue.png"
         },
         {
           "key": "green",
@@ -819,7 +893,8 @@
           "symbol": "🟢",
           "wordFr": "Vert",
           "wordDe": "Grün",
-          "wordEs": "Verde"
+          "wordEs": "Verde",
+          "imageUrl": "/english/colors/green.png"
         },
         {
           "key": "yellow",
@@ -828,7 +903,8 @@
           "symbol": "🟡",
           "wordFr": "Jaune",
           "wordDe": "Gelb",
-          "wordEs": "Amarillo"
+          "wordEs": "Amarillo",
+          "imageUrl": "/english/colors/yellow.png"
         },
         {
           "key": "orange",
@@ -837,7 +913,8 @@
           "symbol": "🟠",
           "wordFr": "Orange",
           "wordDe": "Orange",
-          "wordEs": "Naranja"
+          "wordEs": "Naranja",
+          "imageUrl": "/english/colors/orange.png"
         },
         {
           "key": "purple",
@@ -846,7 +923,8 @@
           "symbol": "🟣",
           "wordFr": "Violet",
           "wordDe": "Lila",
-          "wordEs": "Morado"
+          "wordEs": "Morado",
+          "imageUrl": "/english/colors/purple.png"
         },
         {
           "key": "pink",
@@ -855,7 +933,8 @@
           "symbol": "🩷",
           "wordFr": "Rose",
           "wordDe": "Rosa",
-          "wordEs": "Rosa"
+          "wordEs": "Rosa",
+          "imageUrl": "/english/colors/pink.png"
         },
         {
           "key": "brown",
@@ -864,7 +943,8 @@
           "symbol": "🟤",
           "wordFr": "Marron",
           "wordDe": "Braun",
-          "wordEs": "Marrón"
+          "wordEs": "Marrón",
+          "imageUrl": "/english/colors/brown.png"
         },
         {
           "key": "black",
@@ -873,7 +953,8 @@
           "symbol": "⚫",
           "wordFr": "Noir",
           "wordDe": "Schwarz",
-          "wordEs": "Negro"
+          "wordEs": "Negro",
+          "imageUrl": "/english/colors/black.png"
         },
         {
           "key": "white",
@@ -882,7 +963,8 @@
           "symbol": "⚪",
           "wordFr": "Blanc",
           "wordDe": "Weiß",
-          "wordEs": "Blanco"
+          "wordEs": "Blanco",
+          "imageUrl": "/english/colors/white.png"
         },
         {
           "key": "gray",
@@ -891,7 +973,8 @@
           "symbol": "⬜",
           "wordFr": "Gris",
           "wordDe": "Grau",
-          "wordEs": "Gris"
+          "wordEs": "Gris",
+          "imageUrl": "/english/colors/gray.png"
         },
         {
           "key": "gold",
@@ -900,7 +983,8 @@
           "symbol": "✨",
           "wordFr": "Or",
           "wordDe": "Gold",
-          "wordEs": "Dorado"
+          "wordEs": "Dorado",
+          "imageUrl": "/english/colors/gold.png"
         }
       ]
     },
@@ -914,7 +998,8 @@
           "symbol": "🍎",
           "wordFr": "Pomme",
           "wordDe": "Apfel",
-          "wordEs": "Manzana"
+          "wordEs": "Manzana",
+          "imageUrl": "/english/fruit/apple.png"
         },
         {
           "key": "banana",
@@ -923,7 +1008,8 @@
           "symbol": "🍌",
           "wordFr": "Banane",
           "wordDe": "Banane",
-          "wordEs": "Plátano"
+          "wordEs": "Plátano",
+          "imageUrl": "/english/fruit/banana.png"
         },
         {
           "key": "orange",
@@ -932,7 +1018,8 @@
           "symbol": "🍊",
           "wordFr": "Orange",
           "wordDe": "Orange",
-          "wordEs": "Naranja"
+          "wordEs": "Naranja",
+          "imageUrl": "/english/fruit/orange.png"
         },
         {
           "key": "grape",
@@ -941,7 +1028,8 @@
           "symbol": "🍇",
           "wordFr": "Raisin",
           "wordDe": "Traube",
-          "wordEs": "Uva"
+          "wordEs": "Uva",
+          "imageUrl": "/english/fruit/grape.png"
         },
         {
           "key": "strawberry",
@@ -950,7 +1038,8 @@
           "symbol": "🍓",
           "wordFr": "Fraise",
           "wordDe": "Erdbeere",
-          "wordEs": "Fresa"
+          "wordEs": "Fresa",
+          "imageUrl": "/english/fruit/strawberry.png"
         },
         {
           "key": "watermelon",
@@ -959,7 +1048,8 @@
           "symbol": "🍉",
           "wordFr": "Pastèque",
           "wordDe": "Wassermelone",
-          "wordEs": "Sandía"
+          "wordEs": "Sandía",
+          "imageUrl": "/english/fruit/watermelon.png"
         },
         {
           "key": "peach",
@@ -968,7 +1058,8 @@
           "symbol": "🍑",
           "wordFr": "Pêche",
           "wordDe": "Pfirsich",
-          "wordEs": "Melocotón"
+          "wordEs": "Melocotón",
+          "imageUrl": "/english/fruit/peach.png"
         },
         {
           "key": "pear",
@@ -977,7 +1068,8 @@
           "symbol": "🍐",
           "wordFr": "Poire",
           "wordDe": "Birne",
-          "wordEs": "Pera"
+          "wordEs": "Pera",
+          "imageUrl": "/english/fruit/pear.png"
         },
         {
           "key": "lemon",
@@ -986,7 +1078,8 @@
           "symbol": "🍋",
           "wordFr": "Citron",
           "wordDe": "Zitrone",
-          "wordEs": "Limón"
+          "wordEs": "Limón",
+          "imageUrl": "/english/fruit/lemon.png"
         },
         {
           "key": "cherry",
@@ -995,7 +1088,8 @@
           "symbol": "🍒",
           "wordFr": "Cerise",
           "wordDe": "Kirsche",
-          "wordEs": "Cereza"
+          "wordEs": "Cereza",
+          "imageUrl": "/english/fruit/cherry.png"
         },
         {
           "key": "pineapple",
@@ -1004,7 +1098,8 @@
           "symbol": "🍍",
           "wordFr": "Ananas",
           "wordDe": "Ananas",
-          "wordEs": "Piña"
+          "wordEs": "Piña",
+          "imageUrl": "/english/fruit/pineapple.png"
         },
         {
           "key": "mango",
@@ -1013,7 +1108,8 @@
           "symbol": "🥭",
           "wordFr": "Mangue",
           "wordDe": "Mango",
-          "wordEs": "Mango"
+          "wordEs": "Mango",
+          "imageUrl": "/english/fruit/mango.png"
         }
       ]
     },
@@ -1025,7 +1121,7 @@
           "word": "Mom",
           "wordHe": "אמא",
           "symbol": "👩",
-          "imageUrl": "/english/family/mom.svg",
+          "imageUrl": "/english/family/mom.png",
           "wordFr": "Maman",
           "wordDe": "Mama",
           "wordEs": "Mamá"
@@ -1035,7 +1131,7 @@
           "word": "Dad",
           "wordHe": "אבא",
           "symbol": "👨",
-          "imageUrl": "/english/family/dad.svg",
+          "imageUrl": "/english/family/dad.png",
           "wordFr": "Papa",
           "wordDe": "Papa",
           "wordEs": "Papá"
@@ -1045,7 +1141,7 @@
           "word": "Sister",
           "wordHe": "אחות",
           "symbol": "👧",
-          "imageUrl": "/english/family/sister.svg",
+          "imageUrl": "/english/family/sister.png",
           "wordFr": "Sœur",
           "wordDe": "Schwester",
           "wordEs": "Hermana"
@@ -1055,7 +1151,7 @@
           "word": "Brother",
           "wordHe": "אח",
           "symbol": "👦",
-          "imageUrl": "/english/family/brother.svg",
+          "imageUrl": "/english/family/brother.png",
           "wordFr": "Frère",
           "wordDe": "Bruder",
           "wordEs": "Hermano"
@@ -1065,7 +1161,7 @@
           "word": "Baby",
           "wordHe": "תינוק",
           "symbol": "👶",
-          "imageUrl": "/english/family/baby.svg",
+          "imageUrl": "/english/family/baby.png",
           "wordFr": "Bébé",
           "wordDe": "Baby",
           "wordEs": "Bebé"
@@ -1075,7 +1171,7 @@
           "word": "Grandma",
           "wordHe": "סבתא",
           "symbol": "👵",
-          "imageUrl": "/english/family/grandma.svg",
+          "imageUrl": "/english/family/grandma.png",
           "wordFr": "Mamie",
           "wordDe": "Oma",
           "wordEs": "Abuela"
@@ -1085,7 +1181,7 @@
           "word": "Grandpa",
           "wordHe": "סבא",
           "symbol": "👴",
-          "imageUrl": "/english/family/grandpa.svg",
+          "imageUrl": "/english/family/grandpa.png",
           "wordFr": "Papi",
           "wordDe": "Opa",
           "wordEs": "Abuelo"
@@ -1125,7 +1221,7 @@
           "word": "Parents",
           "wordHe": "הורים",
           "symbol": "👨‍👩‍👧",
-          "imageUrl": "/english/family/parents.svg",
+          "imageUrl": "/english/family/parents.png",
           "wordFr": "Parents",
           "wordDe": "Eltern",
           "wordEs": "Padres"
@@ -1135,7 +1231,7 @@
           "word": "Family",
           "wordHe": "משפחה",
           "symbol": "👪",
-          "imageUrl": "/english/family/family.svg",
+          "imageUrl": "/english/family/family.png",
           "wordFr": "Famille",
           "wordDe": "Familie",
           "wordEs": "Familia"
@@ -1152,7 +1248,8 @@
           "symbol": "👤",
           "wordFr": "Tête",
           "wordDe": "Kopf",
-          "wordEs": "Cabeza"
+          "wordEs": "Cabeza",
+          "imageUrl": "/english/body/head.png"
         },
         {
           "key": "hand",
@@ -1161,7 +1258,8 @@
           "symbol": "✋",
           "wordFr": "Main",
           "wordDe": "Hand",
-          "wordEs": "Mano"
+          "wordEs": "Mano",
+          "imageUrl": "/english/body/hand.png"
         },
         {
           "key": "foot",
@@ -1170,7 +1268,8 @@
           "symbol": "🦶",
           "wordFr": "Pied",
           "wordDe": "Fuß",
-          "wordEs": "Pie"
+          "wordEs": "Pie",
+          "imageUrl": "/english/body/foot.png"
         },
         {
           "key": "eye",
@@ -1179,7 +1278,8 @@
           "symbol": "👁️",
           "wordFr": "Œil",
           "wordDe": "Auge",
-          "wordEs": "Ojo"
+          "wordEs": "Ojo",
+          "imageUrl": "/english/body/eye.png"
         },
         {
           "key": "ear",
@@ -1188,7 +1288,8 @@
           "symbol": "👂",
           "wordFr": "Oreille",
           "wordDe": "Ohr",
-          "wordEs": "Oreja"
+          "wordEs": "Oreja",
+          "imageUrl": "/english/body/ear.png"
         },
         {
           "key": "nose",
@@ -1197,7 +1298,8 @@
           "symbol": "👃",
           "wordFr": "Nez",
           "wordDe": "Nase",
-          "wordEs": "Nariz"
+          "wordEs": "Nariz",
+          "imageUrl": "/english/body/nose.png"
         },
         {
           "key": "mouth",
@@ -1206,7 +1308,8 @@
           "symbol": "👄",
           "wordFr": "Bouche",
           "wordDe": "Mund",
-          "wordEs": "Boca"
+          "wordEs": "Boca",
+          "imageUrl": "/english/body/mouth.png"
         },
         {
           "key": "teeth",
@@ -1215,7 +1318,8 @@
           "symbol": "🦷",
           "wordFr": "Dents",
           "wordDe": "Zähne",
-          "wordEs": "Dientes"
+          "wordEs": "Dientes",
+          "imageUrl": "/english/body/teeth.png"
         },
         {
           "key": "hair",
@@ -1224,7 +1328,8 @@
           "symbol": "💇",
           "wordFr": "Cheveux",
           "wordDe": "Haare",
-          "wordEs": "Pelo"
+          "wordEs": "Pelo",
+          "imageUrl": "/english/body/hair.png"
         },
         {
           "key": "arm",
@@ -1233,7 +1338,8 @@
           "symbol": "💪",
           "wordFr": "Bras",
           "wordDe": "Arm",
-          "wordEs": "Brazo"
+          "wordEs": "Brazo",
+          "imageUrl": "/english/body/arm.png"
         },
         {
           "key": "leg",
@@ -1242,7 +1348,8 @@
           "symbol": "🦵",
           "wordFr": "Jambe",
           "wordDe": "Bein",
-          "wordEs": "Pierna"
+          "wordEs": "Pierna",
+          "imageUrl": "/english/body/leg.png"
         },
         {
           "key": "heart",
@@ -1251,7 +1358,8 @@
           "symbol": "❤️",
           "wordFr": "Cœur",
           "wordDe": "Herz",
-          "wordEs": "Corazón"
+          "wordEs": "Corazón",
+          "imageUrl": "/english/body/heart.png"
         }
       ]
     },
@@ -1265,7 +1373,8 @@
           "symbol": "☀️",
           "wordFr": "Soleil",
           "wordDe": "Sonne",
-          "wordEs": "Sol"
+          "wordEs": "Sol",
+          "imageUrl": "/english/weather/sun.png"
         },
         {
           "key": "rain",
@@ -1274,7 +1383,8 @@
           "symbol": "🌧️",
           "wordFr": "Pluie",
           "wordDe": "Regen",
-          "wordEs": "Lluvia"
+          "wordEs": "Lluvia",
+          "imageUrl": "/english/weather/rain.png"
         },
         {
           "key": "cloud",
@@ -1283,7 +1393,8 @@
           "symbol": "☁️",
           "wordFr": "Nuage",
           "wordDe": "Wolke",
-          "wordEs": "Nube"
+          "wordEs": "Nube",
+          "imageUrl": "/english/weather/cloud.png"
         },
         {
           "key": "snow",
@@ -1292,7 +1403,8 @@
           "symbol": "❄️",
           "wordFr": "Neige",
           "wordDe": "Schnee",
-          "wordEs": "Nieve"
+          "wordEs": "Nieve",
+          "imageUrl": "/english/weather/snow.png"
         },
         {
           "key": "wind",
@@ -1301,7 +1413,8 @@
           "symbol": "💨",
           "wordFr": "Vent",
           "wordDe": "Wind",
-          "wordEs": "Viento"
+          "wordEs": "Viento",
+          "imageUrl": "/english/weather/wind.png"
         },
         {
           "key": "storm",
@@ -1310,7 +1423,8 @@
           "symbol": "⛈️",
           "wordFr": "Orage",
           "wordDe": "Sturm",
-          "wordEs": "Tormenta"
+          "wordEs": "Tormenta",
+          "imageUrl": "/english/weather/storm.png"
         },
         {
           "key": "rainbow",
@@ -1319,7 +1433,8 @@
           "symbol": "🌈",
           "wordFr": "Arc-en-ciel",
           "wordDe": "Regenbogen",
-          "wordEs": "Arcoíris"
+          "wordEs": "Arcoíris",
+          "imageUrl": "/english/weather/rainbow.png"
         },
         {
           "key": "hot",
@@ -1328,7 +1443,8 @@
           "symbol": "🥵",
           "wordFr": "Chaud",
           "wordDe": "Heiß",
-          "wordEs": "Caliente"
+          "wordEs": "Caliente",
+          "imageUrl": "/english/weather/hot.png"
         },
         {
           "key": "cold",
@@ -1337,7 +1453,8 @@
           "symbol": "🥶",
           "wordFr": "Froid",
           "wordDe": "Kalt",
-          "wordEs": "Frío"
+          "wordEs": "Frío",
+          "imageUrl": "/english/weather/cold.png"
         },
         {
           "key": "fog",
@@ -1346,7 +1463,8 @@
           "symbol": "🌫️",
           "wordFr": "Brouillard",
           "wordDe": "Nebel",
-          "wordEs": "Niebla"
+          "wordEs": "Niebla",
+          "imageUrl": "/english/weather/fog.png"
         },
         {
           "key": "lightning",
@@ -1355,7 +1473,8 @@
           "symbol": "⚡",
           "wordFr": "Éclair",
           "wordDe": "Blitz",
-          "wordEs": "Rayo"
+          "wordEs": "Rayo",
+          "imageUrl": "/english/weather/lightning.png"
         },
         {
           "key": "umbrella",
@@ -1364,7 +1483,8 @@
           "symbol": "☂️",
           "wordFr": "Parapluie",
           "wordDe": "Regenschirm",
-          "wordEs": "Paraguas"
+          "wordEs": "Paraguas",
+          "imageUrl": "/english/weather/umbrella.png"
         }
       ]
     },
@@ -1378,7 +1498,8 @@
           "symbol": "👕",
           "wordFr": "T-shirt",
           "wordDe": "Hemd",
-          "wordEs": "Camiseta"
+          "wordEs": "Camiseta",
+          "imageUrl": "/english/clothes/shirt.png"
         },
         {
           "key": "pants",
@@ -1387,7 +1508,8 @@
           "symbol": "👖",
           "wordFr": "Pantalon",
           "wordDe": "Hose",
-          "wordEs": "Pantalones"
+          "wordEs": "Pantalones",
+          "imageUrl": "/english/clothes/pants.png"
         },
         {
           "key": "shoes",
@@ -1396,7 +1518,8 @@
           "symbol": "👟",
           "wordFr": "Chaussures",
           "wordDe": "Schuhe",
-          "wordEs": "Zapatos"
+          "wordEs": "Zapatos",
+          "imageUrl": "/english/clothes/shoes.png"
         },
         {
           "key": "socks",
@@ -1405,7 +1528,8 @@
           "symbol": "🧦",
           "wordFr": "Chaussettes",
           "wordDe": "Socken",
-          "wordEs": "Calcetines"
+          "wordEs": "Calcetines",
+          "imageUrl": "/english/clothes/socks.png"
         },
         {
           "key": "hat",
@@ -1414,7 +1538,8 @@
           "symbol": "🧢",
           "wordFr": "Chapeau",
           "wordDe": "Hut",
-          "wordEs": "Sombrero"
+          "wordEs": "Sombrero",
+          "imageUrl": "/english/clothes/hat.png"
         },
         {
           "key": "coat",
@@ -1423,7 +1548,8 @@
           "symbol": "🧥",
           "wordFr": "Manteau",
           "wordDe": "Mantel",
-          "wordEs": "Abrigo"
+          "wordEs": "Abrigo",
+          "imageUrl": "/english/clothes/coat.png"
         },
         {
           "key": "dress",
@@ -1432,7 +1558,8 @@
           "symbol": "👗",
           "wordFr": "Robe",
           "wordDe": "Kleid",
-          "wordEs": "Vestido"
+          "wordEs": "Vestido",
+          "imageUrl": "/english/clothes/dress.png"
         },
         {
           "key": "skirt",
@@ -1441,7 +1568,8 @@
           "symbol": "👚",
           "wordFr": "Jupe",
           "wordDe": "Rock",
-          "wordEs": "Falda"
+          "wordEs": "Falda",
+          "imageUrl": "/english/clothes/skirt.png"
         },
         {
           "key": "gloves",
@@ -1450,7 +1578,8 @@
           "symbol": "🧤",
           "wordFr": "Gants",
           "wordDe": "Handschuhe",
-          "wordEs": "Guantes"
+          "wordEs": "Guantes",
+          "imageUrl": "/english/clothes/gloves.png"
         },
         {
           "key": "scarf",
@@ -1459,7 +1588,8 @@
           "symbol": "🧣",
           "wordFr": "Écharpe",
           "wordDe": "Schal",
-          "wordEs": "Bufanda"
+          "wordEs": "Bufanda",
+          "imageUrl": "/english/clothes/scarf.png"
         },
         {
           "key": "jacket",
@@ -1468,7 +1598,8 @@
           "symbol": "🦺",
           "wordFr": "Veste",
           "wordDe": "Jacke",
-          "wordEs": "Chaqueta"
+          "wordEs": "Chaqueta",
+          "imageUrl": "/english/clothes/jacket.png"
         },
         {
           "key": "boots",
@@ -1477,7 +1608,8 @@
           "symbol": "👢",
           "wordFr": "Bottes",
           "wordDe": "Stiefel",
-          "wordEs": "Botas"
+          "wordEs": "Botas",
+          "imageUrl": "/english/clothes/boots.png"
         }
       ]
     },
@@ -1491,7 +1623,8 @@
           "symbol": "🍞",
           "wordFr": "Pain",
           "wordDe": "Brot",
-          "wordEs": "Pan"
+          "wordEs": "Pan",
+          "imageUrl": "/english/food/bread.png"
         },
         {
           "key": "milk",
@@ -1500,7 +1633,8 @@
           "symbol": "🥛",
           "wordFr": "Lait",
           "wordDe": "Milch",
-          "wordEs": "Leche"
+          "wordEs": "Leche",
+          "imageUrl": "/english/food/milk.png"
         },
         {
           "key": "egg",
@@ -1509,7 +1643,8 @@
           "symbol": "🥚",
           "wordFr": "Œuf",
           "wordDe": "Ei",
-          "wordEs": "Huevo"
+          "wordEs": "Huevo",
+          "imageUrl": "/english/food/egg.png"
         },
         {
           "key": "cheese",
@@ -1518,7 +1653,8 @@
           "symbol": "🧀",
           "wordFr": "Fromage",
           "wordDe": "Käse",
-          "wordEs": "Queso"
+          "wordEs": "Queso",
+          "imageUrl": "/english/food/cheese.png"
         },
         {
           "key": "rice",
@@ -1527,7 +1663,8 @@
           "symbol": "🍚",
           "wordFr": "Riz",
           "wordDe": "Reis",
-          "wordEs": "Arroz"
+          "wordEs": "Arroz",
+          "imageUrl": "/english/food/rice.png"
         },
         {
           "key": "soup",
@@ -1536,7 +1673,8 @@
           "symbol": "🍲",
           "wordFr": "Soupe",
           "wordDe": "Suppe",
-          "wordEs": "Sopa"
+          "wordEs": "Sopa",
+          "imageUrl": "/english/food/soup.png"
         },
         {
           "key": "pizza",
@@ -1545,7 +1683,8 @@
           "symbol": "🍕",
           "wordFr": "Pizza",
           "wordDe": "Pizza",
-          "wordEs": "Pizza"
+          "wordEs": "Pizza",
+          "imageUrl": "/english/food/pizza.png"
         },
         {
           "key": "salad",
@@ -1554,7 +1693,8 @@
           "symbol": "🥗",
           "wordFr": "Salade",
           "wordDe": "Salat",
-          "wordEs": "Ensalada"
+          "wordEs": "Ensalada",
+          "imageUrl": "/english/food/salad.png"
         },
         {
           "key": "cookie",
@@ -1563,7 +1703,8 @@
           "symbol": "🍪",
           "wordFr": "Biscuit",
           "wordDe": "Keks",
-          "wordEs": "Galleta"
+          "wordEs": "Galleta",
+          "imageUrl": "/english/food/cookie.png"
         },
         {
           "key": "cake",
@@ -1572,7 +1713,8 @@
           "symbol": "🎂",
           "wordFr": "Gâteau",
           "wordDe": "Kuchen",
-          "wordEs": "Pastel"
+          "wordEs": "Pastel",
+          "imageUrl": "/english/food/cake.png"
         },
         {
           "key": "honey",
@@ -1581,7 +1723,8 @@
           "symbol": "🍯",
           "wordFr": "Miel",
           "wordDe": "Honig",
-          "wordEs": "Miel"
+          "wordEs": "Miel",
+          "imageUrl": "/english/food/honey.png"
         },
         {
           "key": "butter",
@@ -1590,7 +1733,8 @@
           "symbol": "🧈",
           "wordFr": "Beurre",
           "wordDe": "Butter",
-          "wordEs": "Mantequilla"
+          "wordEs": "Mantequilla",
+          "imageUrl": "/english/food/butter.png"
         }
       ]
     },
@@ -1604,7 +1748,8 @@
           "symbol": "🏐",
           "wordFr": "Balle",
           "wordDe": "Ball",
-          "wordEs": "Pelota"
+          "wordEs": "Pelota",
+          "imageUrl": "/english/sports/ball.png"
         },
         {
           "key": "soccer",
@@ -1613,7 +1758,8 @@
           "symbol": "⚽",
           "wordFr": "Football",
           "wordDe": "Fußball",
-          "wordEs": "Fútbol"
+          "wordEs": "Fútbol",
+          "imageUrl": "/english/sports/soccer.png"
         },
         {
           "key": "basketball",
@@ -1622,7 +1768,8 @@
           "symbol": "🏀",
           "wordFr": "Basketball",
           "wordDe": "Basketball",
-          "wordEs": "Baloncesto"
+          "wordEs": "Baloncesto",
+          "imageUrl": "/english/sports/basketball.png"
         },
         {
           "key": "tennis",
@@ -1631,7 +1778,8 @@
           "symbol": "🎾",
           "wordFr": "Tennis",
           "wordDe": "Tennis",
-          "wordEs": "Tenis"
+          "wordEs": "Tenis",
+          "imageUrl": "/english/sports/tennis.png"
         },
         {
           "key": "swim",
@@ -1640,7 +1788,8 @@
           "symbol": "🏊",
           "wordFr": "Nager",
           "wordDe": "Schwimmen",
-          "wordEs": "Nadar"
+          "wordEs": "Nadar",
+          "imageUrl": "/english/sports/swim.png"
         },
         {
           "key": "run",
@@ -1649,7 +1798,8 @@
           "symbol": "🏃",
           "wordFr": "Courir",
           "wordDe": "Laufen",
-          "wordEs": "Correr"
+          "wordEs": "Correr",
+          "imageUrl": "/english/sports/run.png"
         },
         {
           "key": "jump",
@@ -1658,7 +1808,8 @@
           "symbol": "🤸",
           "wordFr": "Sauter",
           "wordDe": "Springen",
-          "wordEs": "Saltar"
+          "wordEs": "Saltar",
+          "imageUrl": "/english/sports/jump.png"
         },
         {
           "key": "skate",
@@ -1667,7 +1818,8 @@
           "symbol": "⛸️",
           "wordFr": "Patiner",
           "wordDe": "Skaten",
-          "wordEs": "Patinar"
+          "wordEs": "Patinar",
+          "imageUrl": "/english/sports/skate.png"
         },
         {
           "key": "golf",
@@ -1676,7 +1828,8 @@
           "symbol": "⛳",
           "wordFr": "Golf",
           "wordDe": "Golf",
-          "wordEs": "Golf"
+          "wordEs": "Golf",
+          "imageUrl": "/english/sports/golf.png"
         },
         {
           "key": "yoga",
@@ -1685,7 +1838,8 @@
           "symbol": "🧘",
           "wordFr": "Yoga",
           "wordDe": "Yoga",
-          "wordEs": "Yoga"
+          "wordEs": "Yoga",
+          "imageUrl": "/english/sports/yoga.png"
         },
         {
           "key": "dance",
@@ -1694,7 +1848,8 @@
           "symbol": "💃",
           "wordFr": "Danser",
           "wordDe": "Tanzen",
-          "wordEs": "Bailar"
+          "wordEs": "Bailar",
+          "imageUrl": "/english/sports/dance.png"
         },
         {
           "key": "baseball",
@@ -1703,7 +1858,8 @@
           "symbol": "⚾",
           "wordFr": "Baseball",
           "wordDe": "Baseball",
-          "wordEs": "Béisbol"
+          "wordEs": "Béisbol",
+          "imageUrl": "/english/sports/baseball.png"
         }
       ]
     },
@@ -1717,7 +1873,8 @@
           "symbol": "🛏️",
           "wordFr": "Lit",
           "wordDe": "Bett",
-          "wordEs": "Cama"
+          "wordEs": "Cama",
+          "imageUrl": "/english/home/bed.png"
         },
         {
           "key": "sofa",
@@ -1726,7 +1883,8 @@
           "symbol": "🛋️",
           "wordFr": "Canapé",
           "wordDe": "Sofa",
-          "wordEs": "Sofá"
+          "wordEs": "Sofá",
+          "imageUrl": "/english/home/sofa.png"
         },
         {
           "key": "table",
@@ -1735,7 +1893,8 @@
           "symbol": "🍽️",
           "wordFr": "Table",
           "wordDe": "Tisch",
-          "wordEs": "Mesa"
+          "wordEs": "Mesa",
+          "imageUrl": "/english/home/table.png"
         },
         {
           "key": "chair",
@@ -1744,7 +1903,8 @@
           "symbol": "💺",
           "wordFr": "Chaise",
           "wordDe": "Stuhl",
-          "wordEs": "Silla"
+          "wordEs": "Silla",
+          "imageUrl": "/english/home/chair.png"
         },
         {
           "key": "lamp",
@@ -1753,7 +1913,8 @@
           "symbol": "💡",
           "wordFr": "Lampe",
           "wordDe": "Lampe",
-          "wordEs": "Lámpara"
+          "wordEs": "Lámpara",
+          "imageUrl": "/english/home/lamp.png"
         },
         {
           "key": "door",
@@ -1762,7 +1923,8 @@
           "symbol": "🚪",
           "wordFr": "Porte",
           "wordDe": "Tür",
-          "wordEs": "Puerta"
+          "wordEs": "Puerta",
+          "imageUrl": "/english/home/door.png"
         },
         {
           "key": "window",
@@ -1771,7 +1933,8 @@
           "symbol": "🪟",
           "wordFr": "Fenêtre",
           "wordDe": "Fenster",
-          "wordEs": "Ventana"
+          "wordEs": "Ventana",
+          "imageUrl": "/english/home/window.png"
         },
         {
           "key": "kitchen",
@@ -1780,7 +1943,8 @@
           "symbol": "🍳",
           "wordFr": "Cuisine",
           "wordDe": "Küche",
-          "wordEs": "Cocina"
+          "wordEs": "Cocina",
+          "imageUrl": "/english/home/kitchen.png"
         },
         {
           "key": "bath",
@@ -1789,7 +1953,8 @@
           "symbol": "🛁",
           "wordFr": "Bain",
           "wordDe": "Bad",
-          "wordEs": "Baño"
+          "wordEs": "Baño",
+          "imageUrl": "/english/home/bath.png"
         },
         {
           "key": "fridge",
@@ -1798,7 +1963,8 @@
           "symbol": "🧊",
           "wordFr": "Frigo",
           "wordDe": "Kühlschrank",
-          "wordEs": "Nevera"
+          "wordEs": "Nevera",
+          "imageUrl": "/english/home/fridge.png"
         },
         {
           "key": "clock",
@@ -1807,7 +1973,8 @@
           "symbol": "⏰",
           "wordFr": "Horloge",
           "wordDe": "Uhr",
-          "wordEs": "Reloj"
+          "wordEs": "Reloj",
+          "imageUrl": "/english/home/clock.png"
         },
         {
           "key": "mirror",
@@ -1816,7 +1983,8 @@
           "symbol": "🪞",
           "wordFr": "Miroir",
           "wordDe": "Spiegel",
-          "wordEs": "Espejo"
+          "wordEs": "Espejo",
+          "imageUrl": "/english/home/mirror.png"
         }
       ]
     },
@@ -1830,7 +1998,8 @@
           "symbol": "👨‍⚕️",
           "wordFr": "Médecin",
           "wordDe": "Arzt",
-          "wordEs": "Médico"
+          "wordEs": "Médico",
+          "imageUrl": "/english/jobs/doctor.png"
         },
         {
           "key": "teacher",
@@ -1839,7 +2008,8 @@
           "symbol": "👩‍🏫",
           "wordFr": "Professeur",
           "wordDe": "Lehrer",
-          "wordEs": "Profesor"
+          "wordEs": "Profesor",
+          "imageUrl": "/english/jobs/teacher.png"
         },
         {
           "key": "firefighter",
@@ -1848,7 +2018,8 @@
           "symbol": "👨‍🚒",
           "wordFr": "Pompier",
           "wordDe": "Feuerwehrmann",
-          "wordEs": "Bombero"
+          "wordEs": "Bombero",
+          "imageUrl": "/english/jobs/firefighter.png"
         },
         {
           "key": "police",
@@ -1857,7 +2028,8 @@
           "symbol": "👮",
           "wordFr": "Policier",
           "wordDe": "Polizist",
-          "wordEs": "Policía"
+          "wordEs": "Policía",
+          "imageUrl": "/english/jobs/police.png"
         },
         {
           "key": "chef",
@@ -1866,7 +2038,8 @@
           "symbol": "👨‍🍳",
           "wordFr": "Cuisinier",
           "wordDe": "Koch",
-          "wordEs": "Cocinero"
+          "wordEs": "Cocinero",
+          "imageUrl": "/english/jobs/chef.png"
         },
         {
           "key": "farmer",
@@ -1875,7 +2048,8 @@
           "symbol": "👨‍🌾",
           "wordFr": "Fermier",
           "wordDe": "Bauer",
-          "wordEs": "Granjero"
+          "wordEs": "Granjero",
+          "imageUrl": "/english/jobs/farmer.png"
         },
         {
           "key": "pilot",
@@ -1884,7 +2058,8 @@
           "symbol": "👨‍✈️",
           "wordFr": "Pilote",
           "wordDe": "Pilot",
-          "wordEs": "Piloto"
+          "wordEs": "Piloto",
+          "imageUrl": "/english/jobs/pilot.png"
         },
         {
           "key": "artist",
@@ -1893,7 +2068,8 @@
           "symbol": "🎨",
           "wordFr": "Artiste",
           "wordDe": "Künstler",
-          "wordEs": "Artista"
+          "wordEs": "Artista",
+          "imageUrl": "/english/jobs/artist.png"
         },
         {
           "key": "nurse",
@@ -1902,7 +2078,8 @@
           "symbol": "👩‍⚕️",
           "wordFr": "Infirmière",
           "wordDe": "Krankenschwester",
-          "wordEs": "Enfermera"
+          "wordEs": "Enfermera",
+          "imageUrl": "/english/jobs/nurse.png"
         },
         {
           "key": "builder",
@@ -1911,7 +2088,8 @@
           "symbol": "👷",
           "wordFr": "Maçon",
           "wordDe": "Bauarbeiter",
-          "wordEs": "Constructor"
+          "wordEs": "Constructor",
+          "imageUrl": "/english/jobs/builder.png"
         },
         {
           "key": "vet",
@@ -1920,7 +2098,8 @@
           "symbol": "🐾",
           "wordFr": "Vétérinaire",
           "wordDe": "Tierarzt",
-          "wordEs": "Veterinario"
+          "wordEs": "Veterinario",
+          "imageUrl": "/english/jobs/vet.png"
         },
         {
           "key": "singer",
@@ -1929,7 +2108,8 @@
           "symbol": "🎤",
           "wordFr": "Chanteur",
           "wordDe": "Sänger",
-          "wordEs": "Cantante"
+          "wordEs": "Cantante",
+          "imageUrl": "/english/jobs/singer.png"
         }
       ]
     },
@@ -1943,7 +2123,8 @@
           "symbol": "🌳",
           "wordFr": "Arbre",
           "wordDe": "Baum",
-          "wordEs": "Árbol"
+          "wordEs": "Árbol",
+          "imageUrl": "/english/nature/tree.png"
         },
         {
           "key": "flower",
@@ -1952,7 +2133,8 @@
           "symbol": "🌸",
           "wordFr": "Fleur",
           "wordDe": "Blume",
-          "wordEs": "Flor"
+          "wordEs": "Flor",
+          "imageUrl": "/english/nature/flower.png"
         },
         {
           "key": "grass",
@@ -1961,7 +2143,8 @@
           "symbol": "🌿",
           "wordFr": "Herbe",
           "wordDe": "Gras",
-          "wordEs": "Césped"
+          "wordEs": "Césped",
+          "imageUrl": "/english/nature/grass.png"
         },
         {
           "key": "mountain",
@@ -1970,7 +2153,8 @@
           "symbol": "⛰️",
           "wordFr": "Montagne",
           "wordDe": "Berg",
-          "wordEs": "Montaña"
+          "wordEs": "Montaña",
+          "imageUrl": "/english/nature/mountain.png"
         },
         {
           "key": "river",
@@ -1979,7 +2163,8 @@
           "symbol": "🏞️",
           "wordFr": "Rivière",
           "wordDe": "Fluss",
-          "wordEs": "Río"
+          "wordEs": "Río",
+          "imageUrl": "/english/nature/river.png"
         },
         {
           "key": "lake",
@@ -1988,7 +2173,8 @@
           "symbol": "🌊",
           "wordFr": "Lac",
           "wordDe": "See",
-          "wordEs": "Lago"
+          "wordEs": "Lago",
+          "imageUrl": "/english/nature/lake.png"
         },
         {
           "key": "forest",
@@ -1997,7 +2183,8 @@
           "symbol": "🌲",
           "wordFr": "Forêt",
           "wordDe": "Wald",
-          "wordEs": "Bosque"
+          "wordEs": "Bosque",
+          "imageUrl": "/english/nature/forest.png"
         },
         {
           "key": "rock",
@@ -2006,7 +2193,8 @@
           "symbol": "🪨",
           "wordFr": "Rocher",
           "wordDe": "Fels",
-          "wordEs": "Roca"
+          "wordEs": "Roca",
+          "imageUrl": "/english/nature/rock.png"
         },
         {
           "key": "leaf",
@@ -2015,7 +2203,8 @@
           "symbol": "🍃",
           "wordFr": "Feuille",
           "wordDe": "Blatt",
-          "wordEs": "Hoja"
+          "wordEs": "Hoja",
+          "imageUrl": "/english/nature/leaf.png"
         },
         {
           "key": "bee",
@@ -2024,7 +2213,8 @@
           "symbol": "🐝",
           "wordFr": "Abeille",
           "wordDe": "Biene",
-          "wordEs": "Abeja"
+          "wordEs": "Abeja",
+          "imageUrl": "/english/nature/bee.png"
         },
         {
           "key": "butterfly",
@@ -2033,7 +2223,8 @@
           "symbol": "🦋",
           "wordFr": "Papillon",
           "wordDe": "Schmetterling",
-          "wordEs": "Mariposa"
+          "wordEs": "Mariposa",
+          "imageUrl": "/english/nature/butterfly.png"
         },
         {
           "key": "moon",
@@ -2042,7 +2233,8 @@
           "symbol": "🌙",
           "wordFr": "Lune",
           "wordDe": "Mond",
-          "wordEs": "Luna"
+          "wordEs": "Luna",
+          "imageUrl": "/english/nature/moon.png"
         }
       ]
     },
@@ -2056,7 +2248,8 @@
           "symbol": "😊",
           "wordFr": "Heureux",
           "wordDe": "Glücklich",
-          "wordEs": "Feliz"
+          "wordEs": "Feliz",
+          "imageUrl": "/english/feelings/happy.png"
         },
         {
           "key": "sad",
@@ -2065,7 +2258,8 @@
           "symbol": "😢",
           "wordFr": "Triste",
           "wordDe": "Traurig",
-          "wordEs": "Triste"
+          "wordEs": "Triste",
+          "imageUrl": "/english/feelings/sad.png"
         },
         {
           "key": "angry",
@@ -2074,7 +2268,8 @@
           "symbol": "😠",
           "wordFr": "Fâché",
           "wordDe": "Wütend",
-          "wordEs": "Enojado"
+          "wordEs": "Enojado",
+          "imageUrl": "/english/feelings/angry.png"
         },
         {
           "key": "scared",
@@ -2083,7 +2278,8 @@
           "symbol": "😨",
           "wordFr": "Peur",
           "wordDe": "Angst",
-          "wordEs": "Asustado"
+          "wordEs": "Asustado",
+          "imageUrl": "/english/feelings/scared.png"
         },
         {
           "key": "tired",
@@ -2092,7 +2288,8 @@
           "symbol": "😴",
           "wordFr": "Fatigué",
           "wordDe": "Müde",
-          "wordEs": "Cansado"
+          "wordEs": "Cansado",
+          "imageUrl": "/english/feelings/tired.png"
         },
         {
           "key": "excited",
@@ -2101,7 +2298,8 @@
           "symbol": "🤩",
           "wordFr": "Excité",
           "wordDe": "Aufgeregt",
-          "wordEs": "Emocionado"
+          "wordEs": "Emocionado",
+          "imageUrl": "/english/feelings/excited.png"
         },
         {
           "key": "bored",
@@ -2110,7 +2308,8 @@
           "symbol": "😑",
           "wordFr": "Ennuyé",
           "wordDe": "Gelangweilt",
-          "wordEs": "Aburrido"
+          "wordEs": "Aburrido",
+          "imageUrl": "/english/feelings/bored.png"
         },
         {
           "key": "proud",
@@ -2119,7 +2318,8 @@
           "symbol": "🏅",
           "wordFr": "Fier",
           "wordDe": "Stolz",
-          "wordEs": "Orgulloso"
+          "wordEs": "Orgulloso",
+          "imageUrl": "/english/feelings/proud.png"
         },
         {
           "key": "shy",
@@ -2128,7 +2328,8 @@
           "symbol": "😳",
           "wordFr": "Timide",
           "wordDe": "Schüchtern",
-          "wordEs": "Tímido"
+          "wordEs": "Tímido",
+          "imageUrl": "/english/feelings/shy.png"
         },
         {
           "key": "love",
@@ -2137,7 +2338,8 @@
           "symbol": "😍",
           "wordFr": "Amour",
           "wordDe": "Liebe",
-          "wordEs": "Amor"
+          "wordEs": "Amor",
+          "imageUrl": "/english/feelings/love.png"
         },
         {
           "key": "calm",
@@ -2146,7 +2348,8 @@
           "symbol": "😌",
           "wordFr": "Calme",
           "wordDe": "Ruhig",
-          "wordEs": "Tranquilo"
+          "wordEs": "Tranquilo",
+          "imageUrl": "/english/feelings/calm.png"
         },
         {
           "key": "surprised",
@@ -2155,7 +2358,8 @@
           "symbol": "😲",
           "wordFr": "Surpris",
           "wordDe": "Überrascht",
-          "wordEs": "Sorprendido"
+          "wordEs": "Sorprendido",
+          "imageUrl": "/english/feelings/surprised.png"
         }
       ]
     },
@@ -2169,7 +2373,8 @@
           "symbol": "1️⃣",
           "wordFr": "Un",
           "wordDe": "Eins",
-          "wordEs": "Uno"
+          "wordEs": "Uno",
+          "imageUrl": "/english/numbers/one.png"
         },
         {
           "key": "two",
@@ -2178,7 +2383,8 @@
           "symbol": "2️⃣",
           "wordFr": "Deux",
           "wordDe": "Zwei",
-          "wordEs": "Dos"
+          "wordEs": "Dos",
+          "imageUrl": "/english/numbers/two.png"
         },
         {
           "key": "three",
@@ -2187,7 +2393,8 @@
           "symbol": "3️⃣",
           "wordFr": "Trois",
           "wordDe": "Drei",
-          "wordEs": "Tres"
+          "wordEs": "Tres",
+          "imageUrl": "/english/numbers/three.png"
         },
         {
           "key": "four",
@@ -2196,7 +2403,8 @@
           "symbol": "4️⃣",
           "wordFr": "Quatre",
           "wordDe": "Vier",
-          "wordEs": "Cuatro"
+          "wordEs": "Cuatro",
+          "imageUrl": "/english/numbers/four.png"
         },
         {
           "key": "five",
@@ -2205,7 +2413,8 @@
           "symbol": "5️⃣",
           "wordFr": "Cinq",
           "wordDe": "Fünf",
-          "wordEs": "Cinco"
+          "wordEs": "Cinco",
+          "imageUrl": "/english/numbers/five.png"
         },
         {
           "key": "six",
@@ -2214,7 +2423,8 @@
           "symbol": "6️⃣",
           "wordFr": "Six",
           "wordDe": "Sechs",
-          "wordEs": "Seis"
+          "wordEs": "Seis",
+          "imageUrl": "/english/numbers/six.png"
         },
         {
           "key": "seven",
@@ -2223,7 +2433,8 @@
           "symbol": "7️⃣",
           "wordFr": "Sept",
           "wordDe": "Sieben",
-          "wordEs": "Siete"
+          "wordEs": "Siete",
+          "imageUrl": "/english/numbers/seven.png"
         },
         {
           "key": "eight",
@@ -2232,7 +2443,8 @@
           "symbol": "8️⃣",
           "wordFr": "Huit",
           "wordDe": "Acht",
-          "wordEs": "Ocho"
+          "wordEs": "Ocho",
+          "imageUrl": "/english/numbers/eight.png"
         },
         {
           "key": "nine",
@@ -2241,7 +2453,8 @@
           "symbol": "9️⃣",
           "wordFr": "Neuf",
           "wordDe": "Neun",
-          "wordEs": "Nueve"
+          "wordEs": "Nueve",
+          "imageUrl": "/english/numbers/nine.png"
         },
         {
           "key": "ten",
@@ -2250,7 +2463,8 @@
           "symbol": "🔟",
           "wordFr": "Dix",
           "wordDe": "Zehn",
-          "wordEs": "Diez"
+          "wordEs": "Diez",
+          "imageUrl": "/english/numbers/ten.png"
         },
         {
           "key": "eleven",
@@ -2259,7 +2473,8 @@
           "symbol": "🕚",
           "wordFr": "Onze",
           "wordDe": "Elf",
-          "wordEs": "Once"
+          "wordEs": "Once",
+          "imageUrl": "/english/numbers/eleven.png"
         },
         {
           "key": "twelve",
@@ -2268,7 +2483,8 @@
           "symbol": "🕛",
           "wordFr": "Douze",
           "wordDe": "Zwölf",
-          "wordEs": "Doce"
+          "wordEs": "Doce",
+          "imageUrl": "/english/numbers/twelve.png"
         }
       ]
     },
@@ -2282,7 +2498,8 @@
           "symbol": "⭕",
           "wordFr": "Cercle",
           "wordDe": "Kreis",
-          "wordEs": "Círculo"
+          "wordEs": "Círculo",
+          "imageUrl": "/english/shapes/circle.png"
         },
         {
           "key": "square",
@@ -2291,7 +2508,8 @@
           "symbol": "⬜",
           "wordFr": "Carré",
           "wordDe": "Quadrat",
-          "wordEs": "Cuadrado"
+          "wordEs": "Cuadrado",
+          "imageUrl": "/english/shapes/square.png"
         },
         {
           "key": "triangle",
@@ -2300,7 +2518,8 @@
           "symbol": "🔺",
           "wordFr": "Triangle",
           "wordDe": "Dreieck",
-          "wordEs": "Triángulo"
+          "wordEs": "Triángulo",
+          "imageUrl": "/english/shapes/triangle.png"
         },
         {
           "key": "star",
@@ -2309,7 +2528,8 @@
           "symbol": "⭐",
           "wordFr": "Étoile",
           "wordDe": "Stern",
-          "wordEs": "Estrella"
+          "wordEs": "Estrella",
+          "imageUrl": "/english/shapes/star.png"
         },
         {
           "key": "heart",
@@ -2318,7 +2538,8 @@
           "symbol": "❤️",
           "wordFr": "Cœur",
           "wordDe": "Herz",
-          "wordEs": "Corazón"
+          "wordEs": "Corazón",
+          "imageUrl": "/english/shapes/heart.png"
         },
         {
           "key": "oval",
@@ -2327,7 +2548,8 @@
           "symbol": "🥚",
           "wordFr": "Ovale",
           "wordDe": "Oval",
-          "wordEs": "Óvalo"
+          "wordEs": "Óvalo",
+          "imageUrl": "/english/shapes/oval.png"
         },
         {
           "key": "rectangle",
@@ -2336,7 +2558,8 @@
           "symbol": "▭",
           "wordFr": "Rectangle",
           "wordDe": "Rechteck",
-          "wordEs": "Rectángulo"
+          "wordEs": "Rectángulo",
+          "imageUrl": "/english/shapes/rectangle.png"
         },
         {
           "key": "diamond",
@@ -2345,7 +2568,8 @@
           "symbol": "💎",
           "wordFr": "Losange",
           "wordDe": "Raute",
-          "wordEs": "Rombo"
+          "wordEs": "Rombo",
+          "imageUrl": "/english/shapes/diamond.png"
         },
         {
           "key": "line",
@@ -2354,7 +2578,8 @@
           "symbol": "➖",
           "wordFr": "Ligne",
           "wordDe": "Linie",
-          "wordEs": "Línea"
+          "wordEs": "Línea",
+          "imageUrl": "/english/shapes/line.png"
         },
         {
           "key": "cube",
@@ -2363,7 +2588,8 @@
           "symbol": "🧊",
           "wordFr": "Cube",
           "wordDe": "Würfel",
-          "wordEs": "Cubo"
+          "wordEs": "Cubo",
+          "imageUrl": "/english/shapes/cube.png"
         },
         {
           "key": "sphere",
@@ -2372,7 +2598,8 @@
           "symbol": "⚽",
           "wordFr": "Sphère",
           "wordDe": "Kugel",
-          "wordEs": "Esfera"
+          "wordEs": "Esfera",
+          "imageUrl": "/english/shapes/sphere.png"
         },
         {
           "key": "cone",
@@ -2381,7 +2608,8 @@
           "symbol": "🍦",
           "wordFr": "Cône",
           "wordDe": "Kegel",
-          "wordEs": "Cono"
+          "wordEs": "Cono",
+          "imageUrl": "/english/shapes/cone.png"
         }
       ]
     },
@@ -2395,7 +2623,8 @@
           "symbol": "🎹",
           "wordFr": "Piano",
           "wordDe": "Klavier",
-          "wordEs": "Piano"
+          "wordEs": "Piano",
+          "imageUrl": "/english/music/piano.png"
         },
         {
           "key": "guitar",
@@ -2404,7 +2633,8 @@
           "symbol": "🎸",
           "wordFr": "Guitare",
           "wordDe": "Gitarre",
-          "wordEs": "Guitarra"
+          "wordEs": "Guitarra",
+          "imageUrl": "/english/music/guitar.png"
         },
         {
           "key": "drum",
@@ -2413,7 +2643,8 @@
           "symbol": "🥁",
           "wordFr": "Tambour",
           "wordDe": "Trommel",
-          "wordEs": "Tambor"
+          "wordEs": "Tambor",
+          "imageUrl": "/english/music/drum.png"
         },
         {
           "key": "violin",
@@ -2422,7 +2653,8 @@
           "symbol": "🎻",
           "wordFr": "Violon",
           "wordDe": "Geige",
-          "wordEs": "Violín"
+          "wordEs": "Violín",
+          "imageUrl": "/english/music/violin.png"
         },
         {
           "key": "flute",
@@ -2431,7 +2663,8 @@
           "symbol": "🪈",
           "wordFr": "Flûte",
           "wordDe": "Flöte",
-          "wordEs": "Flauta"
+          "wordEs": "Flauta",
+          "imageUrl": "/english/music/flute.png"
         },
         {
           "key": "trumpet",
@@ -2440,7 +2673,8 @@
           "symbol": "🎺",
           "wordFr": "Trompette",
           "wordDe": "Trompete",
-          "wordEs": "Trompeta"
+          "wordEs": "Trompeta",
+          "imageUrl": "/english/music/trumpet.png"
         },
         {
           "key": "microphone",
@@ -2449,7 +2683,8 @@
           "symbol": "🎙️",
           "wordFr": "Micro",
           "wordDe": "Mikrofon",
-          "wordEs": "Micrófono"
+          "wordEs": "Micrófono",
+          "imageUrl": "/english/music/microphone.png"
         },
         {
           "key": "song",
@@ -2458,7 +2693,8 @@
           "symbol": "🎵",
           "wordFr": "Chanson",
           "wordDe": "Lied",
-          "wordEs": "Canción"
+          "wordEs": "Canción",
+          "imageUrl": "/english/music/song.png"
         },
         {
           "key": "dance",
@@ -2467,7 +2703,8 @@
           "symbol": "💃",
           "wordFr": "Danser",
           "wordDe": "Tanzen",
-          "wordEs": "Bailar"
+          "wordEs": "Bailar",
+          "imageUrl": "/english/music/dance.png"
         },
         {
           "key": "radio",
@@ -2476,7 +2713,8 @@
           "symbol": "📻",
           "wordFr": "Radio",
           "wordDe": "Radio",
-          "wordEs": "Radio"
+          "wordEs": "Radio",
+          "imageUrl": "/english/music/radio.png"
         },
         {
           "key": "headphones",
@@ -2485,7 +2723,8 @@
           "symbol": "🎧",
           "wordFr": "Casque",
           "wordDe": "Kopfhörer",
-          "wordEs": "Auriculares"
+          "wordEs": "Auriculares",
+          "imageUrl": "/english/music/headphones.png"
         },
         {
           "key": "notes",
@@ -2494,7 +2733,8 @@
           "symbol": "🎶",
           "wordFr": "Notes",
           "wordDe": "Noten",
-          "wordEs": "Notas"
+          "wordEs": "Notas",
+          "imageUrl": "/english/music/notes.png"
         }
       ]
     },
@@ -2508,7 +2748,8 @@
           "symbol": "🔺",
           "wordFr": "Pyramide",
           "wordDe": "Pyramide",
-          "wordEs": "Pirámide"
+          "wordEs": "Pirámide",
+          "imageUrl": "/english/places/pyramid.png"
         },
         {
           "key": "tower",
@@ -2517,7 +2758,8 @@
           "symbol": "🗼",
           "wordFr": "Tour",
           "wordDe": "Turm",
-          "wordEs": "Torre"
+          "wordEs": "Torre",
+          "imageUrl": "/english/places/tower.png"
         },
         {
           "key": "beach",
@@ -2526,7 +2768,8 @@
           "symbol": "🏖️",
           "wordFr": "Plage",
           "wordDe": "Strand",
-          "wordEs": "Playa"
+          "wordEs": "Playa",
+          "imageUrl": "/english/places/beach.png"
         },
         {
           "key": "castle",
@@ -2535,7 +2778,8 @@
           "symbol": "🏰",
           "wordFr": "Château",
           "wordDe": "Schloss",
-          "wordEs": "Castillo"
+          "wordEs": "Castillo",
+          "imageUrl": "/english/places/castle.png"
         },
         {
           "key": "temple",
@@ -2544,7 +2788,8 @@
           "symbol": "⛩️",
           "wordFr": "Temple",
           "wordDe": "Tempel",
-          "wordEs": "Templo"
+          "wordEs": "Templo",
+          "imageUrl": "/english/places/temple.png"
         },
         {
           "key": "market",
@@ -2553,7 +2798,8 @@
           "symbol": "🏪",
           "wordFr": "Marché",
           "wordDe": "Markt",
-          "wordEs": "Mercado"
+          "wordEs": "Mercado",
+          "imageUrl": "/english/places/market.png"
         },
         {
           "key": "museum",
@@ -2562,7 +2808,8 @@
           "symbol": "🏛️",
           "wordFr": "Musée",
           "wordDe": "Museum",
-          "wordEs": "Museo"
+          "wordEs": "Museo",
+          "imageUrl": "/english/places/museum.png"
         },
         {
           "key": "zoo",
@@ -2571,7 +2818,8 @@
           "symbol": "🦁",
           "wordFr": "Zoo",
           "wordDe": "Zoo",
-          "wordEs": "Zoológico"
+          "wordEs": "Zoológico",
+          "imageUrl": "/english/places/zoo.png"
         },
         {
           "key": "farm",
@@ -2580,7 +2828,8 @@
           "symbol": "🚜",
           "wordFr": "Ferme",
           "wordDe": "Bauernhof",
-          "wordEs": "Granja"
+          "wordEs": "Granja",
+          "imageUrl": "/english/places/farm.png"
         },
         {
           "key": "airport",
@@ -2589,7 +2838,8 @@
           "symbol": "✈️",
           "wordFr": "Aéroport",
           "wordDe": "Flughafen",
-          "wordEs": "Aeropuerto"
+          "wordEs": "Aeropuerto",
+          "imageUrl": "/english/places/airport.png"
         },
         {
           "key": "harbor",
@@ -2598,7 +2848,8 @@
           "symbol": "⚓",
           "wordFr": "Port",
           "wordDe": "Hafen",
-          "wordEs": "Puerto"
+          "wordEs": "Puerto",
+          "imageUrl": "/english/places/harbor.png"
         },
         {
           "key": "cave",
@@ -2607,7 +2858,8 @@
           "symbol": "🕳️",
           "wordFr": "Grotte",
           "wordDe": "Höhle",
-          "wordEs": "Cueva"
+          "wordEs": "Cueva",
+          "imageUrl": "/english/places/cave.png"
         }
       ]
     }
