@@ -34,6 +34,8 @@ import { getAlbumCoverUrl, roadmapMapArt } from "./adventure-art.js";
 import {
   ROADMAP_LEVEL_SPOTS,
   ROADMAP_MAP_SIZE,
+  ROADMAP_PATH_VERTICES,
+  buildSvgPathFromVertices,
   getRoadmapDisplayPositionsForLevels,
 } from "./roadmap-map-spots.js";
 import { createStickerElement, getStickerLabel } from "./roadmap-stickers.js";
@@ -71,6 +73,7 @@ let dragScrollRaf = null;
 let roadmapDragLayer = null;
 
 const roadmapDialog = document.querySelector("#roadmapDialog");
+const albumDialog = document.querySelector("#albumDialog");
 const roadmapMapEl = document.querySelector("#roadmapMap");
 const roadmapAlbumPickerEl = document.querySelector("#roadmapAlbumPicker");
 const roadmapAlbumDetailEl = document.querySelector("#roadmapAlbumDetail");
@@ -82,17 +85,17 @@ const roadmapAlbumSlotsEl = document.querySelector("#roadmapAlbumSlots");
 const roadmapAlbumTrayEl = document.querySelector("#roadmapAlbumTray");
 const roadmapTitleEl = document.querySelector("#roadmapTitle");
 const roadmapSubtitleEl = document.querySelector("#roadmapSubtitle");
+const albumTitleEl = document.querySelector("#albumTitle");
+const albumSubtitleEl = document.querySelector("#albumSubtitle");
 const roadmapCloseBtn = document.querySelector("#closeRoadmap");
+const albumCloseBtn = document.querySelector("#closeAlbum");
 const roadmapStartBtn = document.querySelector("#roadmapStartChallenge");
 const quickNavAdventureBtn = document.querySelector("#quickNavAdventure");
 const quickNavAlbumBtn = document.querySelector("#quickNavAlbum");
 const roadmapProgressPill = document.querySelector("#roadmapProgressPill");
 const roadmapLevelPopover = document.querySelector("#roadmapLevelPopover");
 const roadmapDevCompleteBtn = document.querySelector("#roadmapDevComplete");
-const roadmapTabMap = document.querySelector("#roadmapTabMap");
-const roadmapTabAlbum = document.querySelector("#roadmapTabAlbum");
-const roadmapPanelMap = document.querySelector("#roadmapPanelMap");
-const roadmapPanelAlbum = document.querySelector("#roadmapPanelAlbum");
+const albumPanel = document.querySelector("#albumPanel");
 
 const roadmapRewardDialog = document.querySelector("#roadmapRewardDialog");
 const roadmapRewardTitleEl = document.querySelector("#roadmapRewardTitle");
@@ -144,9 +147,9 @@ function closeSettingsMenu() {
   if (btn instanceof HTMLButtonElement) btn.setAttribute("aria-expanded", "false");
 }
 
-function syncRoadmapDevBtn(isMap = roadmapTabMap?.classList.contains("is-active")) {
+function syncRoadmapDevBtn() {
   if (!roadmapDevCompleteBtn) return;
-  roadmapDevCompleteBtn.hidden = !isMap || !isDevTesterSession();
+  roadmapDevCompleteBtn.hidden = !isDevTesterSession();
 }
 
 function isAlbumAdminTester() {
@@ -170,8 +173,8 @@ function syncRoadmapStartButton() {
 }
 
 function getDragScrollContainer() {
-  if (roadmapPanelAlbum?.hidden) return null;
-  return roadmapPanelAlbum;
+  if (!albumDialog?.open) return null;
+  return albumPanel;
 }
 
 /** @param {number} clientY */
@@ -213,22 +216,6 @@ function stopDragAutoScroll() {
   }
 }
 
-function setRoadmapTab(tab) {
-  const isMap = tab === "map";
-  roadmapTabMap?.classList.toggle("is-active", isMap);
-  roadmapTabAlbum?.classList.toggle("is-active", !isMap);
-  roadmapTabMap?.setAttribute("aria-selected", isMap ? "true" : "false");
-  roadmapTabAlbum?.setAttribute("aria-selected", !isMap ? "true" : "false");
-  if (roadmapPanelMap) roadmapPanelMap.hidden = !isMap;
-  if (roadmapPanelAlbum) roadmapPanelAlbum.hidden = isMap;
-  if (roadmapStartBtn) roadmapStartBtn.hidden = !isMap;
-  syncRoadmapDevBtn(isMap);
-  if (isMap) {
-    queueRoadmapSpotRelayout();
-    renderLevelPopover();
-  }
-}
-
 function showAlbumPicker() {
   albumView = "picker";
   selectedAlbumWeek = null;
@@ -250,38 +237,33 @@ function openAlbumDetail(weekId) {
   syncAlbumAdminControls();
 }
 
-/**
- * @param {RoadmapUiDeps} d
- */
-function ensureRoadmapDragLayer() {
-  if (!roadmapDialog) return null;
+function ensureAlbumDragLayer() {
+  if (!albumDialog) return null;
   if (!roadmapDragLayer) {
     roadmapDragLayer = document.createElement("div");
     roadmapDragLayer.className = "roadmap-drag-layer";
     roadmapDragLayer.setAttribute("aria-hidden", "true");
-    roadmapDialog.append(roadmapDragLayer);
+    albumDialog.append(roadmapDragLayer);
   }
   return roadmapDragLayer;
 }
 
 export function initRoadmapUi(d) {
   deps = d;
-  ensureRoadmapDragLayer();
+  ensureAlbumDragLayer();
 
   quickNavAdventureBtn?.addEventListener("click", () => openRoadmapDialog());
   quickNavAlbumBtn?.addEventListener("click", () => openRoadmapAlbum());
   roadmapCloseBtn?.addEventListener("click", closeRoadmapDialog);
+  albumCloseBtn?.addEventListener("click", closeAlbumDialog);
   roadmapDialog?.addEventListener("click", (e) => {
     if (e.target === roadmapDialog) closeRoadmapDialog();
   });
+  albumDialog?.addEventListener("click", (e) => {
+    if (e.target === albumDialog) closeAlbumDialog();
+  });
   roadmapDialog?.addEventListener("toggle", () => {
     if (roadmapDialog.open) queueRoadmapSpotRelayout();
-  });
-
-  roadmapTabMap?.addEventListener("click", () => setRoadmapTab("map"));
-  roadmapTabAlbum?.addEventListener("click", () => {
-    setRoadmapTab("album");
-    showAlbumPicker();
   });
 
   roadmapAlbumBackBtn?.addEventListener("click", showAlbumPicker);
@@ -377,7 +359,7 @@ function cancelActiveDrag() {
   detachDragListeners();
   activeDrag.ghost.remove();
   activeDrag.sourceEl.classList.remove("album-tray__item--dragging");
-  roadmapDialog?.classList.remove("is-dragging-sticker");
+  albumDialog?.classList.remove("is-dragging-sticker");
   activeDrag = null;
   clearSlotHovers();
 }
@@ -403,7 +385,7 @@ function finishDragPointer(e) {
   stopDragAutoScroll();
   ghost.remove();
   sourceEl.classList.remove("album-tray__item--dragging");
-  roadmapDialog?.classList.remove("is-dragging-sticker");
+  albumDialog?.classList.remove("is-dragging-sticker");
   activeDrag = null;
 
   if (slotEl && slug) {
@@ -427,11 +409,12 @@ export function refreshRoadmapLabels() {
   }
   if (roadmapTitleEl) roadmapTitleEl.textContent = t("roadmapTitle");
   if (roadmapSubtitleEl) roadmapSubtitleEl.textContent = t("roadmapSubtitle");
+  if (albumTitleEl) albumTitleEl.textContent = t("roadmapAlbumTitle");
+  if (albumSubtitleEl) albumSubtitleEl.textContent = t("roadmapSubtitle");
   if (roadmapCloseBtn) roadmapCloseBtn.textContent = t("roadmapClose");
+  if (albumCloseBtn) albumCloseBtn.textContent = t("roadmapClose");
   syncRoadmapStartButton();
   if (roadmapRewardCloseBtn) roadmapRewardCloseBtn.textContent = t("roadmapClose");
-  if (roadmapTabMap) roadmapTabMap.textContent = t("roadmapTabMap");
-  if (roadmapTabAlbum) roadmapTabAlbum.textContent = t("roadmapTabAlbum");
   if (roadmapDevCompleteBtn) roadmapDevCompleteBtn.textContent = t("roadmapDevComplete");
   syncRoadmapDevBtn();
   if (roadmapAlbumBackBtn) roadmapAlbumBackBtn.textContent = t("roadmapAlbumBack");
@@ -475,25 +458,82 @@ function createProgressRing(progress, target) {
   return ring;
 }
 
+/** @param {number} level */
+function getLevelZone(level) {
+  if (level <= 11) return "nebula";
+  if (level <= 23) return "comet";
+  if (level <= 35) return "planet";
+  if (level <= 47) return "galaxy";
+  if (level <= 59) return "aurora";
+  return "summit";
+}
+
+/**
+ * @param {number} currentLevel
+ * @param {number} visibleMin
+ * @param {number} visibleMax
+ */
+function createStarTrailSvg(currentLevel, visibleMin, visibleMax) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "cosmic-trail");
+  svg.setAttribute("viewBox", `0 0 ${ROADMAP_MAP_SIZE.w} ${ROADMAP_MAP_SIZE.h}`);
+  svg.setAttribute("preserveAspectRatio", "none");
+  svg.setAttribute("aria-hidden", "true");
+
+  const fullPath = buildSvgPathFromVertices(ROADMAP_PATH_VERTICES);
+  const visibleCount = Math.max(1, visibleMax - visibleMin + 1);
+  const progressIndex = Math.max(0, Math.min(visibleCount - 1, currentLevel - visibleMin));
+  const progressFrac = visibleCount <= 1 ? 1 : progressIndex / (visibleCount - 1);
+
+  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+  defs.innerHTML = `
+    <linearGradient id="trailGlow" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff9f1c"/>
+      <stop offset="45%" stop-color="#7b5cff"/>
+      <stop offset="100%" stop-color="#5edfff"/>
+    </linearGradient>
+    <filter id="trailBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  `;
+  svg.append(defs);
+
+  const track = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  track.setAttribute("class", "cosmic-trail__track");
+  track.setAttribute("d", fullPath);
+  svg.append(track);
+
+  const glow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  glow.setAttribute("class", "cosmic-trail__glow");
+  glow.setAttribute("d", fullPath);
+  glow.setAttribute("filter", "url(#trailBlur)");
+  svg.append(glow);
+
+  const fill = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  fill.setAttribute("class", "cosmic-trail__fill");
+  fill.setAttribute("d", fullPath);
+  fill.setAttribute("pathLength", "1");
+  fill.style.strokeDasharray = "1";
+  fill.style.strokeDashoffset = String(1 - progressFrac);
+  svg.append(fill);
+
+  return svg;
+}
+
+function scrollToCurrentLevel() {
+  /* Map fits on screen — no scroll needed. */
+}
+
 /**
  * @param {import("./roadmap.js").RoadmapLevel} challenge
  * @param {{ isDone: boolean; isCurrent: boolean; isLocked: boolean; progress: number; target: number; showAvatar: boolean; avatarId: string }} meta
  */
-/** @param {number} level */
-function getLevelZone(level) {
-  if (level <= 11) return "sunset";
-  if (level <= 23) return "meadow";
-  if (level <= 35) return "forest";
-  if (level <= 47) return "river";
-  if (level <= 59) return "cave";
-  return "summit";
-}
-
 function createLevelNode(challenge, meta) {
   const { t } = /** @type {RoadmapUiDeps} */ (deps);
   const btn = document.createElement("button");
   btn.type = "button";
-  btn.className = "adventure-node";
+  btn.className = "adventure-node adventure-node--star";
   btn.dataset.level = String(challenge.level);
   btn.dataset.zone = getLevelZone(challenge.level);
   if (meta.isDone) btn.classList.add("adventure-node--done");
@@ -504,14 +544,14 @@ function createLevelNode(challenge, meta) {
   btn.setAttribute("aria-label", t("roadmapLevelLabel", { level: String(challenge.level) }));
 
   const halo = document.createElement("span");
-  halo.className = "adventure-node__halo";
+  halo.className = "adventure-node__halo adventure-node__halo--star";
   halo.setAttribute("aria-hidden", "true");
   btn.append(halo);
 
-  const pedestal = document.createElement("span");
-  pedestal.className = "adventure-node__pedestal";
-  pedestal.setAttribute("aria-hidden", "true");
-  btn.append(pedestal);
+  const glow = document.createElement("span");
+  glow.className = "adventure-node__glow";
+  glow.setAttribute("aria-hidden", "true");
+  btn.append(glow);
 
   if (meta.isCurrent) btn.append(createProgressRing(meta.progress, meta.target));
 
@@ -606,19 +646,20 @@ function renderRoadmapMap() {
   roadmapMapEl.replaceChildren();
 
   const scene = document.createElement("div");
-  scene.className = "adventure-scene";
-  scene.innerHTML = `
-    <div class="adventure-scene__backdrop" aria-hidden="true">
-      <img
-        class="adventure-scene__backdrop-img"
-        src="${roadmapMapArt}"
-        alt=""
-        width="${ROADMAP_MAP_SIZE.w}"
-        height="${ROADMAP_MAP_SIZE.h}"
-        decoding="async"
-      />
-    </div>
-  `;
+  scene.className = "adventure-scene adventure-scene--cosmic";
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "adventure-scene__backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+
+  const img = document.createElement("img");
+  img.className = "adventure-scene__backdrop-img";
+  img.src = roadmapMapArt;
+  img.alt = "";
+  img.width = ROADMAP_MAP_SIZE.w;
+  img.height = ROADMAP_MAP_SIZE.h;
+  img.decoding = "async";
+  backdrop.append(img);
 
   const markers = document.createElement("div");
   markers.className = "adventure-scene__markers";
@@ -659,27 +700,40 @@ function renderRoadmapMap() {
     markers.append(anchor);
   }
 
-  const backdrop = scene.querySelector(".adventure-scene__backdrop");
-  if (backdrop instanceof HTMLElement) {
-    backdrop.append(markers);
-  } else {
-    scene.append(markers);
-  }
+  backdrop.append(markers);
+  scene.append(backdrop);
   roadmapMapEl.append(scene);
 
   const relayout = () => applyRoadmapSpotPositions(scene, spotAnchors);
   syncRoadmapSpotPositions = relayout;
 
-  const img = scene.querySelector(".adventure-scene__backdrop-img");
-  if (img instanceof HTMLImageElement && !img.complete) {
+  if (!img.complete) {
     img.addEventListener("load", relayout, { once: true });
   }
 
-  if (typeof ResizeObserver !== "undefined") {
-    const ro = new ResizeObserver(relayout);
-    ro.observe(scene);
+  if (typeof ResizeObserver !== "undefined" && roadmapMapEl) {
+    let lastW = 0;
+    let lastH = 0;
+    /** @type {number | null} */
+    let resizeRaf = null;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      if (Math.abs(width - lastW) < 2 && Math.abs(height - lastH) < 2) return;
+      lastW = width;
+      lastH = height;
+      if (resizeRaf !== null) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        relayout();
+      });
+    });
+    ro.observe(roadmapMapEl);
   }
 
+  relayout();
+  scrollToCurrentLevel();
   renderLevelPopover();
 }
 
@@ -805,7 +859,7 @@ function createDraggablePending(pendingId, stickerId, weekId, slug) {
     ghost.classList.add("mm-sticker--xl", "album-drag-ghost");
     ghost.style.width = `${rect.width * 1.15}px`;
     ghost.style.height = `${rect.height * 1.15}px`;
-    const dragLayer = ensureRoadmapDragLayer() ?? roadmapDialog ?? document.body;
+    const dragLayer = ensureAlbumDragLayer() ?? albumDialog ?? document.body;
     dragLayer.append(ghost);
 
     activeDrag = {
@@ -821,7 +875,7 @@ function createDraggablePending(pendingId, stickerId, weekId, slug) {
     };
     positionDragGhost(e.clientX, e.clientY);
     wrap.classList.add("album-tray__item--dragging");
-    roadmapDialog?.classList.add("is-dragging-sticker");
+    albumDialog?.classList.add("is-dragging-sticker");
     attachDragListeners();
     startDragAutoScroll();
   };
@@ -945,9 +999,12 @@ function renderAlbumView() {
 
 export function renderRoadmapDialog() {
   renderRoadmapMap();
-  if (!roadmapPanelAlbum?.hidden) renderAlbumView();
   refreshRoadmapProgressPill();
   syncRoadmapStartButton();
+}
+
+export function renderAlbumDialog() {
+  renderAlbumView();
 }
 
 export function openRoadmapDialog() {
@@ -955,9 +1012,6 @@ export function openRoadmapDialog() {
   const slug = deps?.getCurrentUserSlug();
   userPickedLevel = false;
   selectedLevel = slug ? getRoadmapSummary(slug).state.currentLevel : null;
-  albumView = "picker";
-  selectedAlbumWeek = null;
-  setRoadmapTab("map");
   roadmapDialog?.showModal();
   renderRoadmapDialog();
   queueRoadmapSpotRelayout();
@@ -969,18 +1023,23 @@ export function openRoadmapAlbum() {
   userPickedLevel = false;
   albumView = "picker";
   selectedAlbumWeek = null;
-  setRoadmapTab("album");
   showAlbumPicker();
-  roadmapDialog?.showModal();
-  renderRoadmapDialog();
+  albumDialog?.showModal();
+  renderAlbumDialog();
 }
 
 export function closeRoadmapDialog() {
-  cancelActiveDrag();
   selectedLevel = null;
   userPickedLevel = false;
   if (roadmapLevelPopover) roadmapLevelPopover.hidden = true;
   roadmapDialog?.close();
+}
+
+export function closeAlbumDialog() {
+  cancelActiveDrag();
+  albumView = "picker";
+  selectedAlbumWeek = null;
+  albumDialog?.close();
 }
 
 /**
@@ -1051,7 +1110,7 @@ function closeRoadmapReward() {
   roadmapRewardDialog?.close();
   pendingReward = null;
   if (week) {
-    setRoadmapTab("album");
+    openRoadmapAlbum();
     openAlbumDetail(week);
   }
 }

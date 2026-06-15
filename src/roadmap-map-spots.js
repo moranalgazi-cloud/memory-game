@@ -1,52 +1,33 @@
-/** Circle centers on roadmap-map.png (512×768). Level 1 = bottom of the path. */
+/** Circle centers on the cosmic star trail (512×768). Level 1 = bottom of the path. */
 export const ROADMAP_MAP_SIZE = { w: 512, h: 768 };
 
 export const ROADMAP_MAX_LEVELS = 70;
 
-/** Dense polyline tracing the yellow road on roadmap-map.png. */
-const PATH_VERTICES = [
-  [248, 712],
-  [278, 698],
-  [308, 682],
-  [338, 668],
-  [352, 648],
-  [328, 632],
-  [278, 620],
-  [218, 612],
-  [162, 604],
-  [178, 586],
-  [228, 568],
-  [288, 550],
-  [342, 532],
-  [362, 510],
-  [322, 492],
-  [258, 476],
-  [192, 460],
-  [142, 444],
-  [168, 422],
-  [242, 404],
-  [318, 386],
-  [356, 366],
-  [342, 346],
-  [278, 328],
-  [188, 310],
-  [152, 290],
-  [218, 270],
-  [312, 252],
-  [358, 230],
-  [288, 212],
-  [188, 194],
-  [218, 176],
-  [292, 158],
-  [318, 142],
-  [252, 126],
+/** Winding polyline tracing the glowing trail on roadmap-map.png. */
+export const ROADMAP_PATH_VERTICES = [
+  [256, 710],
+  [310, 685],
+  [358, 655],
+  [348, 618],
+  [290, 592],
+  [200, 572],
+  [118, 548],
+  [108, 512],
+  [185, 482],
+  [300, 452],
+  [372, 420],
+  [358, 385],
+  [268, 358],
+  [155, 335],
+  [105, 302],
+  [175, 272],
+  [290, 245],
+  [365, 215],
+  [330, 182],
+  [256, 152],
+  [256, 108],
 ];
 
-/**
- * @param {[number, number][]} vertices
- * @param {number} count
- * @returns {{ level: number; x: number; y: number }[]}
- */
 function samplePathEvenly(vertices, count) {
   const segments = [];
   let total = 0;
@@ -88,12 +69,36 @@ function samplePathEvenly(vertices, count) {
   return spots;
 }
 
-/** @param {number} count */
 function buildLevelSpots(count) {
-  return samplePathEvenly(PATH_VERTICES, count);
+  return samplePathEvenly(ROADMAP_PATH_VERTICES, count);
 }
 
 export const ROADMAP_LEVEL_SPOTS = buildLevelSpots(ROADMAP_MAX_LEVELS);
+
+/**
+ * Build an SVG path `d` attribute from vertex coordinates.
+ *
+ * @param {[number, number][]} vertices
+ * @returns {string}
+ */
+export function buildSvgPathFromVertices(vertices) {
+  if (!vertices.length) return "";
+  return vertices
+    .map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x} ${y}`)
+    .join(" ");
+}
+
+/**
+ * Fraction (0–1) along the path for a given level index among visible levels.
+ *
+ * @param {number} levelIndex 0-based index among visible levels
+ * @param {number} totalVisible
+ * @returns {number}
+ */
+export function pathFractionForLevelIndex(levelIndex, totalVisible) {
+  if (totalVisible <= 1) return 0;
+  return levelIndex / (totalVisible - 1);
+}
 
 /**
  * Map the given level numbers onto evenly spaced points along the path.
@@ -103,7 +108,7 @@ export const ROADMAP_LEVEL_SPOTS = buildLevelSpots(ROADMAP_MAX_LEVELS);
  */
 export function getRoadmapDisplayPositionsForLevels(levelNumbers) {
   const count = Math.max(1, levelNumbers.length);
-  const spots = samplePathEvenly(PATH_VERTICES, count);
+  const spots = samplePathEvenly(ROADMAP_PATH_VERTICES, count);
   const map = new Map();
   levelNumbers.forEach((level, index) => {
     const spot = spots[index];

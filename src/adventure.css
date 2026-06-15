@@ -143,14 +143,203 @@ html[lang="he"] .roadmap-reward-dialog button {
   padding: 0;
   max-width: none;
   width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   margin: 0;
   background: var(--adventure-bg);
   color: var(--adventure-text);
   box-shadow: none;
   overflow: hidden;
   position: relative;
+}
+
+.adventure-dialog--map {
+  --adventure-bg: #0a0e2e;
+  --adventure-text: #fff8f0;
+  --adventure-text-muted: rgba(255, 248, 240, 0.72);
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+/* ── Full-screen roadmap: map sits BETWEEN header and footer (no overlay) ── */
+
+.adventure-dialog--map .adventure-dialog__inner--immersive {
+  display: flex;
+  flex-direction: column;
+  /* svh = stable on mobile (doesn't jump when browser chrome hides) */
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
+}
+
+.adventure-dialog--map .adventure-dialog__header--float {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  z-index: 2;
+  flex: none;
+  padding: max(0.55rem, env(safe-area-inset-top, 0px)) 0.85rem 0.5rem;
+  background: rgba(10, 14, 46, 0.96);
+  border-bottom: 1px solid rgba(123, 92, 255, 0.18);
+  pointer-events: auto;
+}
+
+.adventure-dialog--map .adventure-panel--map:not([hidden]) {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.adventure-dialog--map .adventure-map {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  background: #0a0e2e;
+}
+
+/* Width-based sizing — stable on mobile (no container-query height jumps) */
+.adventure-dialog--map .adventure-scene {
+  position: relative;
+  flex: none;
+  aspect-ratio: 512 / 768;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.adventure-dialog--map .adventure-scene__backdrop-img {
+  object-fit: cover;
+}
+
+.adventure-dialog--map .adventure-dialog__header--float,
+.adventure-dialog--map .adventure-dialog__actions--float,
+.adventure-dialog--map .adventure-node,
+.adventure-dialog--map .adventure-spot {
+  touch-action: manipulation;
+}
+
+.adventure-dialog--map .adventure-dialog__title {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.adventure-dialog--map .adventure-dialog__subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.7rem;
+  opacity: 0.8;
+  max-width: 100%;
+}
+
+.adventure-dialog--map .adventure-dialog__actions--float {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  z-index: 2;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0.5rem 0.65rem max(0.5rem, env(safe-area-inset-bottom, 0px));
+  background: rgba(10, 14, 46, 0.98);
+  border-top: 1px solid rgba(123, 92, 255, 0.22);
+  gap: 0.4rem;
+  pointer-events: auto;
+}
+
+.adventure-dialog--map .adventure-dialog__action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
+  pointer-events: none;
+}
+
+.adventure-dialog--map .adventure-dialog__action-row .adventure-dialog__action,
+.adventure-dialog--map .adventure-dialog__action-row .adventure-dialog__dev {
+  pointer-events: auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.adventure-dialog--map .adventure-dialog__action {
+  flex: 1 1 auto;
+  min-height: 2.65rem;
+  font-size: 0.88rem;
+}
+
+.adventure-dialog--map .adventure-popover--dock {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  background: rgba(18, 26, 66, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(123, 92, 255, 0.32);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: #fff8f0;
+  pointer-events: auto;
+}
+
+.adventure-dialog--map .adventure-popover--dock .adventure-popover__title {
+  margin: 0 0 0.2rem;
+  font-size: 0.88rem;
+  color: #ffd166;
+}
+
+.adventure-dialog--map .adventure-popover--dock .adventure-popover__desc {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: rgba(255, 248, 240, 0.82);
+}
+
+.adventure-dialog--map .adventure-popover--dock .adventure-popover__progress,
+.adventure-dialog--map .adventure-popover--dock .adventure-popover__done,
+.adventure-dialog--map .adventure-popover--dock .adventure-popover__locked {
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+}
+
+.adventure-dialog--album {
+  --adventure-bg: #121a42;
+  --adventure-text: #fff8f0;
+  --adventure-text-muted: rgba(255, 248, 240, 0.72);
+  --adventure-header-bg: linear-gradient(
+    180deg,
+    rgba(30, 42, 90, 0.98) 0%,
+    rgba(18, 26, 66, 0.92) 100%
+  );
+  --adventure-panel-bg: transparent;
+  --adventure-footer-bg: rgba(15, 21, 64, 0.95);
+  --adventure-slots-bg: rgba(255, 255, 255, 0.06);
+  --adventure-slots-border: rgba(123, 92, 255, 0.35);
+  --adventure-slot-bg: rgba(255, 255, 255, 0.04);
+  --adventure-slot-missing-border: rgba(255, 255, 255, 0.22);
+  --adventure-slot-placed-border: rgba(255, 209, 102, 0.45);
+  --adventure-tray-bg: rgba(255, 255, 255, 0.07);
+  --adventure-tray-border: rgba(123, 92, 255, 0.28);
+  --adventure-divider: rgba(255, 255, 255, 0.1);
 }
 
 .adventure-dialog::backdrop {
@@ -161,8 +350,15 @@ html[lang="he"] .roadmap-reward-dialog button {
 .adventure-dialog__inner {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.adventure-dialog__inner--immersive {
+  position: relative;
+  height: 100dvh;
+  min-height: 100dvh;
   overflow: hidden;
 }
 
@@ -170,6 +366,37 @@ html[lang="he"] .roadmap-reward-dialog button {
   padding: max(1.1rem, env(safe-area-inset-top, 0px)) 1rem 0.65rem;
   background: var(--adventure-header-bg);
   border-bottom: 1px solid var(--adventure-divider);
+}
+
+.adventure-dialog__header--float {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: max(0.85rem, env(safe-area-inset-top, 0px)) 1rem 0.55rem;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 21, 64, 0.92) 0%,
+    rgba(15, 21, 64, 0.55) 70%,
+    transparent 100%
+  );
+  border-bottom: none;
+  pointer-events: none;
+}
+
+.adventure-dialog__header--float .adventure-dialog__title,
+.adventure-dialog__header--float .adventure-dialog__subtitle {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+.adventure-dialog__header--cosmic {
+  background: linear-gradient(
+    180deg,
+    rgba(30, 42, 90, 0.98) 0%,
+    rgba(18, 26, 66, 0.88) 100%
+  );
+  border-bottom: 1px solid rgba(123, 92, 255, 0.22);
 }
 
 .adventure-dialog__title {
@@ -228,8 +455,12 @@ html[lang="he"] .roadmap-reward-dialog button {
 .adventure-panel--map:not([hidden]) {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  flex: 1 1 auto;
   min-height: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+  position: relative;
 }
 
 .adventure-map {
@@ -239,13 +470,21 @@ html[lang="he"] .roadmap-reward-dialog button {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.45rem 0.75rem 0.65rem;
+  padding: 0;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .adventure-panel--album:not([hidden]) {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  flex: 1 1 auto;
+  padding: 0.65rem 0.85rem 0.5rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(123, 92, 255, 0.18), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(255, 159, 28, 0.08), transparent),
+    var(--adventure-panel-bg, transparent);
 }
 
 .album-picker,
@@ -254,38 +493,180 @@ html[lang="he"] .roadmap-reward-dialog button {
   min-height: 0;
 }
 
-/* roadmap-map.png is 512×768 — box must match that ratio so level spots line up. */
+/* roadmap-map.png is 512×768 — scene scales to fit the viewport, spots stay aligned. */
 .adventure-scene {
   position: relative;
   flex: none;
   direction: ltr;
-  width: min(100%, calc(min(78vh, 40rem) * 512 / 768));
   aspect-ratio: 512 / 768;
-  max-height: min(78vh, 40rem);
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   overflow: hidden;
-  border-radius: var(--adventure-map-radius);
-  box-shadow: var(--adventure-map-shadow);
 }
 
 .adventure-scene__backdrop {
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: inherit;
   overflow: hidden;
+  border-radius: inherit;
 }
 
 .adventure-scene__backdrop-img {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: fill;
-  filter: var(--adventure-map-filter);
-  border-radius: inherit;
+}
+
+/* Nebula blobs */
+.cosmic-nebula {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cosmic-nebula__blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.55;
+  animation: cosmic-nebula-drift 20s ease-in-out infinite;
+}
+
+.cosmic-nebula__blob--a {
+  width: 45%;
+  height: 30%;
+  top: 15%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(123, 92, 255, 0.5), transparent 70%);
+}
+
+.cosmic-nebula__blob--b {
+  width: 35%;
+  height: 25%;
+  top: 45%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(94, 223, 255, 0.35), transparent 70%);
+  animation-delay: -8s;
+}
+
+.cosmic-nebula__blob--c {
+  width: 40%;
+  height: 28%;
+  bottom: 10%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(255, 159, 28, 0.25), transparent 70%);
+  animation-delay: -14s;
+}
+
+/* Twinkling stars */
+.cosmic-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cosmic-star {
+  position: absolute;
+  width: var(--star-size, 2px);
+  height: var(--star-size, 2px);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.4);
+  animation: cosmic-star-twinkle 3s ease-in-out infinite;
+}
+
+.cosmic-star--bright {
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8), 0 0 12px rgba(123, 92, 255, 0.4);
+}
+
+.cosmic-star--bright::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  transform: translate(-50%, -50%);
+}
+
+.cosmic-trail {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cosmic-trail--overlay {
+  z-index: 1;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.cosmic-trail--overlay .cosmic-trail__track,
+.cosmic-trail--overlay .cosmic-trail__glow {
+  display: none;
+}
+
+.cosmic-trail--overlay .cosmic-trail__fill {
+  stroke-width: 8;
+  opacity: 0.9;
+}
+
+.cosmic-trail__track {
+  fill: none;
+  stroke: rgba(123, 92, 255, 0.18);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cosmic-trail__glow {
+  fill: none;
+  stroke: rgba(123, 92, 255, 0.35);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+}
+
+.cosmic-trail__fill {
+  fill: none;
+  stroke: url(#trailGlow);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 8px rgba(255, 159, 28, 0.6));
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+/* Summit star at top of trail */
+.cosmic-summit {
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cosmic-summit__star {
+  display: block;
+  font-size: 2.8rem;
+  color: #ffd166;
+  text-shadow:
+    0 0 20px rgba(255, 209, 102, 0.9),
+    0 0 40px rgba(255, 159, 28, 0.5);
+  animation: cosmic-summit-pulse 2.5s ease-in-out infinite;
 }
 
 .adventure-scene__sky {
@@ -372,79 +753,108 @@ html[lang="he"] .roadmap-reward-dialog button {
   justify-content: center;
 }
 
+.adventure-dialog--map .adventure-node {
+  width: clamp(3rem, 12.5vmin, 4.75rem);
+  height: clamp(3rem, 12.5vmin, 4.75rem);
+}
+
+.adventure-dialog--map .adventure-node__core {
+  width: clamp(2.65rem, 11vmin, 4.1rem);
+  height: clamp(2.65rem, 11vmin, 4.1rem);
+  font-size: clamp(1rem, 4.5vmin, 1.4rem);
+  border-width: 4px;
+}
+
+.adventure-dialog--map .adventure-node__halo--star {
+  width: clamp(3.1rem, 13vmin, 4.9rem);
+  height: clamp(3.1rem, 13vmin, 4.9rem);
+}
+
+.adventure-dialog--map .adventure-node__ring {
+  width: clamp(2.9rem, 12vmin, 4.5rem);
+  height: clamp(2.9rem, 12vmin, 4.5rem);
+}
+
+.adventure-dialog--map .adventure-avatar {
+  width: clamp(3.2rem, 12vmin, 4.25rem);
+  height: clamp(3.6rem, 13.5vmin, 4.75rem);
+  top: clamp(-2.75rem, -10vmin, -3.5rem);
+}
+
 .adventure-node {
   position: relative;
-  width: 2.85rem;
-  height: 3.05rem;
+  width: 3rem;
+  height: 3rem;
   padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
   flex: none;
-  filter: drop-shadow(0 6px 10px rgba(20, 30, 60, 0.22));
+  filter: drop-shadow(0 4px 12px rgba(20, 30, 80, 0.45));
   transition: filter 0.18s ease, transform 0.18s ease;
 }
 
-.adventure-node:hover:not(.adventure-node--locked) {
-  transform: translateY(-2px) scale(1.04);
-  filter: drop-shadow(0 10px 16px rgba(20, 30, 60, 0.3));
+.adventure-node--star:hover:not(.adventure-node--locked) {
+  transform: translateY(-3px) scale(1.08);
+  filter: drop-shadow(0 8px 20px rgba(123, 92, 255, 0.55));
 }
 
-.adventure-node__halo {
+.adventure-node__halo--star {
   position: absolute;
-  top: 0.15rem;
+  top: 50%;
   left: 50%;
   z-index: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 3.2rem;
+  height: 3.2rem;
   border-radius: 50%;
-  transform: translateX(-50%);
-  border: 2px solid rgba(255, 255, 255, 0.42);
-  box-shadow:
-    inset 0 0 10px rgba(255, 255, 255, 0.18),
-    0 0 14px rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 16px rgba(123, 92, 255, 0.25);
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.7;
 }
 
-.adventure-node--current .adventure-node__halo {
-  border-color: rgba(255, 255, 255, 0.95);
-  border-width: 3px;
-  box-shadow:
-    inset 0 0 12px rgba(255, 255, 255, 0.32),
-    0 0 0 3px rgba(34, 211, 238, 0.55),
-    0 0 18px rgba(34, 211, 238, 0.42);
+.adventure-node__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(123, 92, 255, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.adventure-node--current .adventure-node__glow {
+  opacity: 1;
   animation: adventure-halo-pulse 2s ease-in-out infinite;
 }
 
-.adventure-node--locked .adventure-node__halo {
-  opacity: 0.35;
-  border-color: rgba(255, 255, 255, 0.2);
+.adventure-node--current .adventure-node__halo--star {
+  border-color: rgba(255, 255, 255, 0.85);
+  border-width: 2.5px;
+  box-shadow:
+    0 0 0 3px rgba(94, 223, 255, 0.45),
+    0 0 20px rgba(94, 223, 255, 0.35);
+  animation: adventure-halo-pulse 2s ease-in-out infinite;
 }
 
-.adventure-node__pedestal {
-  position: absolute;
-  bottom: 0.02rem;
-  left: 50%;
-  z-index: 0;
-  width: 3rem;
-  height: 0.6rem;
-  border-radius: 50%;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, #c4b49a 0%, #8a7762 55%, #5c4f42 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.25),
-    0 4px 8px rgba(30, 20, 10, 0.38);
-  pointer-events: none;
+.adventure-node--locked .adventure-node__halo--star {
+  opacity: 0.25;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .adventure-node__ring {
   position: absolute;
-  top: 0.1rem;
+  top: 50%;
   left: 50%;
-  width: 2.9rem;
-  height: 2.9rem;
-  transform: translateX(-50%) rotate(-90deg);
+  width: 3rem;
+  height: 3rem;
+  transform: translate(-50%, -50%) rotate(-90deg);
   pointer-events: none;
 }
 
@@ -468,34 +878,38 @@ html[lang="he"] .roadmap-reward-dialog button {
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 2.55rem;
-  height: 2.55rem;
-  margin: 0.14rem auto 0;
+  width: 2.7rem;
+  height: 2.7rem;
+  margin: 0 auto;
   border-radius: 50%;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 900;
   color: #fff;
-  border: 3.5px solid rgba(255, 255, 255, 0.96);
-  background: linear-gradient(155deg, #9aaeff 0%, #5b6cff 55%, #3f52d4 100%);
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  background: linear-gradient(155deg, #a8b8ff 0%, #6c4dff 55%, #4a32d4 100%);
   box-shadow:
-    inset 0 5px 12px rgba(255, 255, 255, 0.48),
-    inset 0 -6px 10px rgba(0, 0, 0, 0.2),
-    0 6px 0 rgba(35, 45, 110, 0.55),
-    0 11px 22px rgba(20, 30, 80, 0.34);
+    inset 0 4px 10px rgba(255, 255, 255, 0.45),
+    inset 0 -5px 8px rgba(0, 0, 0, 0.2),
+    0 0 14px rgba(108, 77, 255, 0.45),
+    0 6px 0 rgba(50, 35, 130, 0.5);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   transition: transform 0.15s ease;
 }
 
-.adventure-node__core::before {
-  content: "";
+.adventure-node--star .adventure-node__core::before {
+  content: "✦";
   position: absolute;
-  top: 10%;
-  left: 16%;
-  width: 42%;
-  height: 30%;
-  border-radius: 50%;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 100%);
+  top: -0.55rem;
+  right: -0.35rem;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 6px rgba(255, 209, 102, 0.8);
   pointer-events: none;
+}
+
+.adventure-node--current.adventure-node--star .adventure-node__core::before {
+  color: #ffd166;
+  animation: cosmic-star-twinkle 1.5s ease-in-out infinite;
 }
 
 .adventure-node__core::after {
@@ -507,49 +921,49 @@ html[lang="he"] .roadmap-reward-dialog button {
   pointer-events: none;
 }
 
-.adventure-node[data-zone="sunset"] .adventure-node__core {
-  background: linear-gradient(155deg, #ffd978 0%, #ff9f2e 55%, #e07000 100%);
-  box-shadow:
-    inset 0 4px 10px rgba(255, 255, 255, 0.45),
-    inset 0 -5px 8px rgba(120, 50, 0, 0.2),
-    0 5px 0 #b85a00,
-    0 9px 18px rgba(160, 70, 0, 0.28);
-}
-
-.adventure-node[data-zone="meadow"] .adventure-node__core {
-  background: linear-gradient(155deg, #d8ff7a 0%, #8fd62e 55%, #5a9e12 100%);
-  box-shadow:
-    inset 0 4px 10px rgba(255, 255, 255, 0.42),
-    inset 0 -5px 8px rgba(40, 90, 0, 0.2),
-    0 5px 0 #4a8610,
-    0 9px 18px rgba(50, 100, 10, 0.28);
-}
-
-.adventure-node[data-zone="forest"] .adventure-node__core {
-  background: linear-gradient(155deg, #7ee8ff 0%, #2eb8e8 55%, #1680b8 100%);
-  box-shadow:
-    inset 0 4px 10px rgba(255, 255, 255, 0.42),
-    inset 0 -5px 8px rgba(0, 70, 110, 0.2),
-    0 5px 0 #126a9a,
-    0 9px 18px rgba(10, 70, 110, 0.28);
-}
-
-.adventure-node[data-zone="river"] .adventure-node__core {
+.adventure-node[data-zone="nebula"] .adventure-node__core {
   background: linear-gradient(155deg, #c9a0ff 0%, #8b5cf6 55%, #5b2fc9 100%);
   box-shadow:
     inset 0 4px 10px rgba(255, 255, 255, 0.42),
     inset 0 -5px 8px rgba(50, 20, 110, 0.2),
-    0 5px 0 #4a22a0,
-    0 9px 18px rgba(60, 30, 120, 0.28);
+    0 0 14px rgba(139, 92, 246, 0.45),
+    0 6px 0 #4a22a0;
 }
 
-.adventure-node[data-zone="cave"] .adventure-node__core {
+.adventure-node[data-zone="comet"] .adventure-node__core {
+  background: linear-gradient(155deg, #7ee8ff 0%, #2eb8e8 55%, #1680b8 100%);
+  box-shadow:
+    inset 0 4px 10px rgba(255, 255, 255, 0.42),
+    inset 0 -5px 8px rgba(0, 70, 110, 0.2),
+    0 0 14px rgba(46, 184, 232, 0.45),
+    0 6px 0 #126a9a;
+}
+
+.adventure-node[data-zone="planet"] .adventure-node__core {
+  background: linear-gradient(155deg, #ffd978 0%, #ff9f2e 55%, #e07000 100%);
+  box-shadow:
+    inset 0 4px 10px rgba(255, 255, 255, 0.45),
+    inset 0 -5px 8px rgba(120, 50, 0, 0.2),
+    0 0 14px rgba(255, 159, 46, 0.45),
+    0 6px 0 #b85a00;
+}
+
+.adventure-node[data-zone="galaxy"] .adventure-node__core {
   background: linear-gradient(155deg, #ffb8e8 0%, #f472b6 55%, #db2777 100%);
   box-shadow:
     inset 0 4px 10px rgba(255, 255, 255, 0.42),
     inset 0 -5px 8px rgba(120, 20, 70, 0.2),
-    0 5px 0 #b01d63,
-    0 9px 18px rgba(140, 30, 80, 0.28);
+    0 0 14px rgba(244, 114, 182, 0.45),
+    0 6px 0 #b01d63;
+}
+
+.adventure-node[data-zone="aurora"] .adventure-node__core {
+  background: linear-gradient(155deg, #9dffc8 0%, #3dd68c 55%, #18a85f 100%);
+  box-shadow:
+    inset 0 4px 10px rgba(255, 255, 255, 0.45),
+    inset 0 -5px 8px rgba(0, 80, 40, 0.2),
+    0 0 14px rgba(61, 214, 140, 0.45),
+    0 6px 0 #148a4e;
 }
 
 .adventure-node[data-zone="summit"] .adventure-node__core {
@@ -558,8 +972,8 @@ html[lang="he"] .roadmap-reward-dialog button {
   box-shadow:
     inset 0 4px 10px rgba(255, 255, 255, 0.5),
     inset 0 -5px 8px rgba(140, 90, 0, 0.18),
-    0 5px 0 #c47f00,
-    0 9px 18px rgba(180, 110, 0, 0.3);
+    0 0 18px rgba(255, 212, 59, 0.65),
+    0 6px 0 #c47f00;
 }
 
 .adventure-node--current .adventure-node__core {
@@ -568,29 +982,28 @@ html[lang="he"] .roadmap-reward-dialog button {
     inset 0 4px 10px rgba(255, 255, 255, 0.5),
     inset 0 -5px 8px rgba(0, 0, 0, 0.15),
     0 0 0 3px rgba(255, 255, 255, 0.92),
-    0 6px 0 rgba(0, 0, 0, 0.22),
-    0 0 22px rgba(34, 211, 238, 0.55);
+    0 0 24px rgba(94, 223, 255, 0.65),
+    0 6px 0 rgba(0, 0, 0, 0.22);
   animation: adventure-node-glow 2s ease-in-out infinite;
 }
 
 .adventure-node--done .adventure-node__core {
-  background: linear-gradient(155deg, #9dffc8 0%, #3dd68c 55%, #18a85f 100%);
+  background: linear-gradient(155deg, #b8ffe0 0%, #34d399 55%, #059669 100%);
   box-shadow:
     inset 0 4px 10px rgba(255, 255, 255, 0.45),
     inset 0 -5px 8px rgba(0, 80, 40, 0.2),
-    0 5px 0 #148a4e,
-    0 9px 18px rgba(0, 90, 50, 0.28);
+    0 0 12px rgba(52, 211, 153, 0.4),
+    0 6px 0 #047857;
 }
 
 .adventure-node--locked .adventure-node__core {
-  background: linear-gradient(155deg, #e2e8f8 0%, #b8c4dc 55%, #8e9bb8 100%);
-  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(155deg, #4a5280 0%, #2e3560 55%, #1e2348 100%);
+  color: rgba(255, 255, 255, 0.55);
   box-shadow:
-    inset 0 3px 8px rgba(255, 255, 255, 0.35),
-    inset 0 -4px 6px rgba(60, 70, 100, 0.15),
-    0 4px 0 #6f7d9a,
-    0 7px 14px rgba(50, 60, 90, 0.22);
-  filter: saturate(0.75);
+    inset 0 3px 8px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 6px rgba(0, 0, 0, 0.25),
+    0 4px 0 #141830;
+  filter: saturate(0.6) brightness(0.85);
 }
 
 .adventure-node--selected .adventure-node__core {
@@ -743,6 +1156,28 @@ html[lang="he"] .roadmap-reward-dialog button {
   border: 1px solid var(--adventure-popover-border);
 }
 
+.adventure-popover--float {
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 12;
+  background: rgba(18, 26, 66, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(123, 92, 255, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  color: #fff8f0;
+  pointer-events: auto;
+}
+
+.adventure-popover--float .adventure-popover__title {
+  color: #ffd166;
+}
+
+.adventure-popover--float .adventure-popover__desc {
+  color: rgba(255, 248, 240, 0.78);
+}
+
 .adventure-popover__title {
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
@@ -786,8 +1221,9 @@ html[lang="he"] .roadmap-reward-dialog button {
   margin: 0 0 0.75rem;
   font-size: 0.95rem;
   font-weight: 800;
-  color: var(--adventure-text);
+  color: #ffd166;
   text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .album-picker__grid {
@@ -806,15 +1242,16 @@ html[lang="he"] .roadmap-reward-dialog button {
   aspect-ratio: 4 / 5;
   min-height: 10.5rem;
   padding: 0;
-  border: 3px solid rgba(255, 255, 255, 0.28);
+  border: 3px solid rgba(255, 255, 255, 0.22);
   border-radius: 22px;
   overflow: hidden;
   cursor: pointer;
   color: #fff;
   text-align: center;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 14px 32px rgba(0, 0, 0, 0.38);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 14px 32px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(123, 92, 255, 0.15);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -1095,6 +1532,40 @@ html[lang="he"] .roadmap-reward-dialog button {
   -webkit-overflow-scrolling: touch;
 }
 
+@keyframes cosmic-nebula-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(12px, -8px) scale(1.05);
+  }
+}
+
+@keyframes cosmic-star-twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes cosmic-summit-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.12);
+    filter: brightness(1.15);
+  }
+}
+
 .album-tray__item:active {
   cursor: grabbing;
 }
@@ -1229,6 +1700,29 @@ html[lang="he"] .roadmap-reward-dialog button {
   padding: 0.65rem 0.75rem max(0.85rem, env(safe-area-inset-bottom, 0px));
   background: var(--adventure-footer-bg);
   border-top: 1px solid var(--adventure-divider);
+}
+
+.adventure-dialog__actions--float {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 11;
+  background: linear-gradient(
+    0deg,
+    rgba(15, 21, 64, 0.95) 0%,
+    rgba(15, 21, 64, 0.75) 60%,
+    transparent 100%
+  );
+  border-top: none;
+  padding: 1.5rem 0.75rem max(0.85rem, env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+
+.adventure-dialog__actions--float .adventure-dialog__action,
+.adventure-dialog__actions--float .adventure-dialog__dev {
+  pointer-events: auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 @media (max-width: 480px) {

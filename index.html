@@ -627,25 +627,43 @@
       </div>
     </dialog>
 
-    <dialog id="roadmapDialog" class="adventure-dialog">
-      <div class="adventure-dialog__inner">
-        <header class="adventure-dialog__header">
+    <dialog id="roadmapDialog" class="adventure-dialog adventure-dialog--map">
+      <div class="adventure-dialog__inner adventure-dialog__inner--immersive">
+        <header class="adventure-dialog__header adventure-dialog__header--float">
           <h2 id="roadmapTitle" class="adventure-dialog__title">My adventure</h2>
           <p id="roadmapSubtitle" class="adventure-dialog__subtitle"></p>
         </header>
-        <div class="adventure-tabs" role="tablist" aria-label="Adventure views">
-          <button type="button" id="roadmapTabMap" class="adventure-tabs__btn is-active" role="tab" aria-selected="true">
-            Map
-          </button>
-          <button type="button" id="roadmapTabAlbum" class="adventure-tabs__btn" role="tab" aria-selected="false">
-            Album
-          </button>
-        </div>
         <div id="roadmapPanelMap" class="adventure-panel adventure-panel--map">
           <div id="roadmapMap" class="adventure-map"></div>
-          <div id="roadmapLevelPopover" class="adventure-popover" hidden></div>
         </div>
-        <div id="roadmapPanelAlbum" class="adventure-panel adventure-panel--album" hidden>
+        <div class="adventure-dialog__actions adventure-dialog__actions--float">
+          <div id="roadmapLevelPopover" class="adventure-popover adventure-popover--dock" hidden></div>
+          <div class="adventure-dialog__action-row">
+          <button type="button" id="roadmapStartChallenge" class="btn btn--primary adventure-dialog__action">
+            Start level
+          </button>
+          <button
+            type="button"
+            id="roadmapDevComplete"
+            class="btn btn--ghost adventure-dialog__dev"
+            title="Temporary testing only"
+            hidden
+          >
+            DEV: Win level
+          </button>
+          <button type="button" id="closeRoadmap" class="btn btn--ghost adventure-dialog__action">Close</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="albumDialog" class="adventure-dialog adventure-dialog--album">
+      <div class="adventure-dialog__inner">
+        <header class="adventure-dialog__header adventure-dialog__header--cosmic">
+          <h2 id="albumTitle" class="adventure-dialog__title">My stickers</h2>
+          <p id="albumSubtitle" class="adventure-dialog__subtitle"></p>
+        </header>
+        <div id="albumPanel" class="adventure-panel adventure-panel--album">
           <div id="roadmapAlbumPicker" class="album-picker"></div>
           <div id="roadmapAlbumDetail" class="album-detail" hidden>
             <button type="button" id="roadmapAlbumBack" class="album-detail__back btn btn--ghost">Back</button>
@@ -664,19 +682,7 @@
           </div>
         </div>
         <div class="adventure-dialog__actions">
-          <button type="button" id="roadmapStartChallenge" class="btn btn--primary adventure-dialog__action">
-            Start level
-          </button>
-          <button
-            type="button"
-            id="roadmapDevComplete"
-            class="btn btn--ghost adventure-dialog__dev"
-            title="Temporary testing only"
-            hidden
-          >
-            DEV: Win level
-          </button>
-          <button type="button" id="closeRoadmap" class="btn btn--ghost adventure-dialog__action">Close</button>
+          <button type="button" id="closeAlbum" class="btn btn--ghost adventure-dialog__action">Close</button>
         </div>
       </div>
     </dialog>
