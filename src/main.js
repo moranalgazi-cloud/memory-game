@@ -2,6 +2,9 @@ import "./style.css";
 import "./adventure.css";
 import "./screens.css";
 import "./tutorial.css";
+import { preloadRoadmapMapArt } from "./adventure-art.js";
+
+preloadRoadmapMapArt();
 import { applyAppBranding } from "./branding.js";
 import { applyModeIcons, getModeLabelKey } from "./mode-icons.js";
 import { applyNavIcons } from "./nav-icons.js";

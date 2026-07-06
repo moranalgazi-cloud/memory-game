@@ -1,4 +1,4 @@
-import roadmapMapImg from "../docs/images/adventure/roadmap-map.png?url";
+import { roadmapMapArt as roadmapMapImg } from "./adventure-art.js";
 import albumCoverImg from "../docs/images/adventure/album-animals.png?url";
 import stickerStar from "../docs/images/stickers/sticker-star.png?url";
 import stickerRainbow from "../docs/images/stickers/sticker-rainbow.png?url";

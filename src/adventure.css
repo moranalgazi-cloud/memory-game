@@ -227,6 +227,17 @@ html[lang="he"] .roadmap-reward-dialog button {
 
 .adventure-dialog--map .adventure-scene__backdrop-img {
   object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+.adventure-scene--loading .adventure-scene__backdrop-img {
+  opacity: 0;
+}
+
+.adventure-scene--loading .adventure-scene__backdrop {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 18%, rgba(100, 130, 255, 0.22), transparent 70%),
+    linear-gradient(180deg, #0a0e2e 0%, #141a52 48%, #0c1238 100%);
 }
 
 .adventure-dialog--map .adventure-dialog__header--float,

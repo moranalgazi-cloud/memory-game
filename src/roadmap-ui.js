@@ -30,7 +30,7 @@ import {
   setAvatarId,
   getAvatarId,
 } from "./roadmap.js";
-import { getAlbumCoverUrl, roadmapMapArt } from "./adventure-art.js";
+import { getAlbumCoverUrl, roadmapMapArt, preloadRoadmapMapArt } from "./adventure-art.js";
 import {
   ROADMAP_LEVEL_SPOTS,
   ROADMAP_MAP_SIZE,
@@ -117,6 +117,12 @@ const LEVEL_SPOTS = ROADMAP_LEVEL_SPOTS;
 /** @type {(() => void) | null} */
 let syncRoadmapSpotPositions = null;
 
+/** @type {{ scene: HTMLDivElement; img: HTMLImageElement; markers: HTMLDivElement } | null} */
+let roadmapMapShell = null;
+
+/** @type {{ el: HTMLDivElement; spot: { level: number; x: number; y: number } }[] | null} */
+let roadmapSpotAnchors = null;
+
 /** @param {HTMLElement} scene @param {{ el: HTMLElement; spot: { x: number; y: number } }[]} spotAnchors */
 function applyRoadmapSpotPositions(scene, spotAnchors) {
   const width = scene.clientWidth;
@@ -127,6 +133,71 @@ function applyRoadmapSpotPositions(scene, spotAnchors) {
     el.style.left = `${(spot.x / ROADMAP_MAP_SIZE.w) * width}px`;
     el.style.top = `${(spot.y / ROADMAP_MAP_SIZE.h) * height}px`;
   }
+}
+
+function ensureRoadmapMapShell() {
+  if (roadmapMapShell || !roadmapMapEl) return roadmapMapShell;
+
+  const scene = document.createElement("div");
+  scene.className = "adventure-scene adventure-scene--cosmic";
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "adventure-scene__backdrop";
+  backdrop.setAttribute("aria-hidden", "true");
+
+  const img = document.createElement("img");
+  img.className = "adventure-scene__backdrop-img";
+  img.src = roadmapMapArt;
+  img.alt = "";
+  img.width = ROADMAP_MAP_SIZE.w;
+  img.height = ROADMAP_MAP_SIZE.h;
+  img.decoding = "async";
+  img.fetchPriority = "high";
+  if (!img.complete) scene.classList.add("adventure-scene--loading");
+  img.addEventListener(
+    "load",
+    () => {
+      scene.classList.remove("adventure-scene--loading");
+      queueRoadmapSpotRelayout();
+    },
+    { once: true },
+  );
+
+  const markers = document.createElement("div");
+  markers.className = "adventure-scene__markers";
+
+  backdrop.append(img, markers);
+  scene.append(backdrop);
+  roadmapMapEl.append(scene);
+
+  const relayout = () => {
+    if (roadmapSpotAnchors) applyRoadmapSpotPositions(scene, roadmapSpotAnchors);
+  };
+  syncRoadmapSpotPositions = relayout;
+
+  if (typeof ResizeObserver !== "undefined") {
+    let lastW = 0;
+    let lastH = 0;
+    /** @type {number | null} */
+    let resizeRaf = null;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      if (Math.abs(width - lastW) < 2 && Math.abs(height - lastH) < 2) return;
+      lastW = width;
+      lastH = height;
+      if (resizeRaf !== null) cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        relayout();
+      });
+    });
+    ro.observe(roadmapMapEl);
+  }
+
+  roadmapMapShell = { scene, img, markers };
+  return roadmapMapShell;
 }
 
 function queueRoadmapSpotRelayout() {
@@ -251,6 +322,7 @@ function ensureAlbumDragLayer() {
 export function initRoadmapUi(d) {
   deps = d;
   ensureAlbumDragLayer();
+  preloadRoadmapMapArt().finally(() => ensureRoadmapMapShell());
 
   quickNavAdventureBtn?.addEventListener("click", () => openRoadmapDialog());
   quickNavAlbumBtn?.addEventListener("click", () => openRoadmapAlbum());
@@ -637,32 +709,16 @@ function renderLevelPopover() {
 
 function renderRoadmapMap() {
   if (!deps || !roadmapMapEl) return;
+  const shell = ensureRoadmapMapShell();
+  if (!shell) return;
+
   const slug = deps.getCurrentUserSlug();
   const summary = getRoadmapSummary(slug);
   const { state } = summary;
   const { start: visibleMin, end: visibleMax } = getVisibleLevelRange(slug);
   const avatarId = getAvatarId(slug);
 
-  roadmapMapEl.replaceChildren();
-
-  const scene = document.createElement("div");
-  scene.className = "adventure-scene adventure-scene--cosmic";
-
-  const backdrop = document.createElement("div");
-  backdrop.className = "adventure-scene__backdrop";
-  backdrop.setAttribute("aria-hidden", "true");
-
-  const img = document.createElement("img");
-  img.className = "adventure-scene__backdrop-img";
-  img.src = roadmapMapArt;
-  img.alt = "";
-  img.width = ROADMAP_MAP_SIZE.w;
-  img.height = ROADMAP_MAP_SIZE.h;
-  img.decoding = "async";
-  backdrop.append(img);
-
-  const markers = document.createElement("div");
-  markers.className = "adventure-scene__markers";
+  shell.markers.replaceChildren();
 
   /** @type {{ el: HTMLDivElement; spot: { level: number; x: number; y: number } }[]} */
   const spotAnchors = [];
@@ -697,42 +753,11 @@ function renderRoadmapMap() {
       }),
     );
     spotAnchors.push({ el: anchor, spot: { ...spot, x: displayPos.x, y: displayPos.y } });
-    markers.append(anchor);
+    shell.markers.append(anchor);
   }
 
-  backdrop.append(markers);
-  scene.append(backdrop);
-  roadmapMapEl.append(scene);
-
-  const relayout = () => applyRoadmapSpotPositions(scene, spotAnchors);
-  syncRoadmapSpotPositions = relayout;
-
-  if (!img.complete) {
-    img.addEventListener("load", relayout, { once: true });
-  }
-
-  if (typeof ResizeObserver !== "undefined" && roadmapMapEl) {
-    let lastW = 0;
-    let lastH = 0;
-    /** @type {number | null} */
-    let resizeRaf = null;
-    const ro = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      const { width, height } = entry.contentRect;
-      if (Math.abs(width - lastW) < 2 && Math.abs(height - lastH) < 2) return;
-      lastW = width;
-      lastH = height;
-      if (resizeRaf !== null) cancelAnimationFrame(resizeRaf);
-      resizeRaf = requestAnimationFrame(() => {
-        resizeRaf = null;
-        relayout();
-      });
-    });
-    ro.observe(roadmapMapEl);
-  }
-
-  relayout();
+  roadmapSpotAnchors = spotAnchors;
+  syncRoadmapSpotPositions?.();
   scrollToCurrentLevel();
   renderLevelPopover();
 }
