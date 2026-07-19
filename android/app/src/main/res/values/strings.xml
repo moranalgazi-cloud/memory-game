@@ -4,4 +4,5 @@
     <string name="title_activity_main">Memory games</string>
     <string name="package_name">com.memorygames.app</string>
     <string name="custom_url_scheme">com.memorygames.app</string>
+    <string name="admob_app_id">ca-app-pub-7757477231564064~2212750854</string>
 </resources>

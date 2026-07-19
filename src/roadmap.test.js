@@ -15,6 +15,8 @@ import {
   DEV_ALBUM_TRAY_SIZE,
   devCompleteCurrentLevel,
   grantStarterStickerIfNeeded,
+  grantBonusSticker,
+  canGrantBonusSticker,
   placePendingSticker,
 } from "./roadmap.js";
 import {
@@ -74,7 +76,8 @@ describe("LEVEL_TEMPLATES", () => {
 
     const winTemplates = LEVEL_TEMPLATES.filter((tpl) => tpl.goal.type === "wins");
     for (const tpl of winTemplates) {
-      expect(tpl.goal.count).toBeLessThanOrEqual(3);
+      // Extended journey levels use CHALLENGE_WIN_COUNT + 1.
+      expect(tpl.goal.count).toBeLessThanOrEqual(CHALLENGE_WIN_COUNT + 1);
       expect(tpl.goal.mode).toBeTruthy();
       expect(tpl.goal.level).toBeTruthy();
       expect(tpl.preset?.mode).toBe(tpl.goal.mode);
@@ -314,7 +317,7 @@ describe("album periods", () => {
   it("counts days until the next album period", () => {
     const days = getDaysUntilNextAlbumPeriod();
     expect(days).toBeGreaterThanOrEqual(1);
-    expect(days).toBeLessThanOrEqual(5);
+    expect(days).toBeLessThanOrEqual(7);
   });
 
   it("assigns each sticker to exactly one album", () => {
@@ -328,12 +331,14 @@ describe("album periods", () => {
     }
   });
 
-  it("picks rewards from any released open album", () => {
+  it("picks rewards only from the current album period", () => {
     const current = getAlbumPeriodId();
-    const open = listReleasedAlbumPeriodIds(current);
-    const reward = pickRewardSticker([], [], open, () => 0);
+    const latest = getLatestReleasedAlbumPeriodId(current);
+    const reward = pickRewardSticker([], [], [latest], () => 0);
     expect(reward).toBeTruthy();
-    expect(open).toContain(reward.albumWeek);
+    expect(reward.albumWeek).toBe(latest);
+    const album = getWeeklyAlbum(latest);
+    expect(album.slots.some((s) => s.stickerId === reward.stickerId)).toBe(true);
   });
 
   it("regular users only see albums released up to the current period", () => {
@@ -357,11 +362,11 @@ describe("album periods", () => {
     expect(isAlbumComplete([], "P99")).toBe(false);
   });
 
-  it("advances period index every 5 days from the epoch", () => {
-    const epoch = new Date(Date.UTC(2026, 5, 9));
+  it("advances period index every 7 days from the epoch", () => {
+    const epoch = new Date(Date.UTC(2026, 6, 19));
     expect(getAlbumPeriodIndex(epoch)).toBe(0);
-    const day5 = new Date(Date.UTC(2026, 5, 14));
-    expect(getAlbumPeriodIndex(day5)).toBe(1);
+    const day7 = new Date(Date.UTC(2026, 6, 26));
+    expect(getAlbumPeriodIndex(day7)).toBe(1);
   });
 });
 
@@ -442,6 +447,18 @@ describe("grantStarterStickerIfNeeded", () => {
     expect(state.placedStickers).toHaveLength(0);
 
     expect(grantStarterStickerIfNeeded(SLUG)).toBeNull();
+  });
+});
+
+describe("grantBonusSticker", () => {
+  it("adds a sticker from the current album when one is available", () => {
+    expect(canGrantBonusSticker(SLUG)).toBe(true);
+    const gift = grantBonusSticker(SLUG);
+    expect(gift).toBeTruthy();
+    expect(loadRoadmap(SLUG).pendingStickers).toHaveLength(1);
+    expect(canGrantBonusSticker(SLUG)).toBe(true);
+    grantBonusSticker(SLUG);
+    expect(loadRoadmap(SLUG).pendingStickers.length).toBeGreaterThanOrEqual(2);
   });
 });
 

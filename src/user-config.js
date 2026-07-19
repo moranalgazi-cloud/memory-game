@@ -1,3 +1,6 @@
+/** Public support inbox shown in About / Contact us. */
+export const SUPPORT_EMAIL = "moranalgazi@gmail.com";
+
 /**
  * Only these **display names** may open Admin (case-insensitive).
  * Unlock uses a password hash — see `ADMIN_PASSWORD_SHA256_HEX` below.

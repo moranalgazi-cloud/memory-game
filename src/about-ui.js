@@ -9,6 +9,8 @@ import {
 } from "./english2-source.js";
 import { getLocale } from "./i18n.js";
 import { getModeIconUrl } from "./mode-icons.js";
+import { copyPlainText } from "./records-email.js";
+import { SUPPORT_EMAIL } from "./user-config.js";
 
 /**
  * @typedef {Object} AboutUiDeps
@@ -22,6 +24,7 @@ const aboutDialog = document.querySelector("#aboutDialog");
 const aboutBody = document.querySelector("#aboutBody");
 const aboutCloseBtn = document.querySelector("#aboutCloseBtn");
 const openAboutSettingsBtn = document.querySelector("#openAbout");
+const openContactSettingsBtn = document.querySelector("#openContact");
 
 /**
  * @param {AboutUiDeps} d
@@ -32,6 +35,10 @@ export function initAboutUi(d) {
   openAboutSettingsBtn?.addEventListener("click", () => {
     closeSettingsMenu();
     openAboutDialog();
+  });
+  openContactSettingsBtn?.addEventListener("click", () => {
+    closeSettingsMenu();
+    openAboutDialog({ scrollToContact: true });
   });
 }
 
@@ -78,6 +85,55 @@ function appendHeading(container, title) {
   h.className = "about-dialog__heading";
   h.textContent = title;
   container.append(h);
+}
+
+/** @param {HTMLElement} container */
+function appendContactBlock(container) {
+  if (!deps) return;
+  const t = deps.t;
+
+  const wrap = document.createElement("div");
+  wrap.className = "about-dialog__contact";
+
+  appendHeading(wrap, t("aboutContactTitle"));
+
+  const lead = document.createElement("p");
+  lead.className = "about-dialog__contact-lead";
+  lead.textContent = t("aboutContactLead");
+  wrap.append(lead);
+
+  const emailLine = document.createElement("p");
+  emailLine.className = "about-dialog__contact-email";
+  const emailLink = document.createElement("a");
+  emailLink.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(t("contactEmailSubject"))}`;
+  emailLink.textContent = SUPPORT_EMAIL;
+  emailLine.append(emailLink);
+  wrap.append(emailLine);
+
+  const actions = document.createElement("div");
+  actions.className = "about-dialog__contact-actions";
+
+  const mailLink = document.createElement("a");
+  mailLink.className = "btn btn--ghost about-dialog__contact-mail";
+  mailLink.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(t("contactEmailSubject"))}`;
+  mailLink.textContent = t("contactEmailSend");
+  actions.append(mailLink);
+
+  const copyBtn = document.createElement("button");
+  copyBtn.type = "button";
+  copyBtn.className = "btn btn--ghost about-dialog__contact-copy";
+  copyBtn.textContent = t("contactEmailCopy");
+  copyBtn.addEventListener("click", async () => {
+    const ok = await copyPlainText(SUPPORT_EMAIL);
+    copyBtn.textContent = ok ? t("contactEmailCopySuccess") : t("contactEmailCopyFailed");
+    window.setTimeout(() => {
+      copyBtn.textContent = t("contactEmailCopy");
+    }, 2200);
+  });
+  actions.append(copyBtn);
+
+  wrap.append(actions);
+  container.append(wrap);
 }
 
 /**
@@ -152,6 +208,8 @@ function renderAboutBody() {
   author.textContent = t("aboutAuthor");
   aboutBody.append(author);
 
+  appendContactBlock(aboutBody);
+
   appendHeading(aboutBody, t("aboutHowTitle"));
   appendBulletList(aboutBody, [
     t("aboutHowStep1"),
@@ -200,16 +258,24 @@ function renderAboutBody() {
   ]);
 }
 
-export function openAboutDialog() {
+/**
+ * @param {{ scrollToContact?: boolean }} [options]
+ */
+export function openAboutDialog(options = {}) {
   if (!aboutDialog || !deps) return;
   const title = document.querySelector("#aboutDialogTitle");
   if (title) title.textContent = deps.t("aboutTitle");
   if (aboutCloseBtn) aboutCloseBtn.textContent = deps.t("aboutCloseBtn");
   renderAboutBody();
   aboutDialog.showModal();
+  if (options.scrollToContact) {
+    const contact = aboutBody?.querySelector(".about-dialog__contact");
+    contact?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 export function refreshAboutLabels() {
   if (!deps) return;
   if (openAboutSettingsBtn) openAboutSettingsBtn.textContent = deps.t("aboutMenu");
+  if (openContactSettingsBtn) openContactSettingsBtn.textContent = deps.t("contactMenu");
 }

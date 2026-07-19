@@ -176,11 +176,17 @@ body {
   box-shadow: 0 4px 16px var(--shadow-soft);
 }
 
+/* SEO / crawler copy — kept in HTML for indexing, never shown in the app UI. */
 .public-meta {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1rem 1rem 0;
-  text-align: center;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .public-meta__panel {
@@ -263,7 +269,7 @@ body {
 
 /* Once a player is active, the in-app chrome replaces this public blurb. */
 body.has-active-player .public-meta {
-  display: none;
+  display: none !important;
 }
 
 .site-footer__link {
@@ -1721,6 +1727,51 @@ select:focus-visible {
   font-weight: 800;
   color: var(--accent-alt);
   text-align: center;
+}
+
+.about-dialog__contact {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--accent-alt) 10%, var(--surface-elevated));
+  border: 1px solid color-mix(in srgb, var(--accent-alt) 22%, transparent);
+}
+
+.about-dialog__contact .about-dialog__heading {
+  margin-top: 0;
+}
+
+.about-dialog__contact-lead {
+  margin: 0 0 0.65rem;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.about-dialog__contact-email {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+.about-dialog__contact-email a {
+  color: var(--accent-alt);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.about-dialog__contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.about-dialog__contact-mail,
+.about-dialog__contact-copy {
+  flex: 1 1 auto;
+  min-width: 7.5rem;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .about-dialog__heading {

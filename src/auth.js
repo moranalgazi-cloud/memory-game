@@ -46,20 +46,11 @@ export function isSignedIn() {
 }
 
 const DEV_TESTER_EMAIL = "moranalgazi@gmail.com";
-const DEV_PREVIEW_PLAYER_NAMES = new Set(["cfvcbcgfvcgdbgcvfgbc"]);
 
-/** True for the dev Gmail account or designated preview player profiles. */
+/** True only for the signed-in Google account used for release testing. */
 export function isDevTesterSession() {
   const email = getAuthEmail();
-  if (email?.trim().toLowerCase() === DEV_TESTER_EMAIL) return true;
-
-  const slug = getCurrentUserSlug()?.trim().toLowerCase();
-  if (slug && DEV_PREVIEW_PLAYER_NAMES.has(slug)) return true;
-
-  const name = getCurrentUser()?.name?.trim().toLowerCase();
-  if (name && DEV_PREVIEW_PLAYER_NAMES.has(name)) return true;
-
-  return false;
+  return email?.trim().toLowerCase() === DEV_TESTER_EMAIL;
 }
 
 /** @returns {string | null} */

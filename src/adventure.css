@@ -1497,6 +1497,25 @@ html[lang="he"] .roadmap-reward-dialog button {
   font-size: 0.7rem;
 }
 
+.album-tray__reward {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed color-mix(in srgb, var(--adventure-text-faint) 35%, transparent);
+  text-align: center;
+}
+
+.album-tray__reward-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.76rem;
+  color: var(--adventure-text-faint);
+  line-height: 1.4;
+}
+
+.album-tray__reward-btn {
+  width: 100%;
+  max-width: 16rem;
+}
+
 .album-tray__row {
   display: flex;
   flex-wrap: wrap;

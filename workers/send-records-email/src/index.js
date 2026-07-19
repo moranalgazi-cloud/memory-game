@@ -3,6 +3,7 @@
  *
  * Secrets (wrangler secret put):
  *   RESEND_API_KEY
+ *   EMAIL_API_SECRET — required Bearer token; endpoint stays disabled without it
  *
  * Vars (wrangler.toml):
  *   FROM_EMAIL — verified sender in Resend, e.g. "Memory Games <records@playmemorygames.win>"
@@ -25,7 +26,7 @@ function corsHeaders(request, allowed) {
   return {
     "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
   };
 }
@@ -77,8 +78,15 @@ export default {
 
     const apiKey = env.RESEND_API_KEY;
     const fromEmail = env.FROM_EMAIL;
-    if (!apiKey || !fromEmail) {
+    const sharedSecret = (env.EMAIL_API_SECRET || "").trim();
+    if (!apiKey || !fromEmail || !sharedSecret) {
       return json({ error: "not_configured" }, 503, cors);
+    }
+
+    const auth = request.headers.get("Authorization") || "";
+    const presented = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
+    if (!presented || presented !== sharedSecret) {
+      return json({ error: "unauthorized" }, 401, cors);
     }
 
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";

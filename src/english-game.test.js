@@ -129,7 +129,7 @@ describe("pickEnglishEntries", () => {
     const pool = getEnglishPool("colors");
     const picked = pickEnglishEntries(pool, 6, "english2", seeded(42));
     expect(picked).toHaveLength(6);
-    expect(picked.every(isValidBilingualEntry)).toBe(true);
+    expect(picked.every((e) => isValidBilingualEntry(e))).toBe(true);
   });
 });
 

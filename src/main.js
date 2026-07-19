@@ -3,8 +3,6 @@ import "./adventure.css";
 import "./screens.css";
 import "./tutorial.css";
 import { preloadRoadmapMapArt } from "./adventure-art.js";
-
-preloadRoadmapMapArt();
 import { applyAppBranding } from "./branding.js";
 import { applyModeIcons, getModeLabelKey } from "./mode-icons.js";
 import { applyNavIcons } from "./nav-icons.js";
@@ -118,6 +116,7 @@ import {
   consumeOAuthPending,
 } from "./auth.js";
 import { armCelebrationAudio, celebrateWin } from "./celebrate.js";
+import { initAds, maybeShowInterstitialAfterSoloWin } from "./ads.js";
 import { applySnapshotToState } from "./multiplayer/protocol.js";
 import { buildOnlineHostConfig } from "./multiplayer/online-deck.js";
 import {
@@ -214,6 +213,7 @@ const publicWhat2El = document.querySelector("#publicWhat2");
 const publicWhat3El = document.querySelector("#publicWhat3");
 const publicGoogleTitleEl = document.querySelector("#publicGoogleTitle");
 const publicGooglePurposeEl = document.querySelector("#publicGooglePurpose");
+const publicMetaEl = document.querySelector("#publicMeta");
 const labelGameMode = document.querySelector("#labelGameMode");
 const labelPairs = document.querySelector("#labelPairs");
 const labelEnglishLevel = document.querySelector("#labelEnglishLevel");
@@ -566,6 +566,13 @@ function closeSettingsMenu() {
   setSettingsMenuOpen(false);
 }
 
+/** Hide the public SEO blurb once a player is active; show the app shell instead. */
+function syncAppShellVisibility() {
+  const active = Boolean(getCurrentUser());
+  document.body.classList.toggle("has-active-player", active);
+  appRoot?.classList.toggle("is-hidden", !active);
+}
+
 /** Pause before matched cards are finalized (ms). */
 const MATCH_PAUSE_MS = 400;
 /** Pause before a non-matching pair flips back — longer so players can compare. */
@@ -712,6 +719,7 @@ function english2TaglineVars(extra = {}) {
 }
 
 function refreshChrome() {
+  syncAppShellVisibility();
   applyAppBranding(t);
   syncEnglish2ModeVisibility();
   applyModeIcons();
@@ -794,6 +802,9 @@ function refreshChrome() {
   if (publicWhat3El) publicWhat3El.textContent = t("publicWhat3");
   if (publicGoogleTitleEl) publicGoogleTitleEl.textContent = t("publicGoogleTitle");
   if (publicGooglePurposeEl) publicGooglePurposeEl.textContent = t("publicGooglePurpose");
+  if (publicMetaEl instanceof HTMLElement) {
+    publicMetaEl.dir = getLocale() === "he" ? "rtl" : "ltr";
+  }
   if (labelLanguage) labelLanguage.textContent = t("language");
   if (openTutorialBtn) openTutorialBtn.textContent = t("tutorialMenu");
   updateThemeToggleLabel();
@@ -1887,6 +1898,7 @@ function refreshAdminSpeedFinish() {
   const show = Boolean(
     cur &&
       isAdminUser(cur) &&
+      isAdminSessionUnlocked() &&
       state &&
       !state.teaching &&
       !state.winHandled &&
@@ -1946,6 +1958,7 @@ function completeGameWin() {
       if (roadmapResult.completed) showRoadmapReward(roadmapResult);
       else if (roadmapResult.progressed) refreshRoadmapProgressPill();
     }
+    void maybeShowInterstitialAfterSoloWin();
   }
   lastWinForQuiz = { mode: state.mode, cards: [...state.cards] };
   clearWinAutoRestart();
@@ -2135,7 +2148,7 @@ async function startTeachMe() {
 
 function speedFinishGame() {
   const cur = getCurrentUser();
-  if (!state || state.winHandled || !cur || !isAdminUser(cur)) return;
+  if (!state || state.winHandled || !cur || !isAdminUser(cur) || !isAdminSessionUnlocked()) return;
 
   cancelEnglishSpeech();
   armCelebrationAudio();
@@ -2813,8 +2826,6 @@ async function confirmUserChoiceAsync() {
 
   hideUserAddError();
   userDialog?.close();
-  document.body.classList.add("has-active-player");
-  appRoot?.classList.remove("is-hidden");
 
   grantStarterStickerIfNeeded(slug);
   refreshChrome();
@@ -2973,6 +2984,7 @@ async function openAdminOverview() {
 }
 
 initLocale();
+preloadRoadmapMapArt();
 syncEnglish2SourceUiLocale(getLocale());
 applyAppBranding(t);
 applyModeIcons();
@@ -3020,6 +3032,8 @@ initOnlinePlay({
 });
 ensureUserRemoteIds();
 
+void initAds();
+
 // Phase 2: keep the account UI in sync with auth-state changes (sign in, sign
 // out, or returning from a Google OAuth redirect), and apply/relax the
 // account-as-player identity.
@@ -3031,12 +3045,10 @@ onAuthChange(() => {
 });
 
 if (getCurrentUser()) {
-  document.body.classList.add("has-active-player");
   refreshChrome();
   showAwaitingGamePick();
 } else {
-  document.body.classList.remove("has-active-player");
-  appRoot?.classList.add("is-hidden");
+  syncAppShellVisibility();
   refreshChrome();
   queueMicrotask(() => openUserPickerDialog());
 }

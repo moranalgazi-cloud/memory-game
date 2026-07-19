@@ -69,6 +69,10 @@ VITE_TURN_CREDENTIALS_URL=http://localhost:8787
 
 Then run `npm run dev` and, in another terminal, `cd workers/turn-credentials && npm run dev`.
 
+## Abuse controls
+
+The worker rate-limits credential minting (~60/hour per IP) and rejects requests whose `Origin` is present but not in `ALLOWED_ORIGINS`. CORS alone is not auth — keep an eye on Cloudflare Realtime usage. Stronger option later: require a short-lived Supabase JWT.
+
 ## Cost
 
 Cloudflare TURN: **~1,000 GB/month free**, then $0.05/GB. This game sends tiny data-channel messages — family use stays at **$0**.

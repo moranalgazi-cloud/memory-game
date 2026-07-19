@@ -86,6 +86,7 @@ function writeUsers(users) {
 }
 
 function migrateLegacyStatsIfNeeded() {
+  if (typeof localStorage === "undefined") return;
   if (readUsers().length > 0) return;
   const legacy = localStorage.getItem(LEGACY_STATS_V2) ?? localStorage.getItem(LEGACY_STATS_V1);
   if (!legacy) return;

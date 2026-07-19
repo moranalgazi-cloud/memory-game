@@ -5,6 +5,7 @@ import { isDevTesterSession } from "./auth.js";
 import {
   DEV_ALBUM_IDS,
   getAlbumPeriodId,
+  getLatestReleasedAlbumPeriodId,
   pickRewardSticker,
   getStickerDef,
   getWeeklyAlbum,
@@ -84,7 +85,8 @@ export const VISIBLE_LEVELS_PER_SCREEN = 10;
 export const DEV_ALBUM_TRAY_SIZE = 5;
 
 function getOpenAlbumWeeksForRewards() {
-  return listReleasedAlbumPeriodIds(getAlbumPeriodId(), { devPreview: isDevTesterSession() });
+  const currentPeriodId = getAlbumPeriodId();
+  return [getLatestReleasedAlbumPeriodId(currentPeriodId)];
 }
 export const CHALLENGE_WIN_COUNT = 3;
 
@@ -448,6 +450,47 @@ export function grantStarterStickerIfNeeded(slug) {
   const state = loadRoadmap(slug);
   if (state.placedStickers.length > 0 || state.pendingStickers.length > 0) return null;
 
+  const openAlbumWeeks = getOpenAlbumWeeksForRewards();
+  const reward = pickRewardSticker(state.placedStickers, state.pendingStickers, openAlbumWeeks);
+  if (!reward) return null;
+
+  const pendingId = newPendingId();
+  saveRoadmap(slug, {
+    ...state,
+    pendingStickers: [
+      ...state.pendingStickers,
+      { id: pendingId, albumWeek: reward.albumWeek, stickerId: reward.stickerId },
+    ],
+  });
+
+  const def = getStickerDef(reward.stickerId);
+  return {
+    stickerId: reward.stickerId,
+    stickerLabel: def.label,
+    albumWeek: reward.albumWeek,
+    pendingId,
+  };
+}
+
+/**
+ * Whether the player can still earn a bonus sticker from the current album (e.g. via rewarded ad).
+ * @param {string | null | undefined} slug
+ */
+export function canGrantBonusSticker(slug) {
+  if (!slug) return false;
+  const state = loadRoadmap(slug);
+  const openAlbumWeeks = getOpenAlbumWeeksForRewards();
+  return pickRewardSticker(state.placedStickers, state.pendingStickers, openAlbumWeeks) !== null;
+}
+
+/**
+ * Grant one random unowned sticker from the current album (rewarded-ad bonus).
+ * @param {string | null | undefined} slug
+ * @returns {{ stickerId: string; stickerLabel: string; albumWeek: string; pendingId: string } | null}
+ */
+export function grantBonusSticker(slug) {
+  if (!slug) return null;
+  const state = loadRoadmap(slug);
   const openAlbumWeeks = getOpenAlbumWeeksForRewards();
   const reward = pickRewardSticker(state.placedStickers, state.pendingStickers, openAlbumWeeks);
   if (!reward) return null;

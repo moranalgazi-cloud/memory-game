@@ -280,15 +280,15 @@ export class OnlineSession {
     }
 
     if (msg.type === "forfeit" && this.role === "host" && this.playState) {
-      const player = msg.player === "guest" ? "guest" : "host";
-      applyForfeit(this.playState, player);
+      // Peer is always the guest on the host's data channel — ignore spoofed `player`.
+      applyForfeit(this.playState, "guest");
       this.broadcastSync();
     }
 
     if (msg.type === "rematch-ready") {
-      const player = msg.player === "host" ? "host" : "guest";
-      if (player === "host") this.hostRematchReady = true;
-      else this.guestRematchReady = true;
+      // Attribute readiness to the peer who sent the message, not msg.player.
+      if (this.role === "host") this.guestRematchReady = true;
+      else this.hostRematchReady = true;
       this.emitRematchStatus();
       this.tryStartRematch();
     }

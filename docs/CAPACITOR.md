@@ -63,6 +63,40 @@ Guide: [Capacitor — Deploying to Google Play](https://capacitorjs.com/docs/and
 
 ---
 
+## Advertising (AdMob, Android)
+
+Ads are **Android-only** and **off by default**. The website never loads AdMob.
+
+1. Create an app in [AdMob](https://admob.google.com/) and an **Interstitial** ad unit.
+2. Copy your **App ID** into `android/app/src/main/res/values/strings.xml` → `admob_app_id`.
+3. For production builds, set in `.env.production` (or your CI secrets):
+
+   ```env
+   VITE_ADS_ENABLED=true
+   VITE_ADMOB_INTERSTITIAL_ID=ca-app-pub-xxxxxxxx/yyyyyyyyyy
+   VITE_ADMOB_REWARDED_ID=ca-app-pub-xxxxxxxx/zzzzzzzzzz
+   VITE_ADS_GAMES_BETWEEN=2
+   ```
+
+4. `npm run cap:sync` → rebuild the signed AAB.
+
+**Behavior:**
+
+- **Interstitial:** full-screen ad after every **2 solo wins** (configurable).
+- **Rewarded video:** optional **Watch video** button in **Album → current week** — grants a bonus sticker when the user finishes the video.
+
+See **`docs/ADMOB-SETUP.md`** for the full step-by-step AdMob + Play Console checklist.
+
+**Kids / Families:** the app requests **child-directed**, **under-age-of-consent**, and **non-personalized** ads (`src/ads.js`). You must also:
+
+- Mark the app **Designed for Families** / child-directed in **Play Console** and **AdMob**.
+- Complete the **Data safety** form (AdMob SDK data collection).
+- Update `public/privacy.html` before shipping ads to production.
+
+**Test ads:** until you set real IDs, Google’s sample app/unit IDs in `strings.xml` and `src/ads.js` show test creatives only.
+
+---
+
 ## Store checklist (manual)
 
 - **Privacy policy** URL and **Data safety** form (local storage, optional Supabase, device id, etc.).

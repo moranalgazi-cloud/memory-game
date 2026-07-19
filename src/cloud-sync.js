@@ -2,7 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import { isValidAgeRange } from "./age-range.js";
 import { listUsers, ensureUserRemoteIds, reassignRemoteId, stampAuthOwner } from "./user-store.js";
 import { loadRecordsForUser } from "./records.js";
-import { getRoadmapCloudSummary } from "./roadmap.js";
 import { ensureAuthReady, getAuthUserId } from "./auth.js";
 
 const DEVICE_KEY = "memory-app-device-id-v1";
@@ -156,6 +155,8 @@ export async function syncUserBySlug(slug) {
   const stats = loadRecordsForUser(slug);
   const lastPlayedAt =
     typeof user.lastPlayedAt === "number" && Number.isFinite(user.lastPlayedAt) ? user.lastPlayedAt : null;
+  // Lazy import avoids cloud-sync → roadmap → auth → user-store → cloud-sync cycle.
+  const { getRoadmapCloudSummary } = await import("./roadmap.js");
   const roadmap = getRoadmapCloudSummary(slug);
   const createdAtMs =
     typeof user.createdAt === "number" && Number.isFinite(user.createdAt) ? user.createdAt : Date.now();
@@ -214,7 +215,7 @@ const debounceTimersBySlug = new Map();
 export function cancelScheduledCloudSyncForSlug(slug) {
   const prev = debounceTimersBySlug.get(slug);
   if (prev !== undefined) {
-    window.clearTimeout(prev);
+    clearTimeout(prev);
     debounceTimersBySlug.delete(slug);
   }
 }
@@ -223,8 +224,8 @@ export function cancelScheduledCloudSyncForSlug(slug) {
 export function scheduleCloudSyncForSlug(slug) {
   if (!isCloudSyncEnabled()) return;
   const prev = debounceTimersBySlug.get(slug);
-  if (prev) window.clearTimeout(prev);
-  const tid = window.setTimeout(() => {
+  if (prev) clearTimeout(prev);
+  const tid = setTimeout(() => {
     debounceTimersBySlug.delete(slug);
     void syncUserBySlug(slug).then((r) => {
       if (!r.ok) {

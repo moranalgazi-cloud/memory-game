@@ -26,6 +26,8 @@ import {
   getVisibleLevelRange,
   ensureDevAlbumTrayStickers,
   grantAllMissingAlbumStickers,
+  grantBonusSticker,
+  canGrantBonusSticker,
   placePendingSticker,
   setAvatarId,
   getAvatarId,
@@ -39,6 +41,7 @@ import {
   getRoadmapDisplayPositionsForLevels,
 } from "./roadmap-map-spots.js";
 import { createStickerElement, getStickerLabel } from "./roadmap-stickers.js";
+import { isAdsSupported, isRewardedVideoReady, showRewardedVideo } from "./ads.js";
 
 /**
  * @typedef {Object} RoadmapUiDeps
@@ -989,7 +992,73 @@ function renderAlbumDetail() {
     roadmapAlbumTrayEl.append(row);
   }
 
+  appendRewardedStickerOffer(slug, weekId);
+
   syncAlbumAdminControls();
+}
+
+/**
+ * Optional rewarded-video button on the current week's album.
+ * @param {string | null} slug
+ * @param {string} weekId
+ */
+function appendRewardedStickerOffer(slug, weekId) {
+  if (!deps || !roadmapAlbumTrayEl || !slug) return;
+  const currentWeek = getLatestReleasedAlbumPeriodId(getAlbumPeriodId());
+  if (weekId !== currentWeek || !isAdsSupported() || !canGrantBonusSticker(slug)) return;
+
+  const wrap = document.createElement("div");
+  wrap.className = "album-tray__reward";
+
+  const hint = document.createElement("p");
+  hint.className = "album-tray__reward-hint";
+  hint.textContent = deps.t("adsWatchForSticker");
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn btn--secondary album-tray__reward-btn";
+  btn.textContent = deps.t("adsWatchBtn");
+  btn.disabled = !isRewardedVideoReady();
+
+  btn.addEventListener("click", () => {
+    void handleRewardedStickerClick(slug, weekId, btn, hint);
+  });
+
+  wrap.append(hint, btn);
+  roadmapAlbumTrayEl.append(wrap);
+}
+
+/**
+ * @param {string} slug
+ * @param {string} weekId
+ * @param {HTMLButtonElement} btn
+ * @param {HTMLParagraphElement} hint
+ */
+async function handleRewardedStickerClick(slug, weekId, btn, hint) {
+  if (!deps) return;
+  btn.disabled = true;
+
+  const { rewarded } = await showRewardedVideo();
+  if (!rewarded) {
+    hint.textContent = deps.t("adsRewardSkipped");
+    btn.disabled = !isRewardedVideoReady();
+    return;
+  }
+
+  const gift = grantBonusSticker(slug);
+  if (!gift) {
+    hint.textContent = deps.t("adsRewardFailed");
+    btn.hidden = true;
+    return;
+  }
+
+  hint.textContent = deps.t("adsRewardEarned", { sticker: gift.stickerLabel });
+  btn.hidden = true;
+  renderAlbumDetail();
+  refreshRoadmapProgressPill();
+  if (isAlbumComplete(getRoadmapSummary(slug).state.placedStickers, weekId)) {
+    showAlbumComplete(weekId, weekId === getAlbumPeriodId());
+  }
 }
 
 /**

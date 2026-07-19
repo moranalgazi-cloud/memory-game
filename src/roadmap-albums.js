@@ -1,10 +1,10 @@
 export const ALBUM_SIZE = 12;
 /** Sticker count for albums that are not full 12-sticker sets */
 export const ALBUM_SHORT_SIZE = 8;
-export const ALBUM_PERIOD_DAYS = 5;
+export const ALBUM_PERIOD_DAYS = 7;
 
-/** UTC midnight on rollout launch day — period P0 starts here; new album every 5 days */
-const ALBUM_EPOCH_MS = Date.UTC(2026, 5, 9);
+/** UTC midnight on rollout launch day — period P0 starts here; new album every week */
+const ALBUM_EPOCH_MS = Date.UTC(2026, 6, 19);
 
 /** @typedef {"animals" | "food" | "cosmic" | "magic" | "nature" | "hero" | "ocean" | "sports" | "music"} StickerCategory */
 
@@ -212,7 +212,7 @@ export const ALBUM_THEME_EMOJI = {
  */
 
 /**
- * Current 5-day album period id (e.g. "P12"). A new album is generated each period.
+ * Current weekly album period id (e.g. "P12"). A new album is generated each period.
  * @param {Date} [date]
  * @returns {string}
  */
@@ -230,7 +230,7 @@ export function getAlbumPeriodIndex(date = new Date()) {
 }
 
 /**
- * Whole days until the next album period starts (1–5).
+ * Whole days until the next album period starts (1–7).
  * @param {Date} [date]
  */
 export function getDaysUntilNextAlbumPeriod(date = new Date()) {
