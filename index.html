@@ -130,6 +130,9 @@
               <button type="button" id="openContact" class="btn btn--ghost settings-menu__btn">
                 Contact us
               </button>
+              <button type="button" id="openDeleteData" class="btn btn--ghost settings-menu__btn">
+                Delete my data
+              </button>
               <button type="button" id="openDisclaimer" class="btn btn--ghost settings-menu__btn">
                 Disclaimer
               </button>
@@ -937,6 +940,18 @@
         <button type="button" id="disclaimerCloseBtn" class="btn btn--ghost disclaimer-dialog__close">
           Close
         </button>
+      </div>
+    </dialog>
+
+    <dialog id="deleteDataDialog" class="info-dialog">
+      <div class="info-dialog__inner">
+        <h2 id="deleteDataTitle" class="info-dialog__title">Delete my data</h2>
+        <p id="deleteDataBody" class="info-dialog__body"></p>
+        <p id="deleteDataError" class="user-add-error is-hidden" role="alert"></p>
+        <div class="info-dialog__actions">
+          <button type="button" id="deleteDataConfirmBtn" class="btn btn--primary">Delete now</button>
+          <button type="button" id="deleteDataCancelBtn" class="btn btn--ghost">Cancel</button>
+        </div>
       </div>
     </dialog>
 

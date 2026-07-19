@@ -1,6 +1,6 @@
 import { ADMIN_USERNAMES } from "./user-config.js";
 import { isValidAgeRange } from "./age-range.js";
-import { isCloudSyncEnabled, syncAllLocalUsersToCloud } from "./cloud-sync.js";
+import { cancelScheduledCloudSyncForSlug, isCloudSyncEnabled, syncAllLocalUsersToCloud } from "./cloud-sync.js";
 
 let warnedCloudSyncDisabled = false;
 
@@ -416,6 +416,31 @@ export function ensureAccountPlayer(uid, displayName, cloudRows = []) {
     console.warn("[user-store] ensureAccountPlayer current slug:", e);
   }
   return acct;
+}
+
+/** Remove all local player profiles, scores, and per-player progress from this device. */
+export function clearAllLocalGameData() {
+  const users = readUsers();
+  for (const u of users) {
+    cancelScheduledCloudSyncForSlug(u.slug);
+    try {
+      localStorage.removeItem(USER_STATS_PREFIX + u.slug);
+      localStorage.removeItem(`memory-roadmap-v2-${u.slug}`);
+      localStorage.removeItem(`memory-roadmap-v1-${u.slug}`);
+      localStorage.removeItem(`memory-tutorial-v1-${u.slug}`);
+    } catch {
+      /* ignore */
+    }
+  }
+  try {
+    localStorage.removeItem(USERS_KEY);
+    localStorage.removeItem(CURRENT_SLUG_KEY);
+    localStorage.removeItem(LEGACY_STATS_V2);
+    localStorage.removeItem(LEGACY_STATS_V1);
+    localStorage.removeItem("memory-tutorial-v1-complete");
+  } catch {
+    /* ignore */
+  }
 }
 
 /** @param {string} slug */

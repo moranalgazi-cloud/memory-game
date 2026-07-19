@@ -50,6 +50,7 @@ import {
   hasAcceptedDisclaimer,
 } from "./disclaimer-ui.js";
 import { initAboutUi, refreshAboutLabels } from "./about-ui.js";
+import { initDeleteDataUi, refreshDeleteDataLabels } from "./delete-data-ui.js";
 import { initTutorialUi, openTutorial, openTutorialIfNeeded, refreshTutorialLabels } from "./tutorial-ui.js";
 import {
   initRoadmapUi,
@@ -983,6 +984,7 @@ function refreshChrome() {
   refreshOnlineLabels();
   refreshDisclaimerLabels();
   refreshAboutLabels();
+  refreshDeleteDataLabels();
   refreshTutorialLabels();
   refreshOnlineChrome();
 }
@@ -2995,6 +2997,7 @@ initDisclaimerUi({
   onGateChange: () => syncUserAddDisclaimerGate(),
 });
 initAboutUi({ t });
+initDeleteDataUi({ t });
 initTutorialUi({ t });
 initRoadmapUi({
   t,

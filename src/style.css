@@ -1837,6 +1837,14 @@ select:focus-visible {
   width: 100%;
 }
 
+.info-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
 .disclaimer-dialog__inner {
   display: flex;
   flex-direction: column;

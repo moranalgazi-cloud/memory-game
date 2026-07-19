@@ -9,6 +9,16 @@ const DEVICE_KEY = "memory-app-device-id-v1";
 /** @type {string | null} */
 let ephemeralDeviceId = null;
 
+/** Clears the persisted device id so the next sync uses a fresh identifier. */
+export function resetDeviceId() {
+  try {
+    localStorage.removeItem(DEVICE_KEY);
+  } catch {
+    /* ignore */
+  }
+  ephemeralDeviceId = null;
+}
+
 /** @returns {string} */
 export function getDeviceId() {
   try {
@@ -284,6 +294,24 @@ export async function fetchPlayersForOwner(ownerId) {
     throw new Error(error.message);
   }
   return Array.isArray(data) ? data : [];
+}
+
+/**
+ * Delete every cloud player row owned by the given auth user.
+ * @param {string} ownerId
+ * @returns {Promise<{ ok: boolean; skipped?: boolean; error?: string }>}
+ */
+export async function deleteAllCloudPlayersForOwner(ownerId) {
+  const c = getSupabaseClient();
+  if (!c) return { ok: true, skipped: true };
+  const uid = String(ownerId ?? "").trim();
+  if (!uid) return { ok: true, skipped: true };
+  const { error } = await c.from("memory_players").delete().eq("owner_id", uid);
+  if (error) {
+    console.warn("[cloud-sync] deleteAllCloudPlayersForOwner failed:", error.message);
+    return { ok: false, error: error.message };
+  }
+  return { ok: true };
 }
 
 /**
